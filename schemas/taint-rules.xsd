@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- XMLXschema representing the sources, propagation rules, destinations and filters the user can define to instruct the checker for certain checks. -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified">
+    <xs:element name="TaintChecker">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="TaintSources"/>
+                <xs:element ref="PropagationRules"/>
+                <xs:element ref="TaintDestinations"/>
+                <xs:element ref="TaintFilters"/>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="TaintSources">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="TaintSource" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="TaintSource">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element type="xs:string" name="method"/>
+                <xs:element name="params">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:integer" name="value" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="PropagationRules">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="PropagationRule" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="PropagationRule">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element type="xs:string" name="method"/>
+                <xs:element name="sources">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:integer" name="value" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="destinations">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:integer" name="value" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="TaintDestinations">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="TaintDestination" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="TaintDestination">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element type="xs:string" name="method"/>
+                <xs:element name="params">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:integer" name="value" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="TaintFilters">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="TaintFilter" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="TaintFilter">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element type="xs:string" name="method"/>
+                <xs:element name="params">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:integer" name="value" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

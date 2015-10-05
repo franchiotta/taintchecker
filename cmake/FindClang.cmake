@@ -55,28 +55,27 @@ function(set_clang_include_dirs config_cmd)
     list(APPEND include_dirs "${llvm_obj_dir}/tools/clang/include")
 	list(APPEND include_dirs "${llvm_src_dir}/tools/clang/lib/StaticAnalyzer/Checkers/")
 	list(APPEND include_dirs "${llvm_obj_dir}/tools/clang/lib/StaticAnalyzer/Checkers/")
-	list(APPEND include_dirs "/usr/include/libxml2")	
   endif()
 
   set(CLANG_INCLUDE_DIRS ${include_dirs} PARENT_SCOPE)
 endfunction()
 
 find_program(LLVM_CONFIG
-  NAMES llvm-config-3.7 llvm-config-3.6 llvm-config
-  PATHS ${LLVM_BIN})
+  NAMES llvm-config
+  PATHS ${LLVM_BIN} ${LLVM_DEBUG_BIN})
 if(LLVM_CONFIG)
   message(STATUS "llvm-config found : ${LLVM_CONFIG}")
 else()
-  message(FATAL_ERROR "Can't found program: llvm-config")
+  message(FATAL_ERROR "Can't found program: llvm-config.")
 endif()
 
 find_program(CLANG_EXECUTABLE
-  NAMES clang-3.7 clang-3.6 clang
-  PATHS ${LLVM_BIN})
+  NAMES clang
+  PATHS ${LLVM_BIN} ${LLVM_DEBUG_BIN})
 if(CLANG_EXECUTABLE)
   message(STATUS "clang found : ${CLANG_EXECUTABLE}")
 else()
-  message(FATAL_ERROR "Can't find program: clang")
+  message(FATAL_ERROR "Can't find program: clang.")
 endif()
 
 set_clang_definitions(${LLVM_CONFIG})

@@ -1,0 +1,219 @@
+<!doctype html>
+<html>
+<head>
+<title>t_crl.c</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC Value stored to 'i' is never read -->
+
+<!-- BUGTYPE Dead assignment -->
+
+<!-- BUGCATEGORY Dead store -->
+
+<!-- BUGFILE /Users/fran/Desktop/openssl-1.0.1f/crypto/asn1/t_crl.c -->
+
+<!-- FILENAME t_crl.c -->
+
+<!-- FUNCTIONNAME X509_CRL_print -->
+
+<!-- BUGLINE 96 -->
+
+<!-- BUGCOLUMN 2 -->
+
+<!-- BUGPATHLENGTH 1 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>crypto/asn1/t_crl.c</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 96, column 2</a></td></tr>
+<tr><td class="rowname">Description:</td><td>Value stored to 'i' is never read</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/* t_crl.c */</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>/* Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"> <span class='comment'>* project 1999.</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"><span class='comment'>/* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"> <span class='comment'>* Copyright (c) 1999 The OpenSSL Project.  All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"> <span class='comment'>* Redistribution and use in source and binary forms, with or without</span></td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"> <span class='comment'>* modification, are permitted provided that the following conditions</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"> <span class='comment'>* are met:</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"> <span class='comment'>* 1. Redistributions of source code must retain the above copyright</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer.</span> </td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> <span class='comment'>* 2. Redistributions in binary form must reproduce the above copyright</span></td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer in</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"> <span class='comment'>*    the documentation and/or other materials provided with the</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"> <span class='comment'>*    distribution.</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"> <span class='comment'>* 3. All advertising materials mentioning features or use of this</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"> <span class='comment'>*    software must display the following acknowledgment:</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"> <span class='comment'>*    "This product includes software developed by the OpenSSL Project</span></td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"> <span class='comment'>*    for use in the OpenSSL Toolkit. (http://www.OpenSSL.org/)"</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"> <span class='comment'>* 4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to</span></td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"> <span class='comment'>*    endorse or promote products derived from this software without</span></td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"> <span class='comment'>*    prior written permission. For written permission, please contact</span></td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"> <span class='comment'>*    licensing@OpenSSL.org.</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"> <span class='comment'>* 5. Products derived from this software may not be called "OpenSSL"</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"> <span class='comment'>*    nor may "OpenSSL" appear in their names without prior written</span></td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> <span class='comment'>*    permission of the OpenSSL Project.</span></td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"> <span class='comment'>* 6. Redistributions of any form whatsoever must retain the following</span></td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"> <span class='comment'>*    acknowledgment:</span></td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line"> <span class='comment'>*    "This product includes software developed by the OpenSSL Project</span></td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line"> <span class='comment'>*    for use in the OpenSSL Toolkit (http://www.OpenSSL.org/)"</span></td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line"> <span class='comment'>* THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY</span></td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line"> <span class='comment'>* EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span></td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line"> <span class='comment'>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR</span></td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line"> <span class='comment'>* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR</span></td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line"> <span class='comment'>* ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span></td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line"> <span class='comment'>* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT</span></td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line"> <span class='comment'>* NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span></td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line"> <span class='comment'>* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span></td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line"> <span class='comment'>* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span></td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line"> <span class='comment'>* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)</span></td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line"> <span class='comment'>* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED</span></td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line"> <span class='comment'>* OF THE POSSIBILITY OF SUCH DAMAGE.</span></td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line"> <span class='comment'>* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line"> <span class='comment'>* This product includes cryptographic software written by Eric Young</span></td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line"> <span class='comment'>* (eay@cryptsoft.com).  This product includes software written by Tim</span></td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line"> <span class='comment'>* Hudson (tjh@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line"><span class='directive'>#include &lt;stdio.h&gt;</span></td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line"><span class='directive'>#include "cryptlib.h"</span></td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line"><span class='directive'>#include &lt;openssl/buffer.h&gt;</span></td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line"><span class='directive'>#include &lt;openssl/bn.h&gt;</span></td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line"><span class='directive'>#include &lt;openssl/objects.h&gt;</span></td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line"><span class='directive'>#include &lt;openssl/x509.h&gt;</span></td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line"><span class='directive'>#include &lt;openssl/x509v3.h&gt;</span></td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_FP_API</span></td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line"><span class='keyword'>int</span> X509_CRL_print_fp(FILE *fp, X509_CRL *x)</td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line">        {</td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line">        BIO *b;</td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line">        <span class='keyword'>int</span> ret;</td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line">        <span class='keyword'>if</span> ((b=BIO_new(BIO_s_file())) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line">		<span class='macro'>X509err(X509_F_X509_CRL_PRINT_FP,ERR_R_BUF_LIB)<span class='expansion'>ERR_put_error(11,(147),(7),"t_crl.c",75)</span></span>;</td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line">                <span class='keyword'>return</span>(0);</td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line">        <span class='macro'>BIO_set_fp(b,fp,BIO_NOCLOSE)<span class='expansion'>BIO_ctrl(b,106,0x00,(char *)fp)</span></span>;</td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line">        ret=X509_CRL_print(b, x);</td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line">        BIO_free(b);</td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line">        <span class='keyword'>return</span>(ret);</td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line"><span class='keyword'>int</span> X509_CRL_print(BIO *out, X509_CRL *x)</td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line">	<span class='macro'>STACK_OF(X509_REVOKED)<span class='expansion'>struct stack_st_X509_REVOKED</span></span> *rev;</td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line">	X509_REVOKED *r;</td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line">	<span class='keyword'>long</span> l;</td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line">	<span class='keyword'>int</span> i;</td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">	<span class='keyword'>char</span> *p;</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">	BIO_printf(out, <span class='string_literal'>"Certificate Revocation List (CRL):\n"</span>);</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line">	l = <span class='macro'>X509_CRL_get_version(x)<span class='expansion'>ASN1_INTEGER_get((x)-&gt;crl-&gt;version)</span></span>;</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line">	BIO_printf(out, <span class='string_literal'>"%8sVersion %lu (0x%lx)\n"</span>, <span class='string_literal'>""</span>, l+1, l);</td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line">	i = <span class="mrange">OBJ_obj2nid(x-&gt;sig_alg-&gt;algorithm)</span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgEvent" style="margin-left:9ex">Value stored to 'i' is never read</div></td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">	X509_signature_print(out, x-&gt;sig_alg, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>);</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line">	p=X509_NAME_oneline(<span class='macro'>X509_CRL_get_issuer(x)<span class='expansion'>((x)-&gt;crl-&gt;issuer)</span></span>,<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,0);</td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line">	BIO_printf(out,<span class='string_literal'>"%8sIssuer: %s\n"</span>,<span class='string_literal'>""</span>,p);</td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line">	<span class='macro'>OPENSSL_free(p)<span class='expansion'>CRYPTO_free(p)</span></span>;</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line">	BIO_printf(out,<span class='string_literal'>"%8sLast Update: "</span>,<span class='string_literal'>""</span>);</td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line">	ASN1_TIME_print(out,<span class='macro'>X509_CRL_get_lastUpdate(x)<span class='expansion'>((x)-&gt;crl-&gt;lastUpdate)</span></span>);</td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line">	BIO_printf(out,<span class='string_literal'>"\n%8sNext Update: "</span>,<span class='string_literal'>""</span>);</td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>X509_CRL_get_nextUpdate(x)<span class='expansion'>((x)-&gt;crl-&gt;nextUpdate)</span></span>)</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line">		 ASN1_TIME_print(out,<span class='macro'>X509_CRL_get_nextUpdate(x)<span class='expansion'>((x)-&gt;crl-&gt;nextUpdate)</span></span>);</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line">	<span class='keyword'>else</span> BIO_printf(out,<span class='string_literal'>"NONE"</span>);</td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line">	BIO_printf(out,<span class='string_literal'>"\n"</span>);</td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">	X509V3_extensions_print(out, <span class='string_literal'>"CRL extensions"</span>,</td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line">						x-&gt;crl-&gt;extensions, 0, 8);</td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line">	rev = <span class='macro'>X509_CRL_get_REVOKED(x)<span class='expansion'>((x)-&gt;crl-&gt;revoked)</span></span>;</td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">	<span class='keyword'>if</span>(<span class='macro'>sk_X509_REVOKED_num(rev)<span class='expansion'>sk_num(((_STACK*) (1 ? (rev) : (struct stack_st_X509_REVOKED*<br>)0)))</span></span> &gt; 0)</td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line">	    BIO_printf(out, <span class='string_literal'>"Revoked Certificates:\n"</span>);</td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line">	<span class='keyword'>else</span> BIO_printf(out, <span class='string_literal'>"No Revoked Certificates.\n"</span>);</td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line">	<span class='keyword'>for</span>(i = 0; i &lt; <span class='macro'>sk_X509_REVOKED_num(rev)<span class='expansion'>sk_num(((_STACK*) (1 ? (rev) : (struct stack_st_X509_REVOKED*<br>)0)))</span></span>; i++) {</td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line">		r = <span class='macro'>sk_X509_REVOKED_value(rev, i)<span class='expansion'>((X509_REVOKED *)sk_value(((_STACK*) (1 ? (rev) : (struct stack_st_X509_REVOKED<br>*)0)), (i)))</span></span>;</td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line">		BIO_printf(out,<span class='string_literal'>"    Serial Number: "</span>);</td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line">		i2a_ASN1_INTEGER(out,r-&gt;serialNumber);</td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line">		BIO_printf(out,<span class='string_literal'>"\n        Revocation Date: "</span>);</td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line">		ASN1_TIME_print(out,r-&gt;revocationDate);</td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line">		BIO_printf(out,<span class='string_literal'>"\n"</span>);</td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line">		X509V3_extensions_print(out, <span class='string_literal'>"CRL entry extensions"</span>,</td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line">						r-&gt;extensions, 0, 8);</td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line">	X509_signature_print(out, x-&gt;sig_alg, x-&gt;signature);</td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line">}</td></tr>
+</table></body></html>

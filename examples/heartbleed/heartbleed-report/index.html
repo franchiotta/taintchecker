@@ -1,0 +1,709 @@
+<html>
+<head>
+<title>openssl-1.0.1f - scan-build results</title>
+<link type="text/css" rel="stylesheet" href="scanview.css"/>
+<script src="sorttable.js"></script>
+<script language='javascript' type="text/javascript">
+function SetDisplay(RowClass, DisplayVal)
+{
+  var Rows = document.getElementsByTagName("tr");
+  for ( var i = 0 ; i < Rows.length; ++i ) {
+    if (Rows[i].className == RowClass) {
+      Rows[i].style.display = DisplayVal;
+    }
+  }
+}
+
+function CopyCheckedStateToCheckButtons(SummaryCheckButton) {
+  var Inputs = document.getElementsByTagName("input");
+  for ( var i = 0 ; i < Inputs.length; ++i ) {
+    if (Inputs[i].type == "checkbox") {
+      if(Inputs[i] != SummaryCheckButton) {
+        Inputs[i].checked = SummaryCheckButton.checked;
+        Inputs[i].onclick();
+      }
+    }
+  }
+}
+
+function returnObjById( id ) {
+    if (document.getElementById)
+        var returnVar = document.getElementById(id);
+    else if (document.all)
+        var returnVar = document.all[id];
+    else if (document.layers)
+        var returnVar = document.layers[id];
+    return returnVar;
+}
+
+var NumUnchecked = 0;
+
+function ToggleDisplay(CheckButton, ClassName) {
+  if (CheckButton.checked) {
+    SetDisplay(ClassName, "");
+    if (--NumUnchecked == 0) {
+      returnObjById("AllBugsCheck").checked = true;
+    }
+  }
+  else {
+    SetDisplay(ClassName, "none");
+    NumUnchecked++;
+    returnObjById("AllBugsCheck").checked = false;
+  }
+}
+</script>
+<!-- SUMMARYENDHEAD -->
+</head>
+<body>
+<h1>openssl-1.0.1f - scan-build results</h1>
+
+<table>
+<tr><th>User:</th><td>fran@MacBook-Pro-de-Francisco.local</td></tr>
+<tr><th>Working Directory:</th><td>/Users/fran/Desktop/openssl-1.0.1f</td></tr>
+<tr><th>Command Line:</th><td>make</td></tr>
+<tr><th>Clang Version:</th><td>clang version 3.8.0 (git@github.com:llvm-mirror/clang.git 7378604f3c03c5d265862fc4339758cfbb0d4cab) (git@github.com:llvm-mirror/llvm.git 899fdb1533eb7ec9ed228c872dcc86fcfb49638a)
+</td></tr>
+<tr><th>Date:</th><td>Wed Nov  4 20:44:33 2015</td></tr>
+</table>
+<h2>Bug Summary</h2><table>
+<thead><tr><td>Bug Type</td><td>Quantity</td><td class="sorttable_nosort">Display?</td></tr></thead>
+<tr style="font-weight:bold"><td class="SUMM_DESC">All Bugs</td><td class="Q">202</td><td><center><input type="checkbox" id="AllBugsCheck" onClick="CopyCheckedStateToCheckButtons(this);" checked/></center></td></tr>
+<tr><th>Dead store</th><th colspan=2></th></tr>
+<tr><td class="SUMM_DESC">Dead assignment</td><td class="Q">130</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_dead_store_dead_assignment');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Dead increment</td><td class="Q">13</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_dead_store_dead_increment');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Dead initialization</td><td class="Q">1</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_dead_store_dead_initialization');" checked/></center></td></tr>
+<tr><th>Logic error</th><th colspan=2></th></tr>
+<tr><td class="SUMM_DESC">Assigned value is garbage or undefined</td><td class="Q">4</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_assigned_value_is_garbage_or_undefined');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Branch condition evaluates to a garbage value</td><td class="Q">1</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_branch_condition_evaluates_to_a_garbage_value');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Dereference of null pointer</td><td class="Q">26</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_dereference_of_null_pointer');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Division by zero</td><td class="Q">1</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_division_by_zero');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Result of operation is garbage or undefined</td><td class="Q">12</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_result_of_operation_is_garbage_or_undefined');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Uninitialized argument value</td><td class="Q">2</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_uninitialized_argument_value');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Unix API</td><td class="Q">5</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_unix_api');" checked/></center></td></tr>
+<tr><th>Untrusted Data</th><th colspan=2></th></tr>
+<tr><td class="SUMM_DESC">Use of Untrusted Data</td><td class="Q">7</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_untrusted_data_use_of_untrusted_data');" checked/></center></td></tr>
+</table>
+<h2>Reports</h2>
+
+<table class="sortable" style="table-layout:automatic">
+<thead><tr>
+  <td>Bug Group</td>
+  <td class="sorttable_sorted">Bug Type<span id="sorttable_sortfwdind">&nbsp;&#x25BE;</span></td>
+  <td>File</td>
+  <td>Function/Method</td>
+  <td class="Q">Line</td>
+  <td class="Q">Path Length</td>
+  <td class="sorttable_nosort"></td>
+  <!-- REPORTBUGCOL -->
+</tr></thead>
+<tbody>
+<tr class="bt_logic_error_assigned_value_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Assigned value is garbage or undefined</td><td>crypto/asn1/a_object.c</td><td class="DESC">a2d_ASN1_OBJECT</td><td class="Q">212</td><td class="Q">50</td><td><a href="report-975110.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-975110.html" -->
+</tr>
+<tr class="bt_logic_error_assigned_value_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Assigned value is garbage or undefined</td><td>crypto/srp/srp_vfy.c</td><td class="DESC">t_fromb64</td><td class="Q">101</td><td class="Q">15</td><td><a href="report-b95eac.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-b95eac.html" -->
+</tr>
+<tr class="bt_logic_error_assigned_value_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Assigned value is garbage or undefined</td><td>crypto/pem/pem_lib.c</td><td class="DESC">PEM_do_header</td><td class="Q">480</td><td class="Q">11</td><td><a href="report-c37757.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c37757.html" -->
+</tr>
+<tr class="bt_logic_error_assigned_value_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Assigned value is garbage or undefined</td><td>crypto/pem/pem_lib.c</td><td class="DESC">load_iv</td><td class="Q">568</td><td class="Q">34</td><td><a href="report-db484f.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-db484f.html" -->
+</tr>
+<tr class="bt_logic_error_branch_condition_evaluates_to_a_garbage_value"><td class="DESC">Logic error</td><td class="DESC">Branch condition evaluates to a garbage value</td><td>crypto/asn1/tasn_dec.c</td><td class="DESC">asn1_d2i_ex_primitive</td><td class="Q">913</td><td class="Q">16</td><td><a href="report-8f0772.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-8f0772.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/ec/ec_mult.c</td><td class="DESC">ec_wNAF_mul</td><td class="Q">511</td><td class="Q">1</td><td><a href="report-00de72.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-00de72.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/apps.c</td><td class="DESC">save_serial</td><td class="Q">1669</td><td class="Q">1</td><td><a href="report-01e87f.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-01e87f.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bio/b_print.c</td><td class="DESC">_dopr</td><td class="Q">353</td><td class="Q">1</td><td><a href="report-0b46dc.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-0b46dc.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_mul.c</td><td class="DESC">bn_mul_high</td><td class="Q">845</td><td class="Q">1</td><td><a href="report-0b5e3c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-0b5e3c.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/d1_srvr.c</td><td class="DESC">dtls1_send_hello_request</td><td class="Q">868</td><td class="Q">1</td><td><a href="report-0ca10e.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-0ca10e.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/s2_srvr.c</td><td class="DESC">server_hello</td><td class="Q">777</td><td class="Q">1</td><td><a href="report-0d4545.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-0d4545.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_mul.c</td><td class="DESC">bn_mul_high</td><td class="Q">832</td><td class="Q">1</td><td><a href="report-13fabf.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-13fabf.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bio/b_print.c</td><td class="DESC">_dopr</td><td class="Q">351</td><td class="Q">1</td><td><a href="report-1406a7.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-1406a7.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bf/bf_enc.c</td><td class="DESC">BF_cbc_encrypt</td><td class="Q">302</td><td class="Q">1</td><td><a href="report-153a46.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-153a46.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/txt_db/txt_db.c</td><td class="DESC">TXT_DB_read</td><td class="Q">133</td><td class="Q">1</td><td><a href="report-17a608.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-17a608.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/apps.c</td><td class="DESC">rotate_index</td><td class="Q">1986</td><td class="Q">1</td><td><a href="report-17e4eb.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-17e4eb.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/pkcs7/pk7_doit.c</td><td class="DESC">PKCS7_get_issuer_and_serial</td><td class="Q">1157</td><td class="Q">1</td><td><a href="report-197f42.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-197f42.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_exp.c</td><td class="DESC">BN_mod_exp_mont</td><td class="Q">468</td><td class="Q">1</td><td><a href="report-1fdb43.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-1fdb43.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/xcbc_enc.c</td><td class="DESC">DES_xcbc_encrypt</td><td class="Q">194</td><td class="Q">1</td><td><a href="report-20597a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-20597a.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/s_server.c</td><td class="DESC">sv_body</td><td class="Q">2206</td><td class="Q">1</td><td><a href="report-219418.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-219418.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/ncbc_enc.c</td><td class="DESC">DES_ncbc_encrypt</td><td class="Q">146</td><td class="Q">1</td><td><a href="report-22b94a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-22b94a.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/engine/eng_dyn.c</td><td class="DESC">dynamic_get_data_ctx</td><td class="Q">253</td><td class="Q">1</td><td><a href="report-272b91.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-272b91.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/apps.c</td><td class="DESC">rotate_serial</td><td class="Q">1730</td><td class="Q">1</td><td><a href="report-27bfba.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-27bfba.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/cms/cms_pwri.c</td><td class="DESC">CMS_add0_recipient_password</td><td class="Q">104</td><td class="Q">1</td><td><a href="report-284562.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-284562.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/rc2/rc2ofb64.c</td><td class="DESC">RC2_ofb64_encrypt</td><td class="Q">108</td><td class="Q">1</td><td><a href="report-28aac2.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-28aac2.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/s_time.c</td><td class="DESC">s_time_main</td><td class="Q">452</td><td class="Q">1</td><td><a href="report-28c95a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-28c95a.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>engines/e_ubsec.c</td><td class="DESC">ubsec_mod_exp_crt</td><td class="Q">649</td><td class="Q">1</td><td><a href="report-2ab218.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-2ab218.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/d1_clnt.c</td><td class="DESC">dtls1_send_client_key_exchange</td><td class="Q">1509</td><td class="Q">1</td><td><a href="report-2cdaf8.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-2cdaf8.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_print.c</td><td class="DESC">BN_hex2bn</td><td class="Q">204</td><td class="Q">1</td><td><a href="report-2dd35d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-2dd35d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/cfb64ede.c</td><td class="DESC">DES_ede3_cfb64_encrypt</td><td class="Q">132</td><td class="Q">1</td><td><a href="report-2e9440.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-2e9440.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/cfb64enc.c</td><td class="DESC">DES_cfb64_encrypt</td><td class="Q">118</td><td class="Q">1</td><td><a href="report-3064da.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-3064da.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/asn1/asn_mime.c</td><td class="DESC">strip_eol</td><td class="Q">940</td><td class="Q">1</td><td><a href="report-3addef.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-3addef.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/ecparam.c</td><td class="DESC">ecparam_main</td><td class="Q">660</td><td class="Q">1</td><td><a href="report-3d8a09.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-3d8a09.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/cbc_cksm.c</td><td class="DESC">DES_cbc_cksum</td><td class="Q">95</td><td class="Q">1</td><td><a href="report-3da7fd.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-3da7fd.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>engines/e_aep.c</td><td class="DESC">aep_mod_exp_crt</td><td class="Q">671</td><td class="Q">1</td><td><a href="report-3e1789.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-3e1789.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/ede_cbcm_enc.c</td><td class="DESC">DES_ede3_cbcm_encrypt</td><td class="Q">196</td><td class="Q">1</td><td><a href="report-3f01f2.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-3f01f2.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_exp.c</td><td class="DESC">BN_mod_exp_simple</td><td class="Q">1058</td><td class="Q">1</td><td><a href="report-4099a4.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-4099a4.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/speed.c</td><td class="DESC">speed_main</td><td class="Q">2198</td><td class="Q">1</td><td><a href="report-40b4be.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-40b4be.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/s3_lib.c</td><td class="DESC">ssl3_choose_cipher</td><td class="Q">3820</td><td class="Q">1</td><td><a href="report-41b8f2.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-41b8f2.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/ecb_enc.c</td><td class="DESC">DES_ecb_encrypt</td><td class="Q">121</td><td class="Q">1</td><td><a href="report-49bf22.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-49bf22.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/apps.c</td><td class="DESC">rotate_index</td><td class="Q">1993</td><td class="Q">1</td><td><a href="report-4c11be.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-4c11be.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/asn1/asn_mime.c</td><td class="DESC">multi_split</td><td class="Q">619</td><td class="Q">1</td><td><a href="report-507979.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-507979.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/s3_srvr.c</td><td class="DESC">ssl3_accept</td><td class="Q">376</td><td class="Q">1</td><td><a href="report-518926.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-518926.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/dsaparam.c</td><td class="DESC">dsaparam_main</td><td class="Q">442</td><td class="Q">1</td><td><a href="report-57d725.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-57d725.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/cast/c_ecb.c</td><td class="DESC">CAST_ecb_encrypt</td><td class="Q">78</td><td class="Q">1</td><td><a href="report-599e40.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-599e40.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/ofb_enc.c</td><td class="DESC">DES_ofb_encrypt</td><td class="Q">133</td><td class="Q">1</td><td><a href="report-5b3dda.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-5b3dda.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bf/bf_cfb64.c</td><td class="DESC">BF_cfb64_encrypt</td><td class="Q">118</td><td class="Q">1</td><td><a href="report-5bf2b3.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-5bf2b3.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_mul.c</td><td class="DESC">bn_mul_high</td><td class="Q">791</td><td class="Q">1</td><td><a href="report-5c6360.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-5c6360.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_exp.c</td><td class="DESC">BN_mod_exp_mont</td><td class="Q">518</td><td class="Q">1</td><td><a href="report-5fc6e5.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-5fc6e5.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_mul.c</td><td class="DESC">bn_mul_high</td><td class="Q">836</td><td class="Q">1</td><td><a href="report-60c7f2.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-60c7f2.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/pcbc_enc.c</td><td class="DESC">DES_pcbc_encrypt</td><td class="Q">122</td><td class="Q">1</td><td><a href="report-68b473.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-68b473.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_exp.c</td><td class="DESC">BN_mod_exp_simple</td><td class="Q">1037</td><td class="Q">1</td><td><a href="report-69053b.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-69053b.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bf/bf_ecb.c</td><td class="DESC">BF_ecb_encrypt</td><td class="Q">94</td><td class="Q">1</td><td><a href="report-69a9a1.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-69a9a1.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/idea/i_ecb.c</td><td class="DESC">idea_ecb_encrypt</td><td class="Q">83</td><td class="Q">1</td><td><a href="report-6a32ac.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-6a32ac.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>engines/e_ubsec.c</td><td class="DESC">ubsec_mod_exp</td><td class="Q">582</td><td class="Q">1</td><td><a href="report-6a6f9a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-6a6f9a.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_exp.c</td><td class="DESC">BN_mod_exp_mont</td><td class="Q">466</td><td class="Q">1</td><td><a href="report-6e00a5.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-6e00a5.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/dsaparam.c</td><td class="DESC">dsaparam_main</td><td class="Q">440</td><td class="Q">1</td><td><a href="report-6e33f6.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-6e33f6.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/asn1/tasn_dec.c</td><td class="DESC">ASN1_item_ex_d2i</td><td class="Q">433</td><td class="Q">1</td><td><a href="report-6e87b2.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-6e87b2.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/cfb_enc.c</td><td class="DESC">DES_cfb_encrypt</td><td class="Q">193</td><td class="Q">1</td><td><a href="report-7124cc.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-7124cc.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/des_enc.c</td><td class="DESC">DES_ede3_cbc_encrypt</td><td class="Q">396</td><td class="Q">1</td><td><a href="report-74b6be.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-74b6be.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/ocsp/ocsp_lib.c</td><td class="DESC">OCSP_parse_url</td><td class="Q">197</td><td class="Q">1</td><td><a href="report-77932c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-77932c.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/des_enc.c</td><td class="DESC">DES_encrypt1</td><td class="Q">153</td><td class="Q">1</td><td><a href="report-78693b.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-78693b.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_exp.c</td><td class="DESC">BN_mod_exp_recp</td><td class="Q">322</td><td class="Q">1</td><td><a href="report-789f96.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-789f96.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/ocsp/ocsp_prn.c</td><td class="DESC">OCSP_RESPONSE_print</td><td class="Q">209</td><td class="Q">1</td><td><a href="report-78c027.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-78c027.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/apps.c</td><td class="DESC">chopup_args</td><td class="Q">388</td><td class="Q">1</td><td><a href="report-7abf32.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-7abf32.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_exp.c</td><td class="DESC">BN_mod_exp_simple</td><td class="Q">1088</td><td class="Q">1</td><td><a href="report-7d07aa.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-7d07aa.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/ocsp.c</td><td class="DESC">ocsp_main</td><td class="Q">764</td><td class="Q">1</td><td><a href="report-7d4111.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-7d4111.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/apps.c</td><td class="DESC">rotate_index</td><td class="Q">2000</td><td class="Q">1</td><td><a href="report-7e80df.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-7e80df.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/d1_clnt.c</td><td class="DESC">dtls1_send_client_verify</td><td class="Q">1619</td><td class="Q">1</td><td><a href="report-7ec36b.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-7ec36b.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/asn1/asn_mime.c</td><td class="DESC">b64_read_asn1</td><td class="Q">195</td><td class="Q">1</td><td><a href="report-82aed5.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-82aed5.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/asn1/bio_ndef.c</td><td class="DESC">ndef_prefix</td><td class="Q">170</td><td class="Q">1</td><td><a href="report-88236e.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-88236e.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/d1_both.c</td><td class="DESC">dtls1_send_finished</td><td class="Q">948</td><td class="Q">1</td><td><a href="report-8918be.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-8918be.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_exp.c</td><td class="DESC">BN_mod_exp_mont</td><td class="Q">488</td><td class="Q">1</td><td><a href="report-89e173.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-89e173.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/d1_pkt.c</td><td class="DESC">dtls1_read_bytes</td><td class="Q">1213</td><td class="Q">1</td><td><a href="report-8a3735.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-8a3735.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bf/bf_ofb64.c</td><td class="DESC">BF_ofb64_encrypt</td><td class="Q">107</td><td class="Q">1</td><td><a href="report-8c5aa4.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-8c5aa4.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_exp.c</td><td class="DESC">BN_mod_exp_recp</td><td class="Q">371</td><td class="Q">1</td><td><a href="report-8cbfc8.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-8cbfc8.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/s3_lib.c</td><td class="DESC">ssl3_choose_cipher</td><td class="Q">3822</td><td class="Q">1</td><td><a href="report-8df142.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-8df142.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/apps.c</td><td class="DESC">save_index</td><td class="Q">1924</td><td class="Q">1</td><td><a href="report-8f1601.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-8f1601.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/rc2/rc2_ecb.c</td><td class="DESC">RC2_ecb_encrypt</td><td class="Q">86</td><td class="Q">1</td><td><a href="report-912e04.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-912e04.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/d1_clnt.c</td><td class="DESC">dtls1_client_hello</td><td class="Q">889</td><td class="Q">1</td><td><a href="report-91d713.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-91d713.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/cast/c_ofb64.c</td><td class="DESC">CAST_ofb64_encrypt</td><td class="Q">108</td><td class="Q">1</td><td><a href="report-924713.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-924713.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/ecparam.c</td><td class="DESC">ecparam_main</td><td class="Q">658</td><td class="Q">1</td><td><a href="report-933a5a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-933a5a.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/xcbc_enc.c</td><td class="DESC">DES_xcbc_encrypt</td><td class="Q">193</td><td class="Q">1</td><td><a href="report-93433c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-93433c.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/d1_clnt.c</td><td class="DESC">dtls1_send_client_certificate</td><td class="Q">1660</td><td class="Q">1</td><td><a href="report-979df6.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-979df6.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_exp.c</td><td class="DESC">BN_mod_exp_recp</td><td class="Q">320</td><td class="Q">1</td><td><a href="report-99847f.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-99847f.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/d1_srvr.c</td><td class="DESC">dtls1_send_server_key_exchange</td><td class="Q">1453</td><td class="Q">1</td><td><a href="report-9f3f66.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-9f3f66.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/speed.c</td><td class="DESC">speed_main</td><td class="Q">2360</td><td class="Q">1</td><td><a href="report-a0b817.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a0b817.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_exp.c</td><td class="DESC">BN_mod_exp_simple</td><td class="Q">1039</td><td class="Q">1</td><td><a href="report-a5077e.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a5077e.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/cfb64ede.c</td><td class="DESC">DES_ede3_cfb_encrypt</td><td class="Q">252</td><td class="Q">1</td><td><a href="report-a684f4.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a684f4.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/ofb64ede.c</td><td class="DESC">DES_ede3_ofb64_encrypt</td><td class="Q">114</td><td class="Q">1</td><td><a href="report-a9d818.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a9d818.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>engines/e_ubsec.c</td><td class="DESC">ubsec_dsa_do_sign</td><td class="Q">769</td><td class="Q">1</td><td><a href="report-aa5955.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-aa5955.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/ocsp/ocsp_lib.c</td><td class="DESC">OCSP_parse_url</td><td class="Q">192</td><td class="Q">1</td><td><a href="report-ab6fbd.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-ab6fbd.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bio/bss_dgram.c</td><td class="DESC">dgram_ctrl</td><td class="Q">482</td><td class="Q">1</td><td><a href="report-ae6d26.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-ae6d26.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/rc2/rc2_cbc.c</td><td class="DESC">RC2_cbc_encrypt</td><td class="Q">132</td><td class="Q">1</td><td><a href="report-aef60d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-aef60d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/apps.c</td><td class="DESC">rotate_serial</td><td class="Q">1723</td><td class="Q">1</td><td><a href="report-b27253.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-b27253.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_print.c</td><td class="DESC">BN_bn2dec</td><td class="Q">140</td><td class="Q">1</td><td><a href="report-b2f195.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-b2f195.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/d1_pkt.c</td><td class="DESC">dtls1_read_bytes</td><td class="Q">1045</td><td class="Q">1</td><td><a href="report-b45260.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-b45260.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/apps.c</td><td class="DESC">rotate_index</td><td class="Q">1981</td><td class="Q">1</td><td><a href="report-b64691.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-b64691.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/rc2/rc2cfb64.c</td><td class="DESC">RC2_cfb64_encrypt</td><td class="Q">119</td><td class="Q">1</td><td><a href="report-b6de0d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-b6de0d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bio/b_print.c</td><td class="DESC">_dopr</td><td class="Q">407</td><td class="Q">1</td><td><a href="report-bcbf4c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-bcbf4c.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bio/b_print.c</td><td class="DESC">_dopr</td><td class="Q">361</td><td class="Q">1</td><td><a href="report-c0bc1a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c0bc1a.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/idea/i_cbc.c</td><td class="DESC">idea_cbc_encrypt</td><td class="Q">132</td><td class="Q">1</td><td><a href="report-c0df51.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c0df51.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bio/b_print.c</td><td class="DESC">_dopr</td><td class="Q">359</td><td class="Q">1</td><td><a href="report-c36e86.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c36e86.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>engines/e_ubsec.c</td><td class="DESC">ubsec_dsa_verify</td><td class="Q">839</td><td class="Q">1</td><td><a href="report-c3e77d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c3e77d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_mul.c</td><td class="DESC">bn_mul_high</td><td class="Q">841</td><td class="Q">1</td><td><a href="report-c4642e.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c4642e.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/asn1/bio_asn1.c</td><td class="DESC">asn1_bio_write</td><td class="Q">209</td><td class="Q">1</td><td><a href="report-c849b1.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c849b1.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/apps.c</td><td class="DESC">save_index</td><td class="Q">1919</td><td class="Q">1</td><td><a href="report-c92b02.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c92b02.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>engines/e_aep.c</td><td class="DESC">aep_mod_exp</td><td class="Q">632</td><td class="Q">1</td><td><a href="report-cb4cc3.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-cb4cc3.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/idea/i_cfb64.c</td><td class="DESC">idea_cfb64_encrypt</td><td class="Q">119</td><td class="Q">1</td><td><a href="report-cf7884.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-cf7884.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/asn1/tasn_dec.c</td><td class="DESC">asn1_template_noexp_d2i</td><td class="Q">632</td><td class="Q">1</td><td><a href="report-cfb9ea.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-cfb9ea.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/s_server.c</td><td class="DESC">sv_body</td><td class="Q">2228</td><td class="Q">1</td><td><a href="report-d0715e.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-d0715e.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/x509.c</td><td class="DESC">x509_main</td><td class="Q">867</td><td class="Q">1</td><td><a href="report-d5ad04.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-d5ad04.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/ofb64enc.c</td><td class="DESC">DES_ofb64_encrypt</td><td class="Q">107</td><td class="Q">1</td><td><a href="report-da2faa.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-da2faa.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/idea/i_ofb64.c</td><td class="DESC">idea_ofb64_encrypt</td><td class="Q">108</td><td class="Q">1</td><td><a href="report-dbcd35.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-dbcd35.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/d1_srvr.c</td><td class="DESC">dtls1_send_server_done</td><td class="Q">1018</td><td class="Q">1</td><td><a href="report-e0015d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-e0015d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/cast/c_cfb64.c</td><td class="DESC">CAST_cfb64_encrypt</td><td class="Q">119</td><td class="Q">1</td><td><a href="report-e1ba0d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-e1ba0d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/des_enc.c</td><td class="DESC">DES_encrypt2</td><td class="Q">240</td><td class="Q">1</td><td><a href="report-e6284d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-e6284d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/apps.c</td><td class="DESC">save_index</td><td class="Q">1929</td><td class="Q">1</td><td><a href="report-e6c75d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-e6c75d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/s3_clnt.c</td><td class="DESC">ssl3_send_client_certificate</td><td class="Q">3107</td><td class="Q">1</td><td><a href="report-e75c8f.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-e75c8f.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_mul.c</td><td class="DESC">bn_mul_high</td><td class="Q">799</td><td class="Q">1</td><td><a href="report-ebaf2f.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-ebaf2f.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/s_server.c</td><td class="DESC">sv_body</td><td class="Q">2216</td><td class="Q">1</td><td><a href="report-ec7e2e.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-ec7e2e.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/apps.c</td><td class="DESC">rotate_index</td><td class="Q">2007</td><td class="Q">1</td><td><a href="report-ece1a2.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-ece1a2.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/s2_pkt.c</td><td class="DESC">n_do_ssl_write</td><td class="Q">587</td><td class="Q">1</td><td><a href="report-ed656d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-ed656d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/asn1/t_crl.c</td><td class="DESC">X509_CRL_print</td><td class="Q">96</td><td class="Q">1</td><td><a href="report-edc559.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-edc559.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/x509/x509_lu.c</td><td class="DESC">X509_STORE_get1_crls</td><td class="Q">546</td><td class="Q">1</td><td><a href="report-ef6db3.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-ef6db3.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_mul.c</td><td class="DESC">bn_mul_high</td><td class="Q">781</td><td class="Q">1</td><td><a href="report-f0a7d4.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f0a7d4.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/d1_both.c</td><td class="DESC">dtls1_output_cert_chain</td><td class="Q">1073</td><td class="Q">1</td><td><a href="report-f0cd29.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f0cd29.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>apps/s_client.c</td><td class="DESC">s_client_main</td><td class="Q">1378</td><td class="Q">1</td><td><a href="report-f12ab8.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f12ab8.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/d1_srvr.c</td><td class="DESC">dtls1_send_server_hello</td><td class="Q">994</td><td class="Q">1</td><td><a href="report-f21019.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f21019.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_nist.c</td><td class="DESC">BN_nist_mod_224</td><td class="Q">588</td><td class="Q">1</td><td><a href="report-f3d3e6.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f3d3e6.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>ssl/s2_clnt.c</td><td class="DESC">client_hello</td><td class="Q">570</td><td class="Q">1</td><td><a href="report-f5d284.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f5d284.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bio/bf_buff.c</td><td class="DESC">buffer_ctrl</td><td class="Q">419</td><td class="Q">1</td><td><a href="report-f7c04f.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f7c04f.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/bn/bn_exp.c</td><td class="DESC">BN_mod_exp_recp</td><td class="Q">341</td><td class="Q">1</td><td><a href="report-f7e5fa.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f7e5fa.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/cast/c_enc.c</td><td class="DESC">CAST_cbc_encrypt</td><td class="Q">206</td><td class="Q">1</td><td><a href="report-fcefd4.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-fcefd4.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>crypto/des/ncbc_enc.c</td><td class="DESC">DES_cbc_encrypt</td><td class="Q">146</td><td class="Q">1</td><td><a href="report-fd3c5b.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-fd3c5b.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>crypto/bn/bn_add.c</td><td class="DESC">BN_uadd</td><td class="Q">133</td><td class="Q">1</td><td><a href="report-0616aa.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-0616aa.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>crypto/pem/pvkfmt.c</td><td class="DESC">do_PVK_header</td><td class="Q">682</td><td class="Q">1</td><td><a href="report-247a21.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-247a21.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>ssl/d1_both.c</td><td class="DESC">dtls1_send_finished</td><td class="Q">920</td><td class="Q">1</td><td><a href="report-284b8c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-284b8c.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>apps/engine.c</td><td class="DESC">append_buf</td><td class="Q">114</td><td class="Q">1</td><td><a href="report-5f8094.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-5f8094.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>crypto/bio/b_print.c</td><td class="DESC">_dopr</td><td class="Q">356</td><td class="Q">1</td><td><a href="report-6025c4.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-6025c4.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>engines/e_4758cca.c</td><td class="DESC">getModulusAndExponent</td><td class="Q">892</td><td class="Q">1</td><td><a href="report-892ed5.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-892ed5.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>crypto/evp/e_aes_cbc_hmac_sha1.c</td><td class="DESC">aesni_cbc_hmac_sha1_cipher</td><td class="Q">425</td><td class="Q">1</td><td><a href="report-8bf07c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-8bf07c.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>crypto/bn/bn_nist.c</td><td class="DESC">BN_nist_mod_224</td><td class="Q">578</td><td class="Q">1</td><td><a href="report-96c6dd.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-96c6dd.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>crypto/pem/pvkfmt.c</td><td class="DESC">do_PVK_header</td><td class="Q">673</td><td class="Q">1</td><td><a href="report-9ed6e5.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-9ed6e5.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>crypto/bio/b_print.c</td><td class="DESC">_dopr</td><td class="Q">348</td><td class="Q">1</td><td><a href="report-a6946d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a6946d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>ssl/s3_both.c</td><td class="DESC">ssl3_send_finished</td><td class="Q">168</td><td class="Q">1</td><td><a href="report-e69e13.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-e69e13.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>engines/e_4758cca.c</td><td class="DESC">getModulusAndExponent</td><td class="Q">881</td><td class="Q">1</td><td><a href="report-f19840.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f19840.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>ssl/s3_srvr.c</td><td class="DESC">ssl3_get_client_key_exchange</td><td class="Q">2804</td><td class="Q">1</td><td><a href="report-fa3f72.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-fa3f72.html" -->
+</tr>
+<tr class="bt_dead_store_dead_initialization"><td class="DESC">Dead store</td><td class="DESC">Dead initialization</td><td>crypto/dsa/dsa_gen.c</td><td class="DESC">DSA_generate_parameters_ex</td><td class="Q">114</td><td class="Q">1</td><td><a href="report-f559df.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f559df.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/aes/aes_ige.c</td><td class="DESC">AES_bi_ige_encrypt</td><td class="Q">292</td><td class="Q">6</td><td><a href="report-014cc9.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-014cc9.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/bn/bn_lib.c</td><td class="DESC">BN_bin2bn</td><td class="Q">610</td><td class="Q">13</td><td><a href="report-1c2094.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-1c2094.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/ec/ecp_smpl.c</td><td class="DESC">ec_GFp_simple_points_make_affine</td><td class="Q">1309</td><td class="Q">30</td><td><a href="report-211ee7.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-211ee7.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/aes/aes_ige.c</td><td class="DESC">AES_bi_ige_encrypt</td><td class="Q">242</td><td class="Q">7</td><td><a href="report-347fe3.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-347fe3.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/aes/aes_ige.c</td><td class="DESC">AES_ige_encrypt</td><td class="Q">130</td><td class="Q">5</td><td><a href="report-3fd46c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-3fd46c.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>ssl/ssl_ciph.c</td><td class="DESC">ssl_cipher_apply_rule</td><td class="Q">959</td><td class="Q">29</td><td><a href="report-4c5228.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-4c5228.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/bn/bn_lib.c</td><td class="DESC">BN_copy</td><td class="Q">502</td><td class="Q">18</td><td><a href="report-4cbd44.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-4cbd44.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/bn/bn_lib.c</td><td class="DESC">BN_copy</td><td class="Q">501</td><td class="Q">18</td><td><a href="report-4ea5d9.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-4ea5d9.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/bn/bn_lib.c</td><td class="DESC">BN_copy</td><td class="Q">496</td><td class="Q">17</td><td><a href="report-5586b6.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-5586b6.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/asn1/tasn_enc.c</td><td class="DESC">ASN1_item_ex_i2d</td><td class="Q">188</td><td class="Q">7</td><td><a href="report-5b08e6.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-5b08e6.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/ts/ts_rsp_verify.c</td><td class="DESC">TS_check_signer_name</td><td class="Q">697</td><td class="Q">7</td><td><a href="report-699b8c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-699b8c.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/evp/digest.c</td><td class="DESC">EVP_DigestInit_ex</td><td class="Q">207</td><td class="Q">6</td><td><a href="report-72e4cd.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-72e4cd.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/asn1/f_string.c</td><td class="DESC">a2i_ASN1_STRING</td><td class="Q">191</td><td class="Q">39</td><td><a href="report-7ddc63.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-7ddc63.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/bio/b_print.c</td><td class="DESC">doapr_outch</td><td class="Q">760</td><td class="Q">5</td><td><a href="report-7eb1f1.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-7eb1f1.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/asn1/tasn_enc.c</td><td class="DESC">ASN1_item_ex_i2d</td><td class="Q">181</td><td class="Q">5</td><td><a href="report-7fa7d7.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-7fa7d7.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/asn1/tasn_new.c</td><td class="DESC">ASN1_primitive_new</td><td class="Q">367</td><td class="Q">3</td><td><a href="report-840424.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-840424.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/bn/bn_lib.c</td><td class="DESC">BN_copy</td><td class="Q">500</td><td class="Q">18</td><td><a href="report-a0a68b.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a0a68b.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>apps/s_cb.c</td><td class="DESC">verify_callback</td><td class="Q">178</td><td class="Q">7</td><td><a href="report-ae0ac0.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-ae0ac0.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/cms/cms_ess.c</td><td class="DESC">cms_msgSigDigest</td><td class="Q">198</td><td class="Q">17</td><td><a href="report-c01703.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c01703.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>apps/s_cb.c</td><td class="DESC">verify_callback</td><td class="Q">184</td><td class="Q">7</td><td><a href="report-ceb796.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-ceb796.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/aes/aes_ige.c</td><td class="DESC">AES_ige_encrypt</td><td class="Q">186</td><td class="Q">5</td><td><a href="report-e50a5d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-e50a5d.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/aes/aes_ige.c</td><td class="DESC">AES_bi_ige_encrypt</td><td class="Q">242</td><td class="Q">6</td><td><a href="report-e7463b.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-e7463b.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/aes/aes_ige.c</td><td class="DESC">AES_ige_encrypt</td><td class="Q">125</td><td class="Q">4</td><td><a href="report-e93c77.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-e93c77.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/aes/aes_ige.c</td><td class="DESC">AES_ige_encrypt</td><td class="Q">181</td><td class="Q">4</td><td><a href="report-f1410d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f1410d.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>crypto/aes/aes_ige.c</td><td class="DESC">AES_bi_ige_encrypt</td><td class="Q">242</td><td class="Q">6</td><td><a href="report-f366bb.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f366bb.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>ssl/ssl_ciph.c</td><td class="DESC">load_builtin_compressions</td><td class="Q">470</td><td class="Q">12</td><td><a href="report-feb850.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-feb850.html" -->
+</tr>
+<tr class="bt_logic_error_division_by_zero"><td class="DESC">Logic error</td><td class="DESC">Division by zero</td><td>ssl/t1_enc.c</td><td class="DESC">tls1_PRF</td><td class="Q">267</td><td class="Q">15</td><td><a href="report-2b09b0.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-2b09b0.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>crypto/rsa/rsa_gen.c</td><td class="DESC">rsa_builtin_keygen</td><td class="Q">188</td><td class="Q">27</td><td><a href="report-04a1af.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-04a1af.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>crypto/engine/eng_rsax.c</td><td class="DESC">e_rsax_rsa_mod_exp</td><td class="Q">609</td><td class="Q">19</td><td><a href="report-0a9b9a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-0a9b9a.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>engines/e_chil.c</td><td class="DESC">hwcrhk_insert_card</td><td class="Q">1315</td><td class="Q">15</td><td><a href="report-13d846.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-13d846.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>crypto/rsa/rsa_crpt.c</td><td class="DESC">RSA_setup_blinding</td><td class="Q">236</td><td class="Q">7</td><td><a href="report-26a29d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-26a29d.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>crypto/bn/bn_gcd.c</td><td class="DESC">BN_mod_inverse_no_branch</td><td class="Q">547</td><td class="Q">8</td><td><a href="report-387af4.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-387af4.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>crypto/rsa/rsa_eay.c</td><td class="DESC">RSA_eay_mod_exp</td><td class="Q">789</td><td class="Q">6</td><td><a href="report-38d6ad.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-38d6ad.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>crypto/engine/eng_rsax.c</td><td class="DESC">e_rsax_rsa_mod_exp</td><td class="Q">652</td><td class="Q">30</td><td><a href="report-49cd08.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-49cd08.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>crypto/engine/eng_rsax.c</td><td class="DESC">e_rsax_rsa_mod_exp</td><td class="Q">553</td><td class="Q">8</td><td><a href="report-526bfa.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-526bfa.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>crypto/bn/bn_gcd.c</td><td class="DESC">BN_mod_inverse_no_branch</td><td class="Q">572</td><td class="Q">10</td><td><a href="report-7a3cff.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-7a3cff.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>crypto/srp/srp_vfy.c</td><td class="DESC">t_fromb64</td><td class="Q">116</td><td class="Q">22</td><td><a href="report-d43fa2.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-d43fa2.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>crypto/engine/eng_rsax.c</td><td class="DESC">e_rsax_rsa_mod_exp</td><td class="Q">577</td><td class="Q">12</td><td><a href="report-ee9280.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-ee9280.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>crypto/rsa/rsa_eay.c</td><td class="DESC">RSA_eay_private_decrypt</td><td class="Q">575</td><td class="Q">12</td><td><a href="report-f62046.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f62046.html" -->
+</tr>
+<tr class="bt_logic_error_uninitialized_argument_value"><td class="DESC">Logic error</td><td class="DESC">Uninitialized argument value</td><td>crypto/bn/bn_exp2.c</td><td class="DESC">BN_mod_exp2_mont</td><td class="Q">298</td><td class="Q">53</td><td><a href="report-3a9064.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-3a9064.html" -->
+</tr>
+<tr class="bt_logic_error_uninitialized_argument_value"><td class="DESC">Logic error</td><td class="DESC">Uninitialized argument value</td><td>crypto/bn/bn_exp2.c</td><td class="DESC">BN_mod_exp2_mont</td><td class="Q">289</td><td class="Q">53</td><td><a href="report-4499e4.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-4499e4.html" -->
+</tr>
+<tr class="bt_logic_error_unix_api"><td class="DESC">Logic error</td><td class="DESC">Unix API</td><td>crypto/asn1/asn1_gen.c</td><td class="DESC">asn1_cb</td><td class="Q">365</td><td class="Q">7</td><td><a href="report-1ac252.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-1ac252.html" -->
+</tr>
+<tr class="bt_logic_error_unix_api"><td class="DESC">Logic error</td><td class="DESC">Unix API</td><td>crypto/aes/aes_ige.c</td><td class="DESC">AES_ige_encrypt</td><td class="Q">172</td><td class="Q">5</td><td><a href="report-3312b3.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-3312b3.html" -->
+</tr>
+<tr class="bt_logic_error_unix_api"><td class="DESC">Logic error</td><td class="DESC">Unix API</td><td>apps/x509.c</td><td class="DESC">x509_load_serial</td><td class="Q">1115</td><td class="Q">194</td><td><a href="report-38ba11.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-38ba11.html" -->
+</tr>
+<tr class="bt_logic_error_unix_api"><td class="DESC">Logic error</td><td class="DESC">Unix API</td><td>crypto/bio/b_print.c</td><td class="DESC">doapr_outch</td><td class="Q">744</td><td class="Q">13</td><td><a href="report-400b41.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-400b41.html" -->
+</tr>
+<tr class="bt_logic_error_unix_api"><td class="DESC">Logic error</td><td class="DESC">Unix API</td><td>crypto/aes/aes_ige.c</td><td class="DESC">AES_ige_encrypt</td><td class="Q">116</td><td class="Q">5</td><td><a href="report-665862.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-665862.html" -->
+</tr>
+<tr class="bt_untrusted_data_use_of_untrusted_data"><td class="DESC">Untrusted Data</td><td class="DESC">Use of Untrusted Data</td><td>ssl/s3_clnt.c</td><td class="DESC">ssl3_get_new_session_ticket</td><td class="Q">2090</td><td class="Q">11</td><td><a href="report-3c5742.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-3c5742.html" -->
+</tr>
+<tr class="bt_untrusted_data_use_of_untrusted_data"><td class="DESC">Untrusted Data</td><td class="DESC">Use of Untrusted Data</td><td>ssl/s3_srvr.c</td><td class="DESC">ssl3_get_client_key_exchange</td><td class="Q">2708</td><td class="Q">12</td><td><a href="report-476df6.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-476df6.html" -->
+</tr>
+<tr class="bt_untrusted_data_use_of_untrusted_data"><td class="DESC">Untrusted Data</td><td class="DESC">Use of Untrusted Data</td><td>ssl/s23_srvr.c</td><td class="DESC">ssl23_get_client_hello</td><td class="Q">489</td><td class="Q">11</td><td><a href="report-539d3e.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-539d3e.html" -->
+</tr>
+<tr class="bt_untrusted_data_use_of_untrusted_data"><td class="DESC">Untrusted Data</td><td class="DESC">Use of Untrusted Data</td><td>ssl/d1_both.c</td><td class="DESC">dtls1_process_heartbeat</td><td class="Q">1487</td><td class="Q">5</td><td><a href="report-a2e739.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a2e739.html" -->
+</tr>
+<tr class="bt_untrusted_data_use_of_untrusted_data"><td class="DESC">Untrusted Data</td><td class="DESC">Use of Untrusted Data</td><td>ssl/s2_srvr.c</td><td class="DESC">get_client_master_key</td><td class="Q">440</td><td class="Q">15</td><td><a href="report-b10e53.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-b10e53.html" -->
+</tr>
+<tr class="bt_untrusted_data_use_of_untrusted_data"><td class="DESC">Untrusted Data</td><td class="DESC">Use of Untrusted Data</td><td>ssl/t1_lib.c</td><td class="DESC">tls1_process_heartbeat</td><td class="Q">2587</td><td class="Q">5</td><td><a href="report-ed085b.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-ed085b.html" -->
+</tr>
+<tr class="bt_untrusted_data_use_of_untrusted_data"><td class="DESC">Untrusted Data</td><td class="DESC">Use of Untrusted Data</td><td>ssl/s3_clnt.c</td><td class="DESC">ssl3_get_key_exchange</td><td class="Q">1378</td><td class="Q">11</td><td><a href="report-f241d4.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f241d4.html" -->
+</tr>
+</tbody>
+</table>
+
+</body></html>

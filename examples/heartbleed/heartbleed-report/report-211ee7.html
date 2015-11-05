@@ -1,0 +1,1478 @@
+<!doctype html>
+<html>
+<head>
+<title>ecp_smpl.c</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC Access to field 'top' results in a dereference of a null pointer -->
+
+<!-- BUGTYPE Dereference of null pointer -->
+
+<!-- BUGCATEGORY Logic error -->
+
+<!-- BUGFILE /Users/fran/Desktop/openssl-1.0.1f/crypto/ec/ecp_smpl.c -->
+
+<!-- FILENAME ecp_smpl.c -->
+
+<!-- FUNCTIONNAME ec_GFp_simple_points_make_affine -->
+
+<!-- BUGLINE 1309 -->
+
+<!-- BUGCOLUMN 8 -->
+
+<!-- BUGPATHLENGTH 30 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>crypto/ec/ecp_smpl.c</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 1309, column 8</a></td></tr>
+<tr><td class="rowname">Description:</td><td>Access to field 'top' results in a dereference of a null pointer</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/* crypto/ec/ecp_smpl.c */</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>/* Includes code written by Lenka Fibikova &lt;fibikova@exp-math.uni-essen.de&gt;</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"> <span class='comment'>* for the OpenSSL project.</span> </td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"> <span class='comment'>* Includes code written by Bodo Moeller for the OpenSSL project.</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"><span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"><span class='comment'>/* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"> <span class='comment'>* Copyright (c) 1998-2002 The OpenSSL Project.  All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"> <span class='comment'>* Redistribution and use in source and binary forms, with or without</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"> <span class='comment'>* modification, are permitted provided that the following conditions</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"> <span class='comment'>* are met:</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"> <span class='comment'>* 1. Redistributions of source code must retain the above copyright</span></td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer.</span> </td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"> <span class='comment'>* 2. Redistributions in binary form must reproduce the above copyright</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer in</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"> <span class='comment'>*    the documentation and/or other materials provided with the</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"> <span class='comment'>*    distribution.</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"> <span class='comment'>* 3. All advertising materials mentioning features or use of this</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"> <span class='comment'>*    software must display the following acknowledgment:</span></td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"> <span class='comment'>*    "This product includes software developed by the OpenSSL Project</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"> <span class='comment'>*    for use in the OpenSSL Toolkit. (http://www.openssl.org/)"</span></td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"> <span class='comment'>* 4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to</span></td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"> <span class='comment'>*    endorse or promote products derived from this software without</span></td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"> <span class='comment'>*    prior written permission. For written permission, please contact</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"> <span class='comment'>*    openssl-core@openssl.org.</span></td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"> <span class='comment'>* 5. Products derived from this software may not be called "OpenSSL"</span></td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> <span class='comment'>*    nor may "OpenSSL" appear in their names without prior written</span></td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"> <span class='comment'>*    permission of the OpenSSL Project.</span></td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"> <span class='comment'>* 6. Redistributions of any form whatsoever must retain the following</span></td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line"> <span class='comment'>*    acknowledgment:</span></td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line"> <span class='comment'>*    "This product includes software developed by the OpenSSL Project</span></td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line"> <span class='comment'>*    for use in the OpenSSL Toolkit (http://www.openssl.org/)"</span></td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line"> <span class='comment'>* THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY</span></td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line"> <span class='comment'>* EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span></td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line"> <span class='comment'>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR</span></td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line"> <span class='comment'>* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR</span></td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line"> <span class='comment'>* ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span></td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line"> <span class='comment'>* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT</span></td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line"> <span class='comment'>* NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span></td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line"> <span class='comment'>* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span></td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line"> <span class='comment'>* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span></td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line"> <span class='comment'>* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)</span></td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line"> <span class='comment'>* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED</span></td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line"> <span class='comment'>* OF THE POSSIBILITY OF SUCH DAMAGE.</span></td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line"> <span class='comment'>* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line"> <span class='comment'>* This product includes cryptographic software written by Eric Young</span></td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line"> <span class='comment'>* (eay@cryptsoft.com).  This product includes software written by Tim</span></td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line"> <span class='comment'>* Hudson (tjh@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line"><span class='comment'>/* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line"> <span class='comment'>* Copyright 2002 Sun Microsystems, Inc. ALL RIGHTS RESERVED.</span></td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line"> <span class='comment'>* Portions of this software developed by SUN MICROSYSTEMS, INC.,</span></td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line"> <span class='comment'>* and contributed to the OpenSSL project.</span></td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line"><span class='directive'>#include &lt;openssl/err.h&gt;</span></td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line"><span class='directive'>#include &lt;openssl/symhacks.h&gt;</span></td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line"><span class='directive'>#ifdef OPENSSL_FIPS</span></td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line"><span class='directive'>#include &lt;openssl/fips.h&gt;</span></td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line"><span class='directive'>#include "ec_lcl.h"</span></td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line"><span class='keyword'>const</span> EC_METHOD *EC_GFp_simple_method(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line"><span class='directive'>#ifdef OPENSSL_FIPS</span></td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line">	<span class='keyword'>return</span> fips_ec_gfp_simple_method();</td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line"><span class='directive'>#else</span></td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line">	<span class='keyword'>static</span> <span class='keyword'>const</span> EC_METHOD ret = {</td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line">		<span class='macro'>EC_FLAGS_DEFAULT_OCT<span class='expansion'>0x1</span></span>,</td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line">		<span class='macro'>NID_X9_62_prime_field<span class='expansion'>406</span></span>,</td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line">		ec_GFp_simple_group_init,</td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line">		ec_GFp_simple_group_finish,</td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line">		ec_GFp_simple_group_clear_finish,</td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line">		ec_GFp_simple_group_copy,</td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line">		ec_GFp_simple_group_set_curve,</td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line">		ec_GFp_simple_group_get_curve,</td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line">		ec_GFp_simple_group_get_degree,</td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line">		ec_GFp_simple_group_check_discriminant,</td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line">		ec_GFp_simple_point_init,</td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">		ec_GFp_simple_point_finish,</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line">		ec_GFp_simple_point_clear_finish,</td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">		ec_GFp_simple_point_copy,</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line">		ec_GFp_simple_point_set_to_infinity,</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line">		ec_GFp_simple_set_Jprojective_coordinates_GFp,</td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line">		ec_GFp_simple_get_Jprojective_coordinates_GFp,</td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">		ec_GFp_simple_point_set_affine_coordinates,</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line">		ec_GFp_simple_point_get_affine_coordinates,</td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line">		0,0,0,</td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line">		ec_GFp_simple_add,</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line">		ec_GFp_simple_dbl,</td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line">		ec_GFp_simple_invert,</td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line">		ec_GFp_simple_is_at_infinity,</td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line">		ec_GFp_simple_is_on_curve,</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line">		ec_GFp_simple_cmp,</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line">		ec_GFp_simple_make_affine,</td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line">		ec_GFp_simple_points_make_affine,</td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line">		0 <span class='comment'>/* mul */</span>,</td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">		0 <span class='comment'>/* precompute_mult */</span>,</td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line">		0 <span class='comment'>/* have_precompute_mult */</span>,	</td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line">		ec_GFp_simple_field_mul,</td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line">		ec_GFp_simple_field_sqr,</td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line">		0 <span class='comment'>/* field_div */</span>,</td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">		0 <span class='comment'>/* field_encode */</span>,</td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line">		0 <span class='comment'>/* field_decode */</span>,</td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line">		0 <span class='comment'>/* field_set_to_one */</span> };</td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line">	<span class='keyword'>return</span> &amp;ret;</td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line"><span class='comment'>/* Most method functions in this file are designed to work with</span></td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line"> <span class='comment'>* non-trivial representations of field elements if necessary</span></td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line"> <span class='comment'>* (see ecp_mont.c): while standard modular addition and subtraction</span></td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line"> <span class='comment'>* are used, the field_mul and field_sqr methods will be used for</span></td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line"> <span class='comment'>* multiplication, and field_encode and field_decode (if defined)</span></td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line"> <span class='comment'>* will be used for converting between representations.</span></td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line"> <span class='comment'>* Functions ec_GFp_simple_points_make_affine() and</span></td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line"> <span class='comment'>* ec_GFp_simple_point_get_affine_coordinates() specifically assume</span></td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line"> <span class='comment'>* that if a non-trivial representation is used, it is a Montgomery</span></td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line"> <span class='comment'>* representation (i.e. 'encoding' means multiplying by some factor R).</span></td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_group_init(EC_GROUP *group)</td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line">	BN_init(&amp;group-&gt;field);</td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line">	BN_init(&amp;group-&gt;a);</td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line">	BN_init(&amp;group-&gt;b);</td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line">	group-&gt;a_is_minus3 = 0;</td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line"><span class='keyword'>void</span> ec_GFp_simple_group_finish(EC_GROUP *group)</td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line">	BN_free(&amp;group-&gt;field);</td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line">	BN_free(&amp;group-&gt;a);</td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line">	BN_free(&amp;group-&gt;b);</td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line"><span class='keyword'>void</span> ec_GFp_simple_group_clear_finish(EC_GROUP *group)</td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line">	BN_clear_free(&amp;group-&gt;field);</td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line">	BN_clear_free(&amp;group-&gt;a);</td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line">	BN_clear_free(&amp;group-&gt;b);</td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_group_copy(EC_GROUP *dest, <span class='keyword'>const</span> EC_GROUP *src)</td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line">	<span class='keyword'>if</span> (!BN_copy(&amp;dest-&gt;field, &amp;src-&gt;field)) <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line">	<span class='keyword'>if</span> (!BN_copy(&amp;dest-&gt;a, &amp;src-&gt;a)) <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line">	<span class='keyword'>if</span> (!BN_copy(&amp;dest-&gt;b, &amp;src-&gt;b)) <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line">	dest-&gt;a_is_minus3 = src-&gt;a_is_minus3;</td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_group_set_curve(EC_GROUP *group,</td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line">	<span class='keyword'>const</span> BIGNUM *p, <span class='keyword'>const</span> BIGNUM *a, <span class='keyword'>const</span> BIGNUM *b, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line">	<span class='keyword'>int</span> ret = 0;</td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line">	BN_CTX *new_ctx = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line">	BIGNUM *tmp_a;</td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line">	<span class='comment'>/* p must be a prime &gt; 3 */</span></td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line">	<span class='keyword'>if</span> (BN_num_bits(p) &lt;= 2 || !<span class='macro'>BN_is_odd(p)<span class='expansion'>(((p)-&gt;top &gt; 0) &amp;&amp; ((p)-&gt;d[0] &amp; 1))</span></span>)</td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line">		<span class='macro'>ECerr(EC_F_EC_GFP_SIMPLE_GROUP_SET_CURVE, EC_R_INVALID_FIELD)<span class='expansion'>ERR_put_error(16,(166),(103),"ecp_smpl.c",185)</span></span>;</td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line">	<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line">		ctx = new_ctx = BN_CTX_new();</td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line">		<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line">	BN_CTX_start(ctx);</td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line">	tmp_a = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line">	<span class='keyword'>if</span> (tmp_a == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line">	<span class='comment'>/* group-&gt;field */</span></td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line">	<span class='keyword'>if</span> (!BN_copy(&amp;group-&gt;field, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line">	BN_set_negative(&amp;group-&gt;field, 0);</td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line">	<span class='comment'>/* group-&gt;a */</span></td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line">	<span class='keyword'>if</span> (!BN_nnmod(tmp_a, a, p, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line">	<span class='keyword'>if</span> (group-&gt;meth-&gt;field_encode)</td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line">		{ <span class='keyword'>if</span> (!group-&gt;meth-&gt;field_encode(group, &amp;group-&gt;a, tmp_a, ctx)) <span class='keyword'>goto</span> err; }	</td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line">		<span class='keyword'>if</span> (!BN_copy(&amp;group-&gt;a, tmp_a)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line">	<span class='comment'>/* group-&gt;b */</span></td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line">	<span class='keyword'>if</span> (!BN_nnmod(&amp;group-&gt;b, b, p, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line">	<span class='keyword'>if</span> (group-&gt;meth-&gt;field_encode)</td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line">		<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_encode(group, &amp;group-&gt;b, &amp;group-&gt;b, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line">	<span class='comment'>/* group-&gt;a_is_minus3 */</span></td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line">	<span class='keyword'>if</span> (!BN_add_word(tmp_a, 3)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line">	group-&gt;a_is_minus3 = (0 == BN_cmp(tmp_a, &amp;group-&gt;field));</td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line">	ret = 1;</td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line"> err:</td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line">	BN_CTX_end(ctx);</td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line">	<span class='keyword'>if</span> (new_ctx != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line">		BN_CTX_free(new_ctx);</td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN229">229</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN230">230</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_group_get_curve(<span class='keyword'>const</span> EC_GROUP *group, BIGNUM *p, BIGNUM *a, BIGNUM *b, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN231">231</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN232">232</td><td class="line">	<span class='keyword'>int</span> ret = 0;</td></tr>
+<tr><td class="num" id="LN233">233</td><td class="line">	BN_CTX *new_ctx = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN234">234</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN235">235</td><td class="line">	<span class='keyword'>if</span> (p != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN236">236</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN237">237</td><td class="line">		<span class='keyword'>if</span> (!BN_copy(p, &amp;group-&gt;field)) <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN238">238</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN239">239</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN240">240</td><td class="line">	<span class='keyword'>if</span> (a != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span> || b != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN241">241</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN242">242</td><td class="line">		<span class='keyword'>if</span> (group-&gt;meth-&gt;field_decode)</td></tr>
+<tr><td class="num" id="LN243">243</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN244">244</td><td class="line">			<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN245">245</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN246">246</td><td class="line">				ctx = new_ctx = BN_CTX_new();</td></tr>
+<tr><td class="num" id="LN247">247</td><td class="line">				<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN248">248</td><td class="line">					<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN249">249</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN250">250</td><td class="line">			<span class='keyword'>if</span> (a != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN251">251</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN252">252</td><td class="line">				<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_decode(group, a, &amp;group-&gt;a, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN253">253</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN254">254</td><td class="line">			<span class='keyword'>if</span> (b != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN255">255</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN256">256</td><td class="line">				<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_decode(group, b, &amp;group-&gt;b, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN257">257</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN258">258</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN259">259</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN260">260</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN261">261</td><td class="line">			<span class='keyword'>if</span> (a != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN262">262</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN263">263</td><td class="line">				<span class='keyword'>if</span> (!BN_copy(a, &amp;group-&gt;a)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN264">264</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN265">265</td><td class="line">			<span class='keyword'>if</span> (b != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN266">266</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN267">267</td><td class="line">				<span class='keyword'>if</span> (!BN_copy(b, &amp;group-&gt;b)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN268">268</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN269">269</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN270">270</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN271">271</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN272">272</td><td class="line">	ret = 1;</td></tr>
+<tr><td class="num" id="LN273">273</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN274">274</td><td class="line"> err:</td></tr>
+<tr><td class="num" id="LN275">275</td><td class="line">	<span class='keyword'>if</span> (new_ctx)</td></tr>
+<tr><td class="num" id="LN276">276</td><td class="line">		BN_CTX_free(new_ctx);</td></tr>
+<tr><td class="num" id="LN277">277</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN278">278</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN279">279</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN280">280</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN281">281</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_group_get_degree(<span class='keyword'>const</span> EC_GROUP *group)</td></tr>
+<tr><td class="num" id="LN282">282</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN283">283</td><td class="line">	<span class='keyword'>return</span> BN_num_bits(&amp;group-&gt;field);</td></tr>
+<tr><td class="num" id="LN284">284</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN285">285</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN286">286</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN287">287</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_group_check_discriminant(<span class='keyword'>const</span> EC_GROUP *group, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN288">288</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN289">289</td><td class="line">	<span class='keyword'>int</span> ret = 0;</td></tr>
+<tr><td class="num" id="LN290">290</td><td class="line">	BIGNUM *a,*b,*order,*tmp_1,*tmp_2;</td></tr>
+<tr><td class="num" id="LN291">291</td><td class="line">	<span class='keyword'>const</span> BIGNUM *p = &amp;group-&gt;field;</td></tr>
+<tr><td class="num" id="LN292">292</td><td class="line">	BN_CTX *new_ctx = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN293">293</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN294">294</td><td class="line">	<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN295">295</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN296">296</td><td class="line">		ctx = new_ctx = BN_CTX_new();</td></tr>
+<tr><td class="num" id="LN297">297</td><td class="line">		<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN298">298</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN299">299</td><td class="line">			<span class='macro'>ECerr(EC_F_EC_GFP_SIMPLE_GROUP_CHECK_DISCRIMINANT, ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_put_error(16,(165),((1|64)),"ecp_smpl.c",299)</span></span>;</td></tr>
+<tr><td class="num" id="LN300">300</td><td class="line">			<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN301">301</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN302">302</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN303">303</td><td class="line">	BN_CTX_start(ctx);</td></tr>
+<tr><td class="num" id="LN304">304</td><td class="line">	a = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN305">305</td><td class="line">	b = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN306">306</td><td class="line">	tmp_1 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN307">307</td><td class="line">	tmp_2 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN308">308</td><td class="line">	order = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN309">309</td><td class="line">	<span class='keyword'>if</span> (order == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN310">310</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN311">311</td><td class="line">	<span class='keyword'>if</span> (group-&gt;meth-&gt;field_decode)</td></tr>
+<tr><td class="num" id="LN312">312</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN313">313</td><td class="line">		<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_decode(group, a, &amp;group-&gt;a, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN314">314</td><td class="line">		<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_decode(group, b, &amp;group-&gt;b, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN315">315</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN316">316</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN317">317</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN318">318</td><td class="line">		<span class='keyword'>if</span> (!BN_copy(a, &amp;group-&gt;a)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN319">319</td><td class="line">		<span class='keyword'>if</span> (!BN_copy(b, &amp;group-&gt;b)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN320">320</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN321">321</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN322">322</td><td class="line">	<span class='comment'>/* check the discriminant:</span></td></tr>
+<tr><td class="num" id="LN323">323</td><td class="line">	 <span class='comment'>* y^2 = x^3 + a*x + b is an elliptic curve &lt;=&gt; 4*a^3 + 27*b^2 != 0 (mod p)</span> </td></tr>
+<tr><td class="num" id="LN324">324</td><td class="line">         <span class='comment'>* 0 =&lt; a, b &lt; p */</span></td></tr>
+<tr><td class="num" id="LN325">325</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>BN_is_zero(a)<span class='expansion'>((a)-&gt;top == 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN326">326</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN327">327</td><td class="line">		<span class='keyword'>if</span> (<span class='macro'>BN_is_zero(b)<span class='expansion'>((b)-&gt;top == 0)</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN328">328</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN329">329</td><td class="line">	<span class='keyword'>else</span> <span class='keyword'>if</span> (!<span class='macro'>BN_is_zero(b)<span class='expansion'>((b)-&gt;top == 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN330">330</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN331">331</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_sqr(tmp_1, a, p, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN332">332</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_mul(tmp_2, tmp_1, a, p, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN333">333</td><td class="line">		<span class='keyword'>if</span> (!BN_lshift(tmp_1, tmp_2, 2)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN334">334</td><td class="line">		<span class='comment'>/* tmp_1 = 4*a^3 */</span></td></tr>
+<tr><td class="num" id="LN335">335</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN336">336</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_sqr(tmp_2, b, p, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN337">337</td><td class="line">		<span class='keyword'>if</span> (!BN_mul_word(tmp_2, 27)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN338">338</td><td class="line">		<span class='comment'>/* tmp_2 = 27*b^2 */</span></td></tr>
+<tr><td class="num" id="LN339">339</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN340">340</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_add(a, tmp_1, tmp_2, p, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN341">341</td><td class="line">		<span class='keyword'>if</span> (<span class='macro'>BN_is_zero(a)<span class='expansion'>((a)-&gt;top == 0)</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN342">342</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN343">343</td><td class="line">	ret = 1;</td></tr>
+<tr><td class="num" id="LN344">344</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN345">345</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN346">346</td><td class="line">	<span class='keyword'>if</span> (ctx != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN347">347</td><td class="line">		BN_CTX_end(ctx);</td></tr>
+<tr><td class="num" id="LN348">348</td><td class="line">	<span class='keyword'>if</span> (new_ctx != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN349">349</td><td class="line">		BN_CTX_free(new_ctx);</td></tr>
+<tr><td class="num" id="LN350">350</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN351">351</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN352">352</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN353">353</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN354">354</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_point_init(EC_POINT *point)</td></tr>
+<tr><td class="num" id="LN355">355</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN356">356</td><td class="line">	BN_init(&amp;point-&gt;X);</td></tr>
+<tr><td class="num" id="LN357">357</td><td class="line">	BN_init(&amp;point-&gt;Y);</td></tr>
+<tr><td class="num" id="LN358">358</td><td class="line">	BN_init(&amp;point-&gt;Z);</td></tr>
+<tr><td class="num" id="LN359">359</td><td class="line">	point-&gt;Z_is_one = 0;</td></tr>
+<tr><td class="num" id="LN360">360</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN361">361</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN362">362</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN363">363</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN364">364</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN365">365</td><td class="line"><span class='keyword'>void</span> ec_GFp_simple_point_finish(EC_POINT *point)</td></tr>
+<tr><td class="num" id="LN366">366</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN367">367</td><td class="line">	BN_free(&amp;point-&gt;X);</td></tr>
+<tr><td class="num" id="LN368">368</td><td class="line">	BN_free(&amp;point-&gt;Y);</td></tr>
+<tr><td class="num" id="LN369">369</td><td class="line">	BN_free(&amp;point-&gt;Z);</td></tr>
+<tr><td class="num" id="LN370">370</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN371">371</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN372">372</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN373">373</td><td class="line"><span class='keyword'>void</span> ec_GFp_simple_point_clear_finish(EC_POINT *point)</td></tr>
+<tr><td class="num" id="LN374">374</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN375">375</td><td class="line">	BN_clear_free(&amp;point-&gt;X);</td></tr>
+<tr><td class="num" id="LN376">376</td><td class="line">	BN_clear_free(&amp;point-&gt;Y);</td></tr>
+<tr><td class="num" id="LN377">377</td><td class="line">	BN_clear_free(&amp;point-&gt;Z);</td></tr>
+<tr><td class="num" id="LN378">378</td><td class="line">	point-&gt;Z_is_one = 0;</td></tr>
+<tr><td class="num" id="LN379">379</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN380">380</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN381">381</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN382">382</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_point_copy(EC_POINT *dest, <span class='keyword'>const</span> EC_POINT *src)</td></tr>
+<tr><td class="num" id="LN383">383</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN384">384</td><td class="line">	<span class='keyword'>if</span> (!BN_copy(&amp;dest-&gt;X, &amp;src-&gt;X)) <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN385">385</td><td class="line">	<span class='keyword'>if</span> (!BN_copy(&amp;dest-&gt;Y, &amp;src-&gt;Y)) <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN386">386</td><td class="line">	<span class='keyword'>if</span> (!BN_copy(&amp;dest-&gt;Z, &amp;src-&gt;Z)) <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN387">387</td><td class="line">	dest-&gt;Z_is_one = src-&gt;Z_is_one;</td></tr>
+<tr><td class="num" id="LN388">388</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN389">389</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN390">390</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN391">391</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN392">392</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN393">393</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_point_set_to_infinity(<span class='keyword'>const</span> EC_GROUP *group, EC_POINT *point)</td></tr>
+<tr><td class="num" id="LN394">394</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN395">395</td><td class="line">	point-&gt;Z_is_one = 0;</td></tr>
+<tr><td class="num" id="LN396">396</td><td class="line">	<span class='macro'>BN_zero(&amp;point-&gt;Z)<span class='expansion'>(BN_set_word((&amp;point-&gt;Z),0))</span></span>;</td></tr>
+<tr><td class="num" id="LN397">397</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN398">398</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN399">399</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN400">400</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN401">401</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_set_Jprojective_coordinates_GFp(<span class='keyword'>const</span> EC_GROUP *group, EC_POINT *point,</td></tr>
+<tr><td class="num" id="LN402">402</td><td class="line">	<span class='keyword'>const</span> BIGNUM *x, <span class='keyword'>const</span> BIGNUM *y, <span class='keyword'>const</span> BIGNUM *z, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN403">403</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN404">404</td><td class="line">	BN_CTX *new_ctx = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN405">405</td><td class="line">	<span class='keyword'>int</span> ret = 0;</td></tr>
+<tr><td class="num" id="LN406">406</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN407">407</td><td class="line">	<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN408">408</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN409">409</td><td class="line">		ctx = new_ctx = BN_CTX_new();</td></tr>
+<tr><td class="num" id="LN410">410</td><td class="line">		<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN411">411</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN412">412</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN413">413</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN414">414</td><td class="line">	<span class='keyword'>if</span> (x != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN415">415</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN416">416</td><td class="line">		<span class='keyword'>if</span> (!BN_nnmod(&amp;point-&gt;X, x, &amp;group-&gt;field, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN417">417</td><td class="line">		<span class='keyword'>if</span> (group-&gt;meth-&gt;field_encode)</td></tr>
+<tr><td class="num" id="LN418">418</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN419">419</td><td class="line">			<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_encode(group, &amp;point-&gt;X, &amp;point-&gt;X, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN420">420</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN421">421</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN422">422</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN423">423</td><td class="line">	<span class='keyword'>if</span> (y != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN424">424</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN425">425</td><td class="line">		<span class='keyword'>if</span> (!BN_nnmod(&amp;point-&gt;Y, y, &amp;group-&gt;field, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN426">426</td><td class="line">		<span class='keyword'>if</span> (group-&gt;meth-&gt;field_encode)</td></tr>
+<tr><td class="num" id="LN427">427</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN428">428</td><td class="line">			<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_encode(group, &amp;point-&gt;Y, &amp;point-&gt;Y, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN429">429</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN430">430</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN431">431</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN432">432</td><td class="line">	<span class='keyword'>if</span> (z != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN433">433</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN434">434</td><td class="line">		<span class='keyword'>int</span> Z_is_one;</td></tr>
+<tr><td class="num" id="LN435">435</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN436">436</td><td class="line">		<span class='keyword'>if</span> (!BN_nnmod(&amp;point-&gt;Z, z, &amp;group-&gt;field, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN437">437</td><td class="line">		Z_is_one = <span class='macro'>BN_is_one(&amp;point-&gt;Z)<span class='expansion'>((((((&amp;point-&gt;Z))-&gt;top == 1) &amp;&amp; (((&amp;point<br>-&gt;Z))-&gt;d[0] == (unsigned long)(1))) || (((1) == 0) &amp;&amp;<br> (((&amp;point-&gt;Z))-&gt;top == 0))) &amp;&amp; !(&amp;point<br>-&gt;Z)-&gt;neg)</span></span>;</td></tr>
+<tr><td class="num" id="LN438">438</td><td class="line">		<span class='keyword'>if</span> (group-&gt;meth-&gt;field_encode)</td></tr>
+<tr><td class="num" id="LN439">439</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN440">440</td><td class="line">			<span class='keyword'>if</span> (Z_is_one &amp;&amp; (group-&gt;meth-&gt;field_set_to_one != 0))</td></tr>
+<tr><td class="num" id="LN441">441</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN442">442</td><td class="line">				<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_set_to_one(group, &amp;point-&gt;Z, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN443">443</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN444">444</td><td class="line">			<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN445">445</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN446">446</td><td class="line">				<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_encode(group, &amp;point-&gt;Z, &amp;point-&gt;Z, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN447">447</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN448">448</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN449">449</td><td class="line">		point-&gt;Z_is_one = Z_is_one;</td></tr>
+<tr><td class="num" id="LN450">450</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN451">451</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN452">452</td><td class="line">	ret = 1;</td></tr>
+<tr><td class="num" id="LN453">453</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN454">454</td><td class="line"> err:</td></tr>
+<tr><td class="num" id="LN455">455</td><td class="line">	<span class='keyword'>if</span> (new_ctx != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN456">456</td><td class="line">		BN_CTX_free(new_ctx);</td></tr>
+<tr><td class="num" id="LN457">457</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN458">458</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN459">459</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN460">460</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN461">461</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_get_Jprojective_coordinates_GFp(<span class='keyword'>const</span> EC_GROUP *group, <span class='keyword'>const</span> EC_POINT *point,</td></tr>
+<tr><td class="num" id="LN462">462</td><td class="line">	BIGNUM *x, BIGNUM *y, BIGNUM *z, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN463">463</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN464">464</td><td class="line">	BN_CTX *new_ctx = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN465">465</td><td class="line">	<span class='keyword'>int</span> ret = 0;</td></tr>
+<tr><td class="num" id="LN466">466</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN467">467</td><td class="line">	<span class='keyword'>if</span> (group-&gt;meth-&gt;field_decode != 0)</td></tr>
+<tr><td class="num" id="LN468">468</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN469">469</td><td class="line">		<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN470">470</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN471">471</td><td class="line">			ctx = new_ctx = BN_CTX_new();</td></tr>
+<tr><td class="num" id="LN472">472</td><td class="line">			<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN473">473</td><td class="line">				<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN474">474</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN475">475</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN476">476</td><td class="line">		<span class='keyword'>if</span> (x != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN477">477</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN478">478</td><td class="line">			<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_decode(group, x, &amp;point-&gt;X, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN479">479</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN480">480</td><td class="line">		<span class='keyword'>if</span> (y != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN481">481</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN482">482</td><td class="line">			<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_decode(group, y, &amp;point-&gt;Y, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN483">483</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN484">484</td><td class="line">		<span class='keyword'>if</span> (z != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN485">485</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN486">486</td><td class="line">			<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_decode(group, z, &amp;point-&gt;Z, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN487">487</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN488">488</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN489">489</td><td class="line">	<span class='keyword'>else</span>	</td></tr>
+<tr><td class="num" id="LN490">490</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN491">491</td><td class="line">		<span class='keyword'>if</span> (x != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN492">492</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN493">493</td><td class="line">			<span class='keyword'>if</span> (!BN_copy(x, &amp;point-&gt;X)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN494">494</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN495">495</td><td class="line">		<span class='keyword'>if</span> (y != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN496">496</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN497">497</td><td class="line">			<span class='keyword'>if</span> (!BN_copy(y, &amp;point-&gt;Y)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN498">498</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN499">499</td><td class="line">		<span class='keyword'>if</span> (z != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN500">500</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN501">501</td><td class="line">			<span class='keyword'>if</span> (!BN_copy(z, &amp;point-&gt;Z)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN502">502</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN503">503</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN504">504</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN505">505</td><td class="line">	ret = 1;</td></tr>
+<tr><td class="num" id="LN506">506</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN507">507</td><td class="line"> err:</td></tr>
+<tr><td class="num" id="LN508">508</td><td class="line">	<span class='keyword'>if</span> (new_ctx != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN509">509</td><td class="line">		BN_CTX_free(new_ctx);</td></tr>
+<tr><td class="num" id="LN510">510</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN511">511</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN512">512</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN513">513</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN514">514</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_point_set_affine_coordinates(<span class='keyword'>const</span> EC_GROUP *group, EC_POINT *point,</td></tr>
+<tr><td class="num" id="LN515">515</td><td class="line">	<span class='keyword'>const</span> BIGNUM *x, <span class='keyword'>const</span> BIGNUM *y, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN516">516</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN517">517</td><td class="line">	<span class='keyword'>if</span> (x == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span> || y == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN518">518</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN519">519</td><td class="line">		<span class='comment'>/* unlike for projective coordinates, we do not tolerate this */</span></td></tr>
+<tr><td class="num" id="LN520">520</td><td class="line">		<span class='macro'>ECerr(EC_F_EC_GFP_SIMPLE_POINT_SET_AFFINE_COORDINATES, ERR_R_PASSED_NULL_PARAMETER)<span class='expansion'>ERR_put_error(16,(168),((3|64)),"ecp_smpl.c",520)</span></span>;</td></tr>
+<tr><td class="num" id="LN521">521</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN522">522</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN523">523</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN524">524</td><td class="line">	<span class='keyword'>return</span> EC_POINT_set_Jprojective_coordinates_GFp(group, point, x, y, BN_value_one(), ctx);</td></tr>
+<tr><td class="num" id="LN525">525</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN526">526</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN527">527</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN528">528</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_point_get_affine_coordinates(<span class='keyword'>const</span> EC_GROUP *group, <span class='keyword'>const</span> EC_POINT *point,</td></tr>
+<tr><td class="num" id="LN529">529</td><td class="line">	BIGNUM *x, BIGNUM *y, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN530">530</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN531">531</td><td class="line">	BN_CTX *new_ctx = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN532">532</td><td class="line">	BIGNUM *Z, *Z_1, *Z_2, *Z_3;</td></tr>
+<tr><td class="num" id="LN533">533</td><td class="line">	<span class='keyword'>const</span> BIGNUM *Z_;</td></tr>
+<tr><td class="num" id="LN534">534</td><td class="line">	<span class='keyword'>int</span> ret = 0;</td></tr>
+<tr><td class="num" id="LN535">535</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN536">536</td><td class="line">	<span class='keyword'>if</span> (EC_POINT_is_at_infinity(group, point))</td></tr>
+<tr><td class="num" id="LN537">537</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN538">538</td><td class="line">		<span class='macro'>ECerr(EC_F_EC_GFP_SIMPLE_POINT_GET_AFFINE_COORDINATES, EC_R_POINT_AT_INFINITY)<span class='expansion'>ERR_put_error(16,(167),(106),"ecp_smpl.c",538)</span></span>;</td></tr>
+<tr><td class="num" id="LN539">539</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN540">540</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN541">541</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN542">542</td><td class="line">	<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN543">543</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN544">544</td><td class="line">		ctx = new_ctx = BN_CTX_new();</td></tr>
+<tr><td class="num" id="LN545">545</td><td class="line">		<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN546">546</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN547">547</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN548">548</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN549">549</td><td class="line">	BN_CTX_start(ctx);</td></tr>
+<tr><td class="num" id="LN550">550</td><td class="line">	Z = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN551">551</td><td class="line">	Z_1 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN552">552</td><td class="line">	Z_2 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN553">553</td><td class="line">	Z_3 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN554">554</td><td class="line">	<span class='keyword'>if</span> (Z_3 == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN555">555</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN556">556</td><td class="line">	<span class='comment'>/* transform  (X, Y, Z)  into  (x, y) := (X/Z^2, Y/Z^3) */</span></td></tr>
+<tr><td class="num" id="LN557">557</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN558">558</td><td class="line">	<span class='keyword'>if</span> (group-&gt;meth-&gt;field_decode)</td></tr>
+<tr><td class="num" id="LN559">559</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN560">560</td><td class="line">		<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_decode(group, Z, &amp;point-&gt;Z, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN561">561</td><td class="line">		Z_ = Z;</td></tr>
+<tr><td class="num" id="LN562">562</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN563">563</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN564">564</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN565">565</td><td class="line">		Z_ = &amp;point-&gt;Z;</td></tr>
+<tr><td class="num" id="LN566">566</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN567">567</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN568">568</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>BN_is_one(Z_)<span class='expansion'>((((((Z_))-&gt;top == 1) &amp;&amp; (((Z_))-&gt;d[0] == (unsigned<br> long)(1))) || (((1) == 0) &amp;&amp; (((Z_))-&gt;top == 0)))<br> &amp;&amp; !(Z_)-&gt;neg)</span></span>)</td></tr>
+<tr><td class="num" id="LN569">569</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN570">570</td><td class="line">		<span class='keyword'>if</span> (group-&gt;meth-&gt;field_decode)</td></tr>
+<tr><td class="num" id="LN571">571</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN572">572</td><td class="line">			<span class='keyword'>if</span> (x != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN573">573</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN574">574</td><td class="line">				<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_decode(group, x, &amp;point-&gt;X, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN575">575</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN576">576</td><td class="line">			<span class='keyword'>if</span> (y != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN577">577</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN578">578</td><td class="line">				<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_decode(group, y, &amp;point-&gt;Y, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN579">579</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN580">580</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN581">581</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN582">582</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN583">583</td><td class="line">			<span class='keyword'>if</span> (x != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN584">584</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN585">585</td><td class="line">				<span class='keyword'>if</span> (!BN_copy(x, &amp;point-&gt;X)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN586">586</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN587">587</td><td class="line">			<span class='keyword'>if</span> (y != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN588">588</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN589">589</td><td class="line">				<span class='keyword'>if</span> (!BN_copy(y, &amp;point-&gt;Y)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN590">590</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN591">591</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN592">592</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN593">593</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN594">594</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN595">595</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_inverse(Z_1, Z_, &amp;group-&gt;field, ctx))</td></tr>
+<tr><td class="num" id="LN596">596</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN597">597</td><td class="line">			<span class='macro'>ECerr(EC_F_EC_GFP_SIMPLE_POINT_GET_AFFINE_COORDINATES, ERR_R_BN_LIB)<span class='expansion'>ERR_put_error(16,(167),(3),"ecp_smpl.c",597)</span></span>;</td></tr>
+<tr><td class="num" id="LN598">598</td><td class="line">			<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN599">599</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN600">600</td><td class="line">		</td></tr>
+<tr><td class="num" id="LN601">601</td><td class="line">		<span class='keyword'>if</span> (group-&gt;meth-&gt;field_encode == 0)</td></tr>
+<tr><td class="num" id="LN602">602</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN603">603</td><td class="line">			<span class='comment'>/* field_sqr works on standard representation */</span></td></tr>
+<tr><td class="num" id="LN604">604</td><td class="line">			<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_sqr(group, Z_2, Z_1, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN605">605</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN606">606</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN607">607</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN608">608</td><td class="line">			<span class='keyword'>if</span> (!BN_mod_sqr(Z_2, Z_1, &amp;group-&gt;field, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN609">609</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN610">610</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN611">611</td><td class="line">		<span class='keyword'>if</span> (x != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN612">612</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN613">613</td><td class="line">			<span class='comment'>/* in the Montgomery case, field_mul will cancel out Montgomery factor in X: */</span></td></tr>
+<tr><td class="num" id="LN614">614</td><td class="line">			<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_mul(group, x, &amp;point-&gt;X, Z_2, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN615">615</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN616">616</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN617">617</td><td class="line">		<span class='keyword'>if</span> (y != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN618">618</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN619">619</td><td class="line">			<span class='keyword'>if</span> (group-&gt;meth-&gt;field_encode == 0)</td></tr>
+<tr><td class="num" id="LN620">620</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN621">621</td><td class="line">				<span class='comment'>/* field_mul works on standard representation */</span></td></tr>
+<tr><td class="num" id="LN622">622</td><td class="line">				<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_mul(group, Z_3, Z_2, Z_1, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN623">623</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN624">624</td><td class="line">			<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN625">625</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN626">626</td><td class="line">				<span class='keyword'>if</span> (!BN_mod_mul(Z_3, Z_2, Z_1, &amp;group-&gt;field, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN627">627</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN628">628</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN629">629</td><td class="line">			<span class='comment'>/* in the Montgomery case, field_mul will cancel out Montgomery factor in Y: */</span></td></tr>
+<tr><td class="num" id="LN630">630</td><td class="line">			<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_mul(group, y, &amp;point-&gt;Y, Z_3, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN631">631</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN632">632</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN633">633</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN634">634</td><td class="line">	ret = 1;</td></tr>
+<tr><td class="num" id="LN635">635</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN636">636</td><td class="line"> err:</td></tr>
+<tr><td class="num" id="LN637">637</td><td class="line">	BN_CTX_end(ctx);</td></tr>
+<tr><td class="num" id="LN638">638</td><td class="line">	<span class='keyword'>if</span> (new_ctx != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN639">639</td><td class="line">		BN_CTX_free(new_ctx);</td></tr>
+<tr><td class="num" id="LN640">640</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN641">641</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN642">642</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN643">643</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_add(<span class='keyword'>const</span> EC_GROUP *group, EC_POINT *r, <span class='keyword'>const</span> EC_POINT *a, <span class='keyword'>const</span> EC_POINT *b, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN644">644</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN645">645</td><td class="line">	<span class='keyword'>int</span> (*field_mul)(<span class='keyword'>const</span> EC_GROUP *, BIGNUM *, <span class='keyword'>const</span> BIGNUM *, <span class='keyword'>const</span> BIGNUM *, BN_CTX *);</td></tr>
+<tr><td class="num" id="LN646">646</td><td class="line">	<span class='keyword'>int</span> (*field_sqr)(<span class='keyword'>const</span> EC_GROUP *, BIGNUM *, <span class='keyword'>const</span> BIGNUM *, BN_CTX *);</td></tr>
+<tr><td class="num" id="LN647">647</td><td class="line">	<span class='keyword'>const</span> BIGNUM *p;</td></tr>
+<tr><td class="num" id="LN648">648</td><td class="line">	BN_CTX *new_ctx = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN649">649</td><td class="line">	BIGNUM *n0, *n1, *n2, *n3, *n4, *n5, *n6;</td></tr>
+<tr><td class="num" id="LN650">650</td><td class="line">	<span class='keyword'>int</span> ret = 0;</td></tr>
+<tr><td class="num" id="LN651">651</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN652">652</td><td class="line">	<span class='keyword'>if</span> (a == b)</td></tr>
+<tr><td class="num" id="LN653">653</td><td class="line">		<span class='keyword'>return</span> EC_POINT_dbl(group, r, a, ctx);</td></tr>
+<tr><td class="num" id="LN654">654</td><td class="line">	<span class='keyword'>if</span> (EC_POINT_is_at_infinity(group, a))</td></tr>
+<tr><td class="num" id="LN655">655</td><td class="line">		<span class='keyword'>return</span> EC_POINT_copy(r, b);</td></tr>
+<tr><td class="num" id="LN656">656</td><td class="line">	<span class='keyword'>if</span> (EC_POINT_is_at_infinity(group, b))</td></tr>
+<tr><td class="num" id="LN657">657</td><td class="line">		<span class='keyword'>return</span> EC_POINT_copy(r, a);</td></tr>
+<tr><td class="num" id="LN658">658</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN659">659</td><td class="line">	field_mul = group-&gt;meth-&gt;field_mul;</td></tr>
+<tr><td class="num" id="LN660">660</td><td class="line">	field_sqr = group-&gt;meth-&gt;field_sqr;</td></tr>
+<tr><td class="num" id="LN661">661</td><td class="line">	p = &amp;group-&gt;field;</td></tr>
+<tr><td class="num" id="LN662">662</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN663">663</td><td class="line">	<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN664">664</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN665">665</td><td class="line">		ctx = new_ctx = BN_CTX_new();</td></tr>
+<tr><td class="num" id="LN666">666</td><td class="line">		<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN667">667</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN668">668</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN669">669</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN670">670</td><td class="line">	BN_CTX_start(ctx);</td></tr>
+<tr><td class="num" id="LN671">671</td><td class="line">	n0 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN672">672</td><td class="line">	n1 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN673">673</td><td class="line">	n2 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN674">674</td><td class="line">	n3 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN675">675</td><td class="line">	n4 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN676">676</td><td class="line">	n5 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN677">677</td><td class="line">	n6 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN678">678</td><td class="line">	<span class='keyword'>if</span> (n6 == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN679">679</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN680">680</td><td class="line">	<span class='comment'>/* Note that in this function we must not read components of 'a' or 'b'</span></td></tr>
+<tr><td class="num" id="LN681">681</td><td class="line">	 <span class='comment'>* once we have written the corresponding components of 'r'.</span></td></tr>
+<tr><td class="num" id="LN682">682</td><td class="line">	 <span class='comment'>* ('r' might be one of 'a' or 'b'.)</span></td></tr>
+<tr><td class="num" id="LN683">683</td><td class="line">	 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN684">684</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN685">685</td><td class="line">	<span class='comment'>/* n1, n2 */</span></td></tr>
+<tr><td class="num" id="LN686">686</td><td class="line">	<span class='keyword'>if</span> (b-&gt;Z_is_one)</td></tr>
+<tr><td class="num" id="LN687">687</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN688">688</td><td class="line">		<span class='keyword'>if</span> (!BN_copy(n1, &amp;a-&gt;X)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN689">689</td><td class="line">		<span class='keyword'>if</span> (!BN_copy(n2, &amp;a-&gt;Y)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN690">690</td><td class="line">		<span class='comment'>/* n1 = X_a */</span></td></tr>
+<tr><td class="num" id="LN691">691</td><td class="line">		<span class='comment'>/* n2 = Y_a */</span></td></tr>
+<tr><td class="num" id="LN692">692</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN693">693</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN694">694</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN695">695</td><td class="line">		<span class='keyword'>if</span> (!field_sqr(group, n0, &amp;b-&gt;Z, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN696">696</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, n1, &amp;a-&gt;X, n0, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN697">697</td><td class="line">		<span class='comment'>/* n1 = X_a * Z_b^2 */</span></td></tr>
+<tr><td class="num" id="LN698">698</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN699">699</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, n0, n0, &amp;b-&gt;Z, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN700">700</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, n2, &amp;a-&gt;Y, n0, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN701">701</td><td class="line">		<span class='comment'>/* n2 = Y_a * Z_b^3 */</span></td></tr>
+<tr><td class="num" id="LN702">702</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN703">703</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN704">704</td><td class="line">	<span class='comment'>/* n3, n4 */</span></td></tr>
+<tr><td class="num" id="LN705">705</td><td class="line">	<span class='keyword'>if</span> (a-&gt;Z_is_one)</td></tr>
+<tr><td class="num" id="LN706">706</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN707">707</td><td class="line">		<span class='keyword'>if</span> (!BN_copy(n3, &amp;b-&gt;X)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN708">708</td><td class="line">		<span class='keyword'>if</span> (!BN_copy(n4, &amp;b-&gt;Y)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN709">709</td><td class="line">		<span class='comment'>/* n3 = X_b */</span></td></tr>
+<tr><td class="num" id="LN710">710</td><td class="line">		<span class='comment'>/* n4 = Y_b */</span></td></tr>
+<tr><td class="num" id="LN711">711</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN712">712</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN713">713</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN714">714</td><td class="line">		<span class='keyword'>if</span> (!field_sqr(group, n0, &amp;a-&gt;Z, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN715">715</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, n3, &amp;b-&gt;X, n0, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN716">716</td><td class="line">		<span class='comment'>/* n3 = X_b * Z_a^2 */</span></td></tr>
+<tr><td class="num" id="LN717">717</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN718">718</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, n0, n0, &amp;a-&gt;Z, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN719">719</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, n4, &amp;b-&gt;Y, n0, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN720">720</td><td class="line">		<span class='comment'>/* n4 = Y_b * Z_a^3 */</span></td></tr>
+<tr><td class="num" id="LN721">721</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN722">722</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN723">723</td><td class="line">	<span class='comment'>/* n5, n6 */</span></td></tr>
+<tr><td class="num" id="LN724">724</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_sub_quick(n5, n1, n3, p)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN725">725</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_sub_quick(n6, n2, n4, p)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN726">726</td><td class="line">	<span class='comment'>/* n5 = n1 - n3 */</span></td></tr>
+<tr><td class="num" id="LN727">727</td><td class="line">	<span class='comment'>/* n6 = n2 - n4 */</span></td></tr>
+<tr><td class="num" id="LN728">728</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN729">729</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>BN_is_zero(n5)<span class='expansion'>((n5)-&gt;top == 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN730">730</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN731">731</td><td class="line">		<span class='keyword'>if</span> (<span class='macro'>BN_is_zero(n6)<span class='expansion'>((n6)-&gt;top == 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN732">732</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN733">733</td><td class="line">			<span class='comment'>/* a is the same point as b */</span></td></tr>
+<tr><td class="num" id="LN734">734</td><td class="line">			BN_CTX_end(ctx);</td></tr>
+<tr><td class="num" id="LN735">735</td><td class="line">			ret = EC_POINT_dbl(group, r, a, ctx);</td></tr>
+<tr><td class="num" id="LN736">736</td><td class="line">			ctx = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN737">737</td><td class="line">			<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN738">738</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN739">739</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN740">740</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN741">741</td><td class="line">			<span class='comment'>/* a is the inverse of b */</span></td></tr>
+<tr><td class="num" id="LN742">742</td><td class="line">			<span class='macro'>BN_zero(&amp;r-&gt;Z)<span class='expansion'>(BN_set_word((&amp;r-&gt;Z),0))</span></span>;</td></tr>
+<tr><td class="num" id="LN743">743</td><td class="line">			r-&gt;Z_is_one = 0;</td></tr>
+<tr><td class="num" id="LN744">744</td><td class="line">			ret = 1;</td></tr>
+<tr><td class="num" id="LN745">745</td><td class="line">			<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN746">746</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN747">747</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN748">748</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN749">749</td><td class="line">	<span class='comment'>/* 'n7', 'n8' */</span></td></tr>
+<tr><td class="num" id="LN750">750</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_add_quick(n1, n1, n3, p)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN751">751</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_add_quick(n2, n2, n4, p)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN752">752</td><td class="line">	<span class='comment'>/* 'n7' = n1 + n3 */</span></td></tr>
+<tr><td class="num" id="LN753">753</td><td class="line">	<span class='comment'>/* 'n8' = n2 + n4 */</span></td></tr>
+<tr><td class="num" id="LN754">754</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN755">755</td><td class="line">	<span class='comment'>/* Z_r */</span></td></tr>
+<tr><td class="num" id="LN756">756</td><td class="line">	<span class='keyword'>if</span> (a-&gt;Z_is_one &amp;&amp; b-&gt;Z_is_one)</td></tr>
+<tr><td class="num" id="LN757">757</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN758">758</td><td class="line">		<span class='keyword'>if</span> (!BN_copy(&amp;r-&gt;Z, n5)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN759">759</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN760">760</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN761">761</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN762">762</td><td class="line">		<span class='keyword'>if</span> (a-&gt;Z_is_one)</td></tr>
+<tr><td class="num" id="LN763">763</td><td class="line">			{ <span class='keyword'>if</span> (!BN_copy(n0, &amp;b-&gt;Z)) <span class='keyword'>goto</span> end; }</td></tr>
+<tr><td class="num" id="LN764">764</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> (b-&gt;Z_is_one)</td></tr>
+<tr><td class="num" id="LN765">765</td><td class="line">			{ <span class='keyword'>if</span> (!BN_copy(n0, &amp;a-&gt;Z)) <span class='keyword'>goto</span> end; }</td></tr>
+<tr><td class="num" id="LN766">766</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN767">767</td><td class="line">			{ <span class='keyword'>if</span> (!field_mul(group, n0, &amp;a-&gt;Z, &amp;b-&gt;Z, ctx)) <span class='keyword'>goto</span> end; }</td></tr>
+<tr><td class="num" id="LN768">768</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, &amp;r-&gt;Z, n0, n5, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN769">769</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN770">770</td><td class="line">	r-&gt;Z_is_one = 0;</td></tr>
+<tr><td class="num" id="LN771">771</td><td class="line">	<span class='comment'>/* Z_r = Z_a * Z_b * n5 */</span></td></tr>
+<tr><td class="num" id="LN772">772</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN773">773</td><td class="line">	<span class='comment'>/* X_r */</span></td></tr>
+<tr><td class="num" id="LN774">774</td><td class="line">	<span class='keyword'>if</span> (!field_sqr(group, n0, n6, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN775">775</td><td class="line">	<span class='keyword'>if</span> (!field_sqr(group, n4, n5, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN776">776</td><td class="line">	<span class='keyword'>if</span> (!field_mul(group, n3, n1, n4, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN777">777</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_sub_quick(&amp;r-&gt;X, n0, n3, p)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN778">778</td><td class="line">	<span class='comment'>/* X_r = n6^2 - n5^2 * 'n7' */</span></td></tr>
+<tr><td class="num" id="LN779">779</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN780">780</td><td class="line">	<span class='comment'>/* 'n9' */</span></td></tr>
+<tr><td class="num" id="LN781">781</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_lshift1_quick(n0, &amp;r-&gt;X, p)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN782">782</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_sub_quick(n0, n3, n0, p)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN783">783</td><td class="line">	<span class='comment'>/* n9 = n5^2 * 'n7' - 2 * X_r */</span></td></tr>
+<tr><td class="num" id="LN784">784</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN785">785</td><td class="line">	<span class='comment'>/* Y_r */</span></td></tr>
+<tr><td class="num" id="LN786">786</td><td class="line">	<span class='keyword'>if</span> (!field_mul(group, n0, n0, n6, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN787">787</td><td class="line">	<span class='keyword'>if</span> (!field_mul(group, n5, n4, n5, ctx)) <span class='keyword'>goto</span> end; <span class='comment'>/* now n5 is n5^3 */</span></td></tr>
+<tr><td class="num" id="LN788">788</td><td class="line">	<span class='keyword'>if</span> (!field_mul(group, n1, n2, n5, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN789">789</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_sub_quick(n0, n0, n1, p)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN790">790</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>BN_is_odd(n0)<span class='expansion'>(((n0)-&gt;top &gt; 0) &amp;&amp; ((n0)-&gt;d[0] &amp; 1))</span></span>)</td></tr>
+<tr><td class="num" id="LN791">791</td><td class="line">		<span class='keyword'>if</span> (!BN_add(n0, n0, p)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN792">792</td><td class="line">	<span class='comment'>/* now  0 &lt;= n0 &lt; 2*p,  and n0 is even */</span></td></tr>
+<tr><td class="num" id="LN793">793</td><td class="line">	<span class='keyword'>if</span> (!BN_rshift1(&amp;r-&gt;Y, n0)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN794">794</td><td class="line">	<span class='comment'>/* Y_r = (n6 * 'n9' - 'n8' * 'n5^3') / 2 */</span></td></tr>
+<tr><td class="num" id="LN795">795</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN796">796</td><td class="line">	ret = 1;</td></tr>
+<tr><td class="num" id="LN797">797</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN798">798</td><td class="line"> end:</td></tr>
+<tr><td class="num" id="LN799">799</td><td class="line">	<span class='keyword'>if</span> (ctx) <span class='comment'>/* otherwise we already called BN_CTX_end */</span></td></tr>
+<tr><td class="num" id="LN800">800</td><td class="line">		BN_CTX_end(ctx);</td></tr>
+<tr><td class="num" id="LN801">801</td><td class="line">	<span class='keyword'>if</span> (new_ctx != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN802">802</td><td class="line">		BN_CTX_free(new_ctx);</td></tr>
+<tr><td class="num" id="LN803">803</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN804">804</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN805">805</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN806">806</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN807">807</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_dbl(<span class='keyword'>const</span> EC_GROUP *group, EC_POINT *r, <span class='keyword'>const</span> EC_POINT *a, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN808">808</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN809">809</td><td class="line">	<span class='keyword'>int</span> (*field_mul)(<span class='keyword'>const</span> EC_GROUP *, BIGNUM *, <span class='keyword'>const</span> BIGNUM *, <span class='keyword'>const</span> BIGNUM *, BN_CTX *);</td></tr>
+<tr><td class="num" id="LN810">810</td><td class="line">	<span class='keyword'>int</span> (*field_sqr)(<span class='keyword'>const</span> EC_GROUP *, BIGNUM *, <span class='keyword'>const</span> BIGNUM *, BN_CTX *);</td></tr>
+<tr><td class="num" id="LN811">811</td><td class="line">	<span class='keyword'>const</span> BIGNUM *p;</td></tr>
+<tr><td class="num" id="LN812">812</td><td class="line">	BN_CTX *new_ctx = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN813">813</td><td class="line">	BIGNUM *n0, *n1, *n2, *n3;</td></tr>
+<tr><td class="num" id="LN814">814</td><td class="line">	<span class='keyword'>int</span> ret = 0;</td></tr>
+<tr><td class="num" id="LN815">815</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN816">816</td><td class="line">	<span class='keyword'>if</span> (EC_POINT_is_at_infinity(group, a))</td></tr>
+<tr><td class="num" id="LN817">817</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN818">818</td><td class="line">		<span class='macro'>BN_zero(&amp;r-&gt;Z)<span class='expansion'>(BN_set_word((&amp;r-&gt;Z),0))</span></span>;</td></tr>
+<tr><td class="num" id="LN819">819</td><td class="line">		r-&gt;Z_is_one = 0;</td></tr>
+<tr><td class="num" id="LN820">820</td><td class="line">		<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN821">821</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN822">822</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN823">823</td><td class="line">	field_mul = group-&gt;meth-&gt;field_mul;</td></tr>
+<tr><td class="num" id="LN824">824</td><td class="line">	field_sqr = group-&gt;meth-&gt;field_sqr;</td></tr>
+<tr><td class="num" id="LN825">825</td><td class="line">	p = &amp;group-&gt;field;</td></tr>
+<tr><td class="num" id="LN826">826</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN827">827</td><td class="line">	<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN828">828</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN829">829</td><td class="line">		ctx = new_ctx = BN_CTX_new();</td></tr>
+<tr><td class="num" id="LN830">830</td><td class="line">		<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN831">831</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN832">832</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN833">833</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN834">834</td><td class="line">	BN_CTX_start(ctx);</td></tr>
+<tr><td class="num" id="LN835">835</td><td class="line">	n0 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN836">836</td><td class="line">	n1 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN837">837</td><td class="line">	n2 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN838">838</td><td class="line">	n3 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN839">839</td><td class="line">	<span class='keyword'>if</span> (n3 == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN840">840</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN841">841</td><td class="line">	<span class='comment'>/* Note that in this function we must not read components of 'a'</span></td></tr>
+<tr><td class="num" id="LN842">842</td><td class="line">	 <span class='comment'>* once we have written the corresponding components of 'r'.</span></td></tr>
+<tr><td class="num" id="LN843">843</td><td class="line">	 <span class='comment'>* ('r' might the same as 'a'.)</span></td></tr>
+<tr><td class="num" id="LN844">844</td><td class="line">	 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN845">845</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN846">846</td><td class="line">	<span class='comment'>/* n1 */</span></td></tr>
+<tr><td class="num" id="LN847">847</td><td class="line">	<span class='keyword'>if</span> (a-&gt;Z_is_one)</td></tr>
+<tr><td class="num" id="LN848">848</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN849">849</td><td class="line">		<span class='keyword'>if</span> (!field_sqr(group, n0, &amp;a-&gt;X, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN850">850</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_lshift1_quick(n1, n0, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN851">851</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_add_quick(n0, n0, n1, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN852">852</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_add_quick(n1, n0, &amp;group-&gt;a, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN853">853</td><td class="line">		<span class='comment'>/* n1 = 3 * X_a^2 + a_curve */</span></td></tr>
+<tr><td class="num" id="LN854">854</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN855">855</td><td class="line">	<span class='keyword'>else</span> <span class='keyword'>if</span> (group-&gt;a_is_minus3)</td></tr>
+<tr><td class="num" id="LN856">856</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN857">857</td><td class="line">		<span class='keyword'>if</span> (!field_sqr(group, n1, &amp;a-&gt;Z, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN858">858</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_add_quick(n0, &amp;a-&gt;X, n1, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN859">859</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_sub_quick(n2, &amp;a-&gt;X, n1, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN860">860</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, n1, n0, n2, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN861">861</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_lshift1_quick(n0, n1, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN862">862</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_add_quick(n1, n0, n1, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN863">863</td><td class="line">		<span class='comment'>/* n1 = 3 * (X_a + Z_a^2) * (X_a - Z_a^2)</span></td></tr>
+<tr><td class="num" id="LN864">864</td><td class="line">		 <span class='comment'>*    = 3 * X_a^2 - 3 * Z_a^4 */</span></td></tr>
+<tr><td class="num" id="LN865">865</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN866">866</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN867">867</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN868">868</td><td class="line">		<span class='keyword'>if</span> (!field_sqr(group, n0, &amp;a-&gt;X, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN869">869</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_lshift1_quick(n1, n0, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN870">870</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_add_quick(n0, n0, n1, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN871">871</td><td class="line">		<span class='keyword'>if</span> (!field_sqr(group, n1, &amp;a-&gt;Z, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN872">872</td><td class="line">		<span class='keyword'>if</span> (!field_sqr(group, n1, n1, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN873">873</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, n1, n1, &amp;group-&gt;a, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN874">874</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_add_quick(n1, n1, n0, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN875">875</td><td class="line">		<span class='comment'>/* n1 = 3 * X_a^2 + a_curve * Z_a^4 */</span></td></tr>
+<tr><td class="num" id="LN876">876</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN877">877</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN878">878</td><td class="line">	<span class='comment'>/* Z_r */</span></td></tr>
+<tr><td class="num" id="LN879">879</td><td class="line">	<span class='keyword'>if</span> (a-&gt;Z_is_one)</td></tr>
+<tr><td class="num" id="LN880">880</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN881">881</td><td class="line">		<span class='keyword'>if</span> (!BN_copy(n0, &amp;a-&gt;Y)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN882">882</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN883">883</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN884">884</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN885">885</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, n0, &amp;a-&gt;Y, &amp;a-&gt;Z, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN886">886</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN887">887</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_lshift1_quick(&amp;r-&gt;Z, n0, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN888">888</td><td class="line">	r-&gt;Z_is_one = 0;</td></tr>
+<tr><td class="num" id="LN889">889</td><td class="line">	<span class='comment'>/* Z_r = 2 * Y_a * Z_a */</span></td></tr>
+<tr><td class="num" id="LN890">890</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN891">891</td><td class="line">	<span class='comment'>/* n2 */</span></td></tr>
+<tr><td class="num" id="LN892">892</td><td class="line">	<span class='keyword'>if</span> (!field_sqr(group, n3, &amp;a-&gt;Y, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN893">893</td><td class="line">	<span class='keyword'>if</span> (!field_mul(group, n2, &amp;a-&gt;X, n3, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN894">894</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_lshift_quick(n2, n2, 2, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN895">895</td><td class="line">	<span class='comment'>/* n2 = 4 * X_a * Y_a^2 */</span></td></tr>
+<tr><td class="num" id="LN896">896</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN897">897</td><td class="line">	<span class='comment'>/* X_r */</span></td></tr>
+<tr><td class="num" id="LN898">898</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_lshift1_quick(n0, n2, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN899">899</td><td class="line">	<span class='keyword'>if</span> (!field_sqr(group, &amp;r-&gt;X, n1, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN900">900</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_sub_quick(&amp;r-&gt;X, &amp;r-&gt;X, n0, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN901">901</td><td class="line">	<span class='comment'>/* X_r = n1^2 - 2 * n2 */</span></td></tr>
+<tr><td class="num" id="LN902">902</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN903">903</td><td class="line">	<span class='comment'>/* n3 */</span></td></tr>
+<tr><td class="num" id="LN904">904</td><td class="line">	<span class='keyword'>if</span> (!field_sqr(group, n0, n3, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN905">905</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_lshift_quick(n3, n0, 3, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN906">906</td><td class="line">	<span class='comment'>/* n3 = 8 * Y_a^4 */</span></td></tr>
+<tr><td class="num" id="LN907">907</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN908">908</td><td class="line">	<span class='comment'>/* Y_r */</span></td></tr>
+<tr><td class="num" id="LN909">909</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_sub_quick(n0, n2, &amp;r-&gt;X, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN910">910</td><td class="line">	<span class='keyword'>if</span> (!field_mul(group, n0, n1, n0, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN911">911</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_sub_quick(&amp;r-&gt;Y, n0, n3, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN912">912</td><td class="line">	<span class='comment'>/* Y_r = n1 * (n2 - X_r) - n3 */</span></td></tr>
+<tr><td class="num" id="LN913">913</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN914">914</td><td class="line">	ret = 1;</td></tr>
+<tr><td class="num" id="LN915">915</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN916">916</td><td class="line"> err:</td></tr>
+<tr><td class="num" id="LN917">917</td><td class="line">	BN_CTX_end(ctx);</td></tr>
+<tr><td class="num" id="LN918">918</td><td class="line">	<span class='keyword'>if</span> (new_ctx != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN919">919</td><td class="line">		BN_CTX_free(new_ctx);</td></tr>
+<tr><td class="num" id="LN920">920</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN921">921</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN922">922</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN923">923</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN924">924</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_invert(<span class='keyword'>const</span> EC_GROUP *group, EC_POINT *point, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN925">925</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN926">926</td><td class="line">	<span class='keyword'>if</span> (EC_POINT_is_at_infinity(group, point) || <span class='macro'>BN_is_zero(&amp;point-&gt;Y)<span class='expansion'>((&amp;point-&gt;Y)-&gt;top == 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN927">927</td><td class="line">		<span class='comment'>/* point is its own inverse */</span></td></tr>
+<tr><td class="num" id="LN928">928</td><td class="line">		<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN929">929</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN930">930</td><td class="line">	<span class='keyword'>return</span> BN_usub(&amp;point-&gt;Y, &amp;group-&gt;field, &amp;point-&gt;Y);</td></tr>
+<tr><td class="num" id="LN931">931</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN932">932</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN933">933</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN934">934</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_is_at_infinity(<span class='keyword'>const</span> EC_GROUP *group, <span class='keyword'>const</span> EC_POINT *point)</td></tr>
+<tr><td class="num" id="LN935">935</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN936">936</td><td class="line">	<span class='keyword'>return</span> <span class='macro'>BN_is_zero(&amp;point-&gt;Z)<span class='expansion'>((&amp;point-&gt;Z)-&gt;top == 0)</span></span>;</td></tr>
+<tr><td class="num" id="LN937">937</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN938">938</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN939">939</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN940">940</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_is_on_curve(<span class='keyword'>const</span> EC_GROUP *group, <span class='keyword'>const</span> EC_POINT *point, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN941">941</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN942">942</td><td class="line">	<span class='keyword'>int</span> (*field_mul)(<span class='keyword'>const</span> EC_GROUP *, BIGNUM *, <span class='keyword'>const</span> BIGNUM *, <span class='keyword'>const</span> BIGNUM *, BN_CTX *);</td></tr>
+<tr><td class="num" id="LN943">943</td><td class="line">	<span class='keyword'>int</span> (*field_sqr)(<span class='keyword'>const</span> EC_GROUP *, BIGNUM *, <span class='keyword'>const</span> BIGNUM *, BN_CTX *);</td></tr>
+<tr><td class="num" id="LN944">944</td><td class="line">	<span class='keyword'>const</span> BIGNUM *p;</td></tr>
+<tr><td class="num" id="LN945">945</td><td class="line">	BN_CTX *new_ctx = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN946">946</td><td class="line">	BIGNUM *rh, *tmp, *Z4, *Z6;</td></tr>
+<tr><td class="num" id="LN947">947</td><td class="line">	<span class='keyword'>int</span> ret = -1;</td></tr>
+<tr><td class="num" id="LN948">948</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN949">949</td><td class="line">	<span class='keyword'>if</span> (EC_POINT_is_at_infinity(group, point))</td></tr>
+<tr><td class="num" id="LN950">950</td><td class="line">		<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN951">951</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN952">952</td><td class="line">	field_mul = group-&gt;meth-&gt;field_mul;</td></tr>
+<tr><td class="num" id="LN953">953</td><td class="line">	field_sqr = group-&gt;meth-&gt;field_sqr;</td></tr>
+<tr><td class="num" id="LN954">954</td><td class="line">	p = &amp;group-&gt;field;</td></tr>
+<tr><td class="num" id="LN955">955</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN956">956</td><td class="line">	<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN957">957</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN958">958</td><td class="line">		ctx = new_ctx = BN_CTX_new();</td></tr>
+<tr><td class="num" id="LN959">959</td><td class="line">		<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN960">960</td><td class="line">			<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN961">961</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN962">962</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN963">963</td><td class="line">	BN_CTX_start(ctx);</td></tr>
+<tr><td class="num" id="LN964">964</td><td class="line">	rh = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN965">965</td><td class="line">	tmp = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN966">966</td><td class="line">	Z4 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN967">967</td><td class="line">	Z6 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN968">968</td><td class="line">	<span class='keyword'>if</span> (Z6 == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN969">969</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN970">970</td><td class="line">	<span class='comment'>/* We have a curve defined by a Weierstrass equation</span></td></tr>
+<tr><td class="num" id="LN971">971</td><td class="line">	 <span class='comment'>*      y^2 = x^3 + a*x + b.</span></td></tr>
+<tr><td class="num" id="LN972">972</td><td class="line">	 <span class='comment'>* The point to consider is given in Jacobian projective coordinates</span></td></tr>
+<tr><td class="num" id="LN973">973</td><td class="line">	 <span class='comment'>* where  (X, Y, Z)  represents  (x, y) = (X/Z^2, Y/Z^3).</span></td></tr>
+<tr><td class="num" id="LN974">974</td><td class="line">	 <span class='comment'>* Substituting this and multiplying by  Z^6  transforms the above equation into</span></td></tr>
+<tr><td class="num" id="LN975">975</td><td class="line">	 <span class='comment'>*      Y^2 = X^3 + a*X*Z^4 + b*Z^6.</span></td></tr>
+<tr><td class="num" id="LN976">976</td><td class="line">	 <span class='comment'>* To test this, we add up the right-hand side in 'rh'.</span></td></tr>
+<tr><td class="num" id="LN977">977</td><td class="line">	 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN978">978</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN979">979</td><td class="line">	<span class='comment'>/* rh := X^2 */</span></td></tr>
+<tr><td class="num" id="LN980">980</td><td class="line">	<span class='keyword'>if</span> (!field_sqr(group, rh, &amp;point-&gt;X, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN981">981</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN982">982</td><td class="line">	<span class='keyword'>if</span> (!point-&gt;Z_is_one)</td></tr>
+<tr><td class="num" id="LN983">983</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN984">984</td><td class="line">		<span class='keyword'>if</span> (!field_sqr(group, tmp, &amp;point-&gt;Z, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN985">985</td><td class="line">		<span class='keyword'>if</span> (!field_sqr(group, Z4, tmp, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN986">986</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, Z6, Z4, tmp, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN987">987</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN988">988</td><td class="line">		<span class='comment'>/* rh := (rh + a*Z^4)*X */</span></td></tr>
+<tr><td class="num" id="LN989">989</td><td class="line">		<span class='keyword'>if</span> (group-&gt;a_is_minus3)</td></tr>
+<tr><td class="num" id="LN990">990</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN991">991</td><td class="line">			<span class='keyword'>if</span> (!BN_mod_lshift1_quick(tmp, Z4, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN992">992</td><td class="line">			<span class='keyword'>if</span> (!BN_mod_add_quick(tmp, tmp, Z4, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN993">993</td><td class="line">			<span class='keyword'>if</span> (!BN_mod_sub_quick(rh, rh, tmp, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN994">994</td><td class="line">			<span class='keyword'>if</span> (!field_mul(group, rh, rh, &amp;point-&gt;X, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN995">995</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN996">996</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN997">997</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN998">998</td><td class="line">			<span class='keyword'>if</span> (!field_mul(group, tmp, Z4, &amp;group-&gt;a, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN999">999</td><td class="line">			<span class='keyword'>if</span> (!BN_mod_add_quick(rh, rh, tmp, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1000">1000</td><td class="line">			<span class='keyword'>if</span> (!field_mul(group, rh, rh, &amp;point-&gt;X, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1001">1001</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN1002">1002</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1003">1003</td><td class="line">		<span class='comment'>/* rh := rh + b*Z^6 */</span></td></tr>
+<tr><td class="num" id="LN1004">1004</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, tmp, &amp;group-&gt;b, Z6, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1005">1005</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_add_quick(rh, rh, tmp, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1006">1006</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1007">1007</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN1008">1008</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1009">1009</td><td class="line">		<span class='comment'>/* point-&gt;Z_is_one */</span></td></tr>
+<tr><td class="num" id="LN1010">1010</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1011">1011</td><td class="line">		<span class='comment'>/* rh := (rh + a)*X */</span></td></tr>
+<tr><td class="num" id="LN1012">1012</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_add_quick(rh, rh, &amp;group-&gt;a, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1013">1013</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, rh, rh, &amp;point-&gt;X, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1014">1014</td><td class="line">		<span class='comment'>/* rh := rh + b */</span></td></tr>
+<tr><td class="num" id="LN1015">1015</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_add_quick(rh, rh, &amp;group-&gt;b, p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1016">1016</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1017">1017</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1018">1018</td><td class="line">	<span class='comment'>/* 'lh' := Y^2 */</span></td></tr>
+<tr><td class="num" id="LN1019">1019</td><td class="line">	<span class='keyword'>if</span> (!field_sqr(group, tmp, &amp;point-&gt;Y, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1020">1020</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1021">1021</td><td class="line">	ret = (0 == BN_ucmp(tmp, rh));</td></tr>
+<tr><td class="num" id="LN1022">1022</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1023">1023</td><td class="line"> err:</td></tr>
+<tr><td class="num" id="LN1024">1024</td><td class="line">	BN_CTX_end(ctx);</td></tr>
+<tr><td class="num" id="LN1025">1025</td><td class="line">	<span class='keyword'>if</span> (new_ctx != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN1026">1026</td><td class="line">		BN_CTX_free(new_ctx);</td></tr>
+<tr><td class="num" id="LN1027">1027</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN1028">1028</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN1029">1029</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1030">1030</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1031">1031</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_cmp(<span class='keyword'>const</span> EC_GROUP *group, <span class='keyword'>const</span> EC_POINT *a, <span class='keyword'>const</span> EC_POINT *b, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN1032">1032</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN1033">1033</td><td class="line">	<span class='comment'>/* return values:</span></td></tr>
+<tr><td class="num" id="LN1034">1034</td><td class="line">	 <span class='comment'>*  -1   error</span></td></tr>
+<tr><td class="num" id="LN1035">1035</td><td class="line">	 <span class='comment'>*   0   equal (in affine coordinates)</span></td></tr>
+<tr><td class="num" id="LN1036">1036</td><td class="line">	 <span class='comment'>*   1   not equal</span></td></tr>
+<tr><td class="num" id="LN1037">1037</td><td class="line">	 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN1038">1038</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1039">1039</td><td class="line">	<span class='keyword'>int</span> (*field_mul)(<span class='keyword'>const</span> EC_GROUP *, BIGNUM *, <span class='keyword'>const</span> BIGNUM *, <span class='keyword'>const</span> BIGNUM *, BN_CTX *);</td></tr>
+<tr><td class="num" id="LN1040">1040</td><td class="line">	<span class='keyword'>int</span> (*field_sqr)(<span class='keyword'>const</span> EC_GROUP *, BIGNUM *, <span class='keyword'>const</span> BIGNUM *, BN_CTX *);</td></tr>
+<tr><td class="num" id="LN1041">1041</td><td class="line">	BN_CTX *new_ctx = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1042">1042</td><td class="line">	BIGNUM *tmp1, *tmp2, *Za23, *Zb23;</td></tr>
+<tr><td class="num" id="LN1043">1043</td><td class="line">	<span class='keyword'>const</span> BIGNUM *tmp1_, *tmp2_;</td></tr>
+<tr><td class="num" id="LN1044">1044</td><td class="line">	<span class='keyword'>int</span> ret = -1;</td></tr>
+<tr><td class="num" id="LN1045">1045</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN1046">1046</td><td class="line">	<span class='keyword'>if</span> (EC_POINT_is_at_infinity(group, a))</td></tr>
+<tr><td class="num" id="LN1047">1047</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1048">1048</td><td class="line">		<span class='keyword'>return</span> EC_POINT_is_at_infinity(group, b) ? 0 : 1;</td></tr>
+<tr><td class="num" id="LN1049">1049</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1050">1050</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1051">1051</td><td class="line">	<span class='keyword'>if</span> (EC_POINT_is_at_infinity(group, b))</td></tr>
+<tr><td class="num" id="LN1052">1052</td><td class="line">		<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN1053">1053</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN1054">1054</td><td class="line">	<span class='keyword'>if</span> (a-&gt;Z_is_one &amp;&amp; b-&gt;Z_is_one)</td></tr>
+<tr><td class="num" id="LN1055">1055</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1056">1056</td><td class="line">		<span class='keyword'>return</span> ((BN_cmp(&amp;a-&gt;X, &amp;b-&gt;X) == 0) &amp;&amp; BN_cmp(&amp;a-&gt;Y, &amp;b-&gt;Y) == 0) ? 0 : 1;</td></tr>
+<tr><td class="num" id="LN1057">1057</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1058">1058</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1059">1059</td><td class="line">	field_mul = group-&gt;meth-&gt;field_mul;</td></tr>
+<tr><td class="num" id="LN1060">1060</td><td class="line">	field_sqr = group-&gt;meth-&gt;field_sqr;</td></tr>
+<tr><td class="num" id="LN1061">1061</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1062">1062</td><td class="line">	<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN1063">1063</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1064">1064</td><td class="line">		ctx = new_ctx = BN_CTX_new();</td></tr>
+<tr><td class="num" id="LN1065">1065</td><td class="line">		<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN1066">1066</td><td class="line">			<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN1067">1067</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1068">1068</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1069">1069</td><td class="line">	BN_CTX_start(ctx);</td></tr>
+<tr><td class="num" id="LN1070">1070</td><td class="line">	tmp1 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN1071">1071</td><td class="line">	tmp2 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN1072">1072</td><td class="line">	Za23 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN1073">1073</td><td class="line">	Zb23 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN1074">1074</td><td class="line">	<span class='keyword'>if</span> (Zb23 == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN1075">1075</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1076">1076</td><td class="line">	<span class='comment'>/* We have to decide whether</span></td></tr>
+<tr><td class="num" id="LN1077">1077</td><td class="line">	 <span class='comment'>*     (X_a/Z_a^2, Y_a/Z_a^3) = (X_b/Z_b^2, Y_b/Z_b^3),</span></td></tr>
+<tr><td class="num" id="LN1078">1078</td><td class="line">	 <span class='comment'>* or equivalently, whether</span></td></tr>
+<tr><td class="num" id="LN1079">1079</td><td class="line">	 <span class='comment'>*     (X_a*Z_b^2, Y_a*Z_b^3) = (X_b*Z_a^2, Y_b*Z_a^3).</span></td></tr>
+<tr><td class="num" id="LN1080">1080</td><td class="line">	 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN1081">1081</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1082">1082</td><td class="line">	<span class='keyword'>if</span> (!b-&gt;Z_is_one)</td></tr>
+<tr><td class="num" id="LN1083">1083</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1084">1084</td><td class="line">		<span class='keyword'>if</span> (!field_sqr(group, Zb23, &amp;b-&gt;Z, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN1085">1085</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, tmp1, &amp;a-&gt;X, Zb23, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN1086">1086</td><td class="line">		tmp1_ = tmp1;</td></tr>
+<tr><td class="num" id="LN1087">1087</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1088">1088</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN1089">1089</td><td class="line">		tmp1_ = &amp;a-&gt;X;</td></tr>
+<tr><td class="num" id="LN1090">1090</td><td class="line">	<span class='keyword'>if</span> (!a-&gt;Z_is_one)</td></tr>
+<tr><td class="num" id="LN1091">1091</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1092">1092</td><td class="line">		<span class='keyword'>if</span> (!field_sqr(group, Za23, &amp;a-&gt;Z, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN1093">1093</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, tmp2, &amp;b-&gt;X, Za23, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN1094">1094</td><td class="line">		tmp2_ = tmp2;</td></tr>
+<tr><td class="num" id="LN1095">1095</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1096">1096</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN1097">1097</td><td class="line">		tmp2_ = &amp;b-&gt;X;</td></tr>
+<tr><td class="num" id="LN1098">1098</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN1099">1099</td><td class="line">	<span class='comment'>/* compare  X_a*Z_b^2  with  X_b*Z_a^2 */</span></td></tr>
+<tr><td class="num" id="LN1100">1100</td><td class="line">	<span class='keyword'>if</span> (BN_cmp(tmp1_, tmp2_) != 0)</td></tr>
+<tr><td class="num" id="LN1101">1101</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1102">1102</td><td class="line">		ret = 1; <span class='comment'>/* points differ */</span></td></tr>
+<tr><td class="num" id="LN1103">1103</td><td class="line">		<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN1104">1104</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1105">1105</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1106">1106</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1107">1107</td><td class="line">	<span class='keyword'>if</span> (!b-&gt;Z_is_one)</td></tr>
+<tr><td class="num" id="LN1108">1108</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1109">1109</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, Zb23, Zb23, &amp;b-&gt;Z, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN1110">1110</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, tmp1, &amp;a-&gt;Y, Zb23, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN1111">1111</td><td class="line">		<span class='comment'>/* tmp1_ = tmp1 */</span></td></tr>
+<tr><td class="num" id="LN1112">1112</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1113">1113</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN1114">1114</td><td class="line">		tmp1_ = &amp;a-&gt;Y;</td></tr>
+<tr><td class="num" id="LN1115">1115</td><td class="line">	<span class='keyword'>if</span> (!a-&gt;Z_is_one)</td></tr>
+<tr><td class="num" id="LN1116">1116</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1117">1117</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, Za23, Za23, &amp;a-&gt;Z, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN1118">1118</td><td class="line">		<span class='keyword'>if</span> (!field_mul(group, tmp2, &amp;b-&gt;Y, Za23, ctx)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN1119">1119</td><td class="line">		<span class='comment'>/* tmp2_ = tmp2 */</span></td></tr>
+<tr><td class="num" id="LN1120">1120</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1121">1121</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN1122">1122</td><td class="line">		tmp2_ = &amp;b-&gt;Y;</td></tr>
+<tr><td class="num" id="LN1123">1123</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1124">1124</td><td class="line">	<span class='comment'>/* compare  Y_a*Z_b^3  with  Y_b*Z_a^3 */</span></td></tr>
+<tr><td class="num" id="LN1125">1125</td><td class="line">	<span class='keyword'>if</span> (BN_cmp(tmp1_, tmp2_) != 0)</td></tr>
+<tr><td class="num" id="LN1126">1126</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1127">1127</td><td class="line">		ret = 1; <span class='comment'>/* points differ */</span></td></tr>
+<tr><td class="num" id="LN1128">1128</td><td class="line">		<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN1129">1129</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1130">1130</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1131">1131</td><td class="line">	<span class='comment'>/* points are equal */</span></td></tr>
+<tr><td class="num" id="LN1132">1132</td><td class="line">	ret = 0;</td></tr>
+<tr><td class="num" id="LN1133">1133</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1134">1134</td><td class="line"> end:</td></tr>
+<tr><td class="num" id="LN1135">1135</td><td class="line">	BN_CTX_end(ctx);</td></tr>
+<tr><td class="num" id="LN1136">1136</td><td class="line">	<span class='keyword'>if</span> (new_ctx != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN1137">1137</td><td class="line">		BN_CTX_free(new_ctx);</td></tr>
+<tr><td class="num" id="LN1138">1138</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN1139">1139</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN1140">1140</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1141">1141</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1142">1142</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_make_affine(<span class='keyword'>const</span> EC_GROUP *group, EC_POINT *point, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN1143">1143</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN1144">1144</td><td class="line">	BN_CTX *new_ctx = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1145">1145</td><td class="line">	BIGNUM *x, *y;</td></tr>
+<tr><td class="num" id="LN1146">1146</td><td class="line">	<span class='keyword'>int</span> ret = 0;</td></tr>
+<tr><td class="num" id="LN1147">1147</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1148">1148</td><td class="line">	<span class='keyword'>if</span> (point-&gt;Z_is_one || EC_POINT_is_at_infinity(group, point))</td></tr>
+<tr><td class="num" id="LN1149">1149</td><td class="line">		<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN1150">1150</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1151">1151</td><td class="line">	<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN1152">1152</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1153">1153</td><td class="line">		ctx = new_ctx = BN_CTX_new();</td></tr>
+<tr><td class="num" id="LN1154">1154</td><td class="line">		<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN1155">1155</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN1156">1156</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1157">1157</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1158">1158</td><td class="line">	BN_CTX_start(ctx);</td></tr>
+<tr><td class="num" id="LN1159">1159</td><td class="line">	x = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN1160">1160</td><td class="line">	y = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN1161">1161</td><td class="line">	<span class='keyword'>if</span> (y == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1162">1162</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1163">1163</td><td class="line">	<span class='keyword'>if</span> (!EC_POINT_get_affine_coordinates_GFp(group, point, x, y, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1164">1164</td><td class="line">	<span class='keyword'>if</span> (!EC_POINT_set_affine_coordinates_GFp(group, point, x, y, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1165">1165</td><td class="line">	<span class='keyword'>if</span> (!point-&gt;Z_is_one)</td></tr>
+<tr><td class="num" id="LN1166">1166</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1167">1167</td><td class="line">		<span class='macro'>ECerr(EC_F_EC_GFP_SIMPLE_MAKE_AFFINE, ERR_R_INTERNAL_ERROR)<span class='expansion'>ERR_put_error(16,(102),((4|64)),"ecp_smpl.c",1167)</span></span>;</td></tr>
+<tr><td class="num" id="LN1168">1168</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1169">1169</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1170">1170</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN1171">1171</td><td class="line">	ret = 1;</td></tr>
+<tr><td class="num" id="LN1172">1172</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1173">1173</td><td class="line"> err:</td></tr>
+<tr><td class="num" id="LN1174">1174</td><td class="line">	BN_CTX_end(ctx);</td></tr>
+<tr><td class="num" id="LN1175">1175</td><td class="line">	<span class='keyword'>if</span> (new_ctx != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN1176">1176</td><td class="line">		BN_CTX_free(new_ctx);</td></tr>
+<tr><td class="num" id="LN1177">1177</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN1178">1178</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN1179">1179</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1180">1180</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1181">1181</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_points_make_affine(<span class='keyword'>const</span> EC_GROUP *group, size_t num, EC_POINT *points[], BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN1182">1182</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN1183">1183</td><td class="line">	BN_CTX *new_ctx = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1184">1184</td><td class="line">	BIGNUM *tmp0, *tmp1;</td></tr>
+<tr><td class="num" id="LN1185">1185</td><td class="line">	size_t pow2 = 0;</td></tr>
+<tr><td class="num" id="LN1186">1186</td><td class="line">	BIGNUM **heap = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1187">1187</td><td class="line">	size_t i;</td></tr>
+<tr><td class="num" id="LN1188">1188</td><td class="line">	<span class='keyword'>int</span> ret = 0;</td></tr>
+<tr><td class="num" id="LN1189">1189</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1190">1190</td><td class="line">	<span class='keyword'>if</span> (<span class="mrange">num == 0</span>)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path1" class="msg msgEvent" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">1</div></td><td>Assuming 'num' is not equal to 0</td><td><div class="PathNav"><a href="#Path2" title="Next event (2)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path2" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">2</div></td><td><div class="PathNav"><a href="#Path1" title="Previous event (1)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path3" title="Next event (3)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1191">1191</td><td class="line">		<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN1192">1192</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1193">1193</td><td class="line">	<span class='keyword'>if</span> (<span class="mrange">ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span></span>)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path3" class="msg msgEvent" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">3</div></td><td><div class="PathNav"><a href="#Path2" title="Previous event (2)">&#x2190;</a></div></td></td><td>Assuming 'ctx' is not equal to null</td><td><div class="PathNav"><a href="#Path4" title="Next event (4)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path4" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">4</div></td><td><div class="PathNav"><a href="#Path3" title="Previous event (3)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path5" title="Next event (5)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1194">1194</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1195">1195</td><td class="line">		ctx = new_ctx = BN_CTX_new();</td></tr>
+<tr><td class="num" id="LN1196">1196</td><td class="line">		<span class='keyword'>if</span> (ctx == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN1197">1197</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN1198">1198</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1199">1199</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1200">1200</td><td class="line">	BN_CTX_start(ctx);</td></tr>
+<tr><td class="num" id="LN1201">1201</td><td class="line">	tmp0 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN1202">1202</td><td class="line">	tmp1 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN1203">1203</td><td class="line">	<span class='keyword'>if</span> (<span class="mrange">tmp0  == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span></span> || <span class="mrange">tmp1 == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path5" class="msg msgEvent" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">5</div></td><td><div class="PathNav"><a href="#Path4" title="Previous event (4)">&#x2190;</a></div></td></td><td>Assuming 'tmp0' is not equal to null</td><td><div class="PathNav"><a href="#Path6" title="Next event (6)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path6" class="msg msgEvent" style="margin-left:30ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">6</div></td><td><div class="PathNav"><a href="#Path5" title="Previous event (5)">&#x2190;</a></div></td></td><td>Assuming 'tmp1' is not equal to null</td><td><div class="PathNav"><a href="#Path7" title="Next event (7)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path7" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">7</div></td><td><div class="PathNav"><a href="#Path6" title="Previous event (6)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path8" title="Next event (8)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1204">1204</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1205">1205</td><td class="line">	<span class='comment'>/* Before converting the individual points, compute inverses of all Z values.</span></td></tr>
+<tr><td class="num" id="LN1206">1206</td><td class="line">	 <span class='comment'>* Modular inversion is rather slow, but luckily we can do with a single</span></td></tr>
+<tr><td class="num" id="LN1207">1207</td><td class="line">	 <span class='comment'>* explicit inversion, plus about 3 multiplications per input value.</span></td></tr>
+<tr><td class="num" id="LN1208">1208</td><td class="line">	 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN1209">1209</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1210">1210</td><td class="line">	pow2 = 1;</td></tr>
+<tr><td class="num" id="LN1211">1211</td><td class="line">	<span class='keyword'>while</span> (<span class="mrange"><span class="mrange">num &gt; pow2</span></span>)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path8" class="msg msgEvent" style="margin-left:16ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">8</div></td><td><div class="PathNav"><a href="#Path7" title="Previous event (7)">&#x2190;</a></div></td></td><td>Assuming 'num' is &gt; 'pow2'</td><td><div class="PathNav"><a href="#Path9" title="Next event (9)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path9" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">9</div></td><td><div class="PathNav"><a href="#Path8" title="Previous event (8)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path10" title="Next event (10)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path10" class="msg msgEvent" style="margin-left:16ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">10</div></td><td><div class="PathNav"><a href="#Path9" title="Previous event (9)">&#x2190;</a></div></td></td><td>Assuming 'num' is &lt;= 'pow2'</td><td><div class="PathNav"><a href="#Path11" title="Next event (11)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path11" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">11</div></td><td><div class="PathNav"><a href="#Path10" title="Previous event (10)">&#x2190;</a></div></td></td><td>Loop condition is false. Execution continues on line 1215</td><td><div class="PathNav"><a href="#Path12" title="Next event (12)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1212">1212</td><td class="line">		pow2 &lt;&lt;= 1;</td></tr>
+<tr><td class="num" id="LN1213">1213</td><td class="line">	<span class='comment'>/* Now pow2 is the smallest power of 2 satifsying pow2 &gt;= num.</span></td></tr>
+<tr><td class="num" id="LN1214">1214</td><td class="line">	 <span class='comment'>* We need twice that. */</span></td></tr>
+<tr><td class="num" id="LN1215">1215</td><td class="line">	pow2 &lt;&lt;= 1;</td></tr>
+<tr><td class="num" id="LN1216">1216</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1217">1217</td><td class="line">	heap = <span class='macro'>OPENSSL_malloc(pow2 * <span class='keyword'>sizeof</span> heap[0])<span class='expansion'>CRYPTO_malloc((int)pow2 * sizeof heap[0],"ecp_smpl.c",1217)</span></span>;</td></tr>
+<tr><td class="num" id="LN1218">1218</td><td class="line">	<span class='keyword'>if</span> (<span class="mrange">heap == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path12" class="msg msgEvent" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">12</div></td><td><div class="PathNav"><a href="#Path11" title="Previous event (11)">&#x2190;</a></div></td></td><td>Assuming 'heap' is not equal to null</td><td><div class="PathNav"><a href="#Path13" title="Next event (13)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path13" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">13</div></td><td><div class="PathNav"><a href="#Path12" title="Previous event (12)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path14" title="Next event (14)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1219">1219</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN1220">1220</td><td class="line">	<span class='comment'>/* The array is used as a binary tree, exactly as in heapsort:</span></td></tr>
+<tr><td class="num" id="LN1221">1221</td><td class="line">	 <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN1222">1222</td><td class="line">	 <span class='comment'>*                               heap[1]</span></td></tr>
+<tr><td class="num" id="LN1223">1223</td><td class="line">	 <span class='comment'>*                 heap[2]                     heap[3]</span></td></tr>
+<tr><td class="num" id="LN1224">1224</td><td class="line">	 <span class='comment'>*          heap[4]       heap[5]       heap[6]       heap[7]</span></td></tr>
+<tr><td class="num" id="LN1225">1225</td><td class="line">	 <span class='comment'>*   heap[8]heap[9] heap[10]heap[11] heap[12]heap[13] heap[14] heap[15]</span></td></tr>
+<tr><td class="num" id="LN1226">1226</td><td class="line">	 <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN1227">1227</td><td class="line">	 <span class='comment'>* We put the Z's in the last line;</span></td></tr>
+<tr><td class="num" id="LN1228">1228</td><td class="line">	 <span class='comment'>* then we set each other node to the product of its two child-nodes (where</span></td></tr>
+<tr><td class="num" id="LN1229">1229</td><td class="line">	 <span class='comment'>* empty or 0 entries are treated as ones);</span></td></tr>
+<tr><td class="num" id="LN1230">1230</td><td class="line">	 <span class='comment'>* then we invert heap[1];</span></td></tr>
+<tr><td class="num" id="LN1231">1231</td><td class="line">	 <span class='comment'>* then we invert each other node by replacing it by the product of its</span></td></tr>
+<tr><td class="num" id="LN1232">1232</td><td class="line">	 <span class='comment'>* parent (after inversion) and its sibling (before inversion).</span></td></tr>
+<tr><td class="num" id="LN1233">1233</td><td class="line">	 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN1234">1234</td><td class="line">	heap[0] = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1235">1235</td><td class="line">	<span class='keyword'>for</span> (i = pow2/2 - 1; i &gt; 0; i--)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path14" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">14</div></td><td><div class="PathNav"><a href="#Path13" title="Previous event (13)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path15" title="Next event (15)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path15" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">15</div></td><td><div class="PathNav"><a href="#Path14" title="Previous event (14)">&#x2190;</a></div></td></td><td>Loop condition is false. Execution continues on line 1237</td><td><div class="PathNav"><a href="#Path16" title="Next event (16)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1236">1236</td><td class="line">		heap[i] = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1237">1237</td><td class="line">	<span class='keyword'>for</span> (i = 0; i &lt; num; i++)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path16" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">16</div></td><td><div class="PathNav"><a href="#Path15" title="Previous event (15)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path17" title="Next event (17)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path17" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">17</div></td><td><div class="PathNav"><a href="#Path16" title="Previous event (16)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path18" title="Next event (18)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path18" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">18</div></td><td><div class="PathNav"><a href="#Path17" title="Previous event (17)">&#x2190;</a></div></td></td><td>Loop condition is false. Execution continues on line 1239</td><td><div class="PathNav"><a href="#Path19" title="Next event (19)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1238">1238</td><td class="line">		heap[pow2/2 + i] = &amp;points[i]-&gt;Z;</td></tr>
+<tr><td class="num" id="LN1239">1239</td><td class="line">	<span class='keyword'>for</span> (i = pow2/2 + num; i &lt; pow2; i++)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path19" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">19</div></td><td><div class="PathNav"><a href="#Path18" title="Previous event (18)">&#x2190;</a></div></td></td><td>Loop condition is false. Execution continues on line 1243</td><td><div class="PathNav"><a href="#Path20" title="Next event (20)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1240">1240</td><td class="line">		heap[i] = <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1241">1241</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN1242">1242</td><td class="line">	<span class='comment'>/* set each node to the product of its children */</span></td></tr>
+<tr><td class="num" id="LN1243">1243</td><td class="line">	<span class='keyword'>for</span> (i = pow2/2 - 1; i &gt; 0; i--)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path20" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">20</div></td><td><div class="PathNav"><a href="#Path19" title="Previous event (19)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path21" title="Next event (21)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path23" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">23</div></td><td><div class="PathNav"><a href="#Path22" title="Previous event (22)">&#x2190;</a></div></td></td><td>Loop condition is false. Execution continues on line 1270</td><td><div class="PathNav"><a href="#Path24" title="Next event (24)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1244">1244</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1245">1245</td><td class="line">		heap[i] = BN_new();</td></tr>
+<tr><td class="num" id="LN1246">1246</td><td class="line">		<span class='keyword'>if</span> (heap[i] == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path21" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">21</div></td><td><div class="PathNav"><a href="#Path20" title="Previous event (20)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path22" title="Next event (22)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1247">1247</td><td class="line">		</td></tr>
+<tr><td class="num" id="LN1248">1248</td><td class="line">		<span class='keyword'>if</span> (heap[2*i] != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path22" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">22</div></td><td><div class="PathNav"><a href="#Path21" title="Previous event (21)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path23" title="Next event (23)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1249">1249</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN1250">1250</td><td class="line">			<span class='keyword'>if</span> ((heap[2*i + 1] == <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>) || <span class='macro'>BN_is_zero(heap[2*i + 1])<span class='expansion'>((heap[2*i + 1])-&gt;top == 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN1251">1251</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN1252">1252</td><td class="line">				<span class='keyword'>if</span> (!BN_copy(heap[i], heap[2*i])) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1253">1253</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN1254">1254</td><td class="line">			<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN1255">1255</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN1256">1256</td><td class="line">				<span class='keyword'>if</span> (<span class='macro'>BN_is_zero(heap[2*i])<span class='expansion'>((heap[2*i])-&gt;top == 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN1257">1257</td><td class="line">					{</td></tr>
+<tr><td class="num" id="LN1258">1258</td><td class="line">					<span class='keyword'>if</span> (!BN_copy(heap[i], heap[2*i + 1])) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1259">1259</td><td class="line">					}</td></tr>
+<tr><td class="num" id="LN1260">1260</td><td class="line">				<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN1261">1261</td><td class="line">					{</td></tr>
+<tr><td class="num" id="LN1262">1262</td><td class="line">					<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_mul(group, heap[i],</td></tr>
+<tr><td class="num" id="LN1263">1263</td><td class="line">						heap[2*i], heap[2*i + 1], ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1264">1264</td><td class="line">					}</td></tr>
+<tr><td class="num" id="LN1265">1265</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN1266">1266</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN1267">1267</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1268">1268</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1269">1269</td><td class="line">	<span class='comment'>/* invert heap[1] */</span></td></tr>
+<tr><td class="num" id="LN1270">1270</td><td class="line">	<span class='keyword'>if</span> (!<span class='macro'>BN_is_zero(heap[1])<span class='expansion'>((heap[1])-&gt;top == 0)</span></span>)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path24" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">24</div></td><td><div class="PathNav"><a href="#Path23" title="Previous event (23)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path25" title="Next event (25)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1271">1271</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1272">1272</td><td class="line">		<span class='keyword'>if</span> (!BN_mod_inverse(heap[1], heap[1], &amp;group-&gt;field, ctx))</td></tr>
+<tr><td class="num" id="LN1273">1273</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN1274">1274</td><td class="line">			<span class='macro'>ECerr(EC_F_EC_GFP_SIMPLE_POINTS_MAKE_AFFINE, ERR_R_BN_LIB)<span class='expansion'>ERR_put_error(16,(137),(3),"ecp_smpl.c",1274)</span></span>;</td></tr>
+<tr><td class="num" id="LN1275">1275</td><td class="line">			<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1276">1276</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN1277">1277</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1278">1278</td><td class="line">	<span class='keyword'>if</span> (group-&gt;meth-&gt;field_encode != 0)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path25" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">25</div></td><td><div class="PathNav"><a href="#Path24" title="Previous event (24)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path26" title="Next event (26)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1279">1279</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1280">1280</td><td class="line">		<span class='comment'>/* in the Montgomery case, we just turned  R*H  (representing H)</span></td></tr>
+<tr><td class="num" id="LN1281">1281</td><td class="line">		 <span class='comment'>* into  1/(R*H),  but we need  R*(1/H)  (representing 1/H);</span></td></tr>
+<tr><td class="num" id="LN1282">1282</td><td class="line">		 <span class='comment'>* i.e. we have need to multiply by the Montgomery factor twice */</span></td></tr>
+<tr><td class="num" id="LN1283">1283</td><td class="line">		<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_encode(group, heap[1], heap[1], ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1284">1284</td><td class="line">		<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_encode(group, heap[1], heap[1], ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1285">1285</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1286">1286</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1287">1287</td><td class="line">	<span class='comment'>/* set other heap[i]'s to their inverses */</span></td></tr>
+<tr><td class="num" id="LN1288">1288</td><td class="line">	<span class='keyword'>for</span> (i = 2; i &lt; pow2/2 + num; i += 2)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path26" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">26</div></td><td><div class="PathNav"><a href="#Path25" title="Previous event (25)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path27" title="Next event (27)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path28" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">28</div></td><td><div class="PathNav"><a href="#Path27" title="Previous event (27)">&#x2190;</a></div></td></td><td>Loop condition is false. Execution continues on line 1305</td><td><div class="PathNav"><a href="#Path29" title="Next event (29)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1289">1289</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1290">1290</td><td class="line">		<span class='comment'>/* i is even */</span></td></tr>
+<tr><td class="num" id="LN1291">1291</td><td class="line">		<span class='keyword'>if</span> ((heap[i + 1] != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>) &amp;&amp; !<span class='macro'>BN_is_zero(heap[i + 1])<span class='expansion'>((heap[i + 1])-&gt;top == 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN1292">1292</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN1293">1293</td><td class="line">			<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_mul(group, tmp0, heap[i/2], heap[i + 1], ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1294">1294</td><td class="line">			<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_mul(group, tmp1, heap[i/2], heap[i], ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1295">1295</td><td class="line">			<span class='keyword'>if</span> (!BN_copy(heap[i], tmp0)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1296">1296</td><td class="line">			<span class='keyword'>if</span> (!BN_copy(heap[i + 1], tmp1)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1297">1297</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN1298">1298</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN1299">1299</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN1300">1300</td><td class="line">			<span class='keyword'>if</span> (!BN_copy(heap[i], heap[i/2])) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path27" class="msg msgControl" style="margin-left:25ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">27</div></td><td><div class="PathNav"><a href="#Path26" title="Previous event (26)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path28" title="Next event (28)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1301">1301</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN1302">1302</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1303">1303</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1304">1304</td><td class="line">	<span class='comment'>/* we have replaced all non-zero Z's by their inverses, now fix up all the points */</span></td></tr>
+<tr><td class="num" id="LN1305">1305</td><td class="line">	<span class='keyword'>for</span> (i = 0; i &lt; num; i++)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path29" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">29</div></td><td><div class="PathNav"><a href="#Path28" title="Previous event (28)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#EndPath" title="Next event (30)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN1306">1306</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1307">1307</td><td class="line">		EC_POINT *p = points[i];</td></tr>
+<tr><td class="num" id="LN1308">1308</td><td class="line">		</td></tr>
+<tr><td class="num" id="LN1309">1309</td><td class="line">		<span class='keyword'>if</span> (!<span class='macro'>BN_is_zero(&amp;p-&gt;Z)<span class='expansion'>((&amp;p-&gt;Z)-&gt;top == 0)</span></span>)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgControl" style="margin-left:22ex; max-width:100em"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">30</div></td><td><div class="PathNav"><a href="#Path29" title="Previous event (29)">&#x2190;</a></div></td></td><td>Within the expansion of the macro 'BN_is_zero':
+</td></tr></table><div class="msg msgEvent" style="width:94%; margin-left:5px"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">a</div></td><td valign="top">Access to field 'top' results in a dereference of a null pointer</td></tr></table></div>
+</div></td></tr>
+<tr><td class="num" id="LN1310">1310</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN1311">1311</td><td class="line">			<span class='comment'>/* turn  (X, Y, 1/Z)  into  (X/Z^2, Y/Z^3, 1) */</span></td></tr>
+<tr><td class="num" id="LN1312">1312</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1313">1313</td><td class="line">			<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_sqr(group, tmp1, &amp;p-&gt;Z, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1314">1314</td><td class="line">			<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_mul(group, &amp;p-&gt;X, &amp;p-&gt;X, tmp1, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1315">1315</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1316">1316</td><td class="line">			<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_mul(group, tmp1, tmp1, &amp;p-&gt;Z, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1317">1317</td><td class="line">			<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_mul(group, &amp;p-&gt;Y, &amp;p-&gt;Y, tmp1, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1318">1318</td><td class="line">		</td></tr>
+<tr><td class="num" id="LN1319">1319</td><td class="line">			<span class='keyword'>if</span> (group-&gt;meth-&gt;field_set_to_one != 0)</td></tr>
+<tr><td class="num" id="LN1320">1320</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN1321">1321</td><td class="line">				<span class='keyword'>if</span> (!group-&gt;meth-&gt;field_set_to_one(group, &amp;p-&gt;Z, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1322">1322</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN1323">1323</td><td class="line">			<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN1324">1324</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN1325">1325</td><td class="line">				<span class='keyword'>if</span> (!<span class='macro'>BN_one(&amp;p-&gt;Z)<span class='expansion'>(BN_set_word((&amp;p-&gt;Z),1))</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN1326">1326</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN1327">1327</td><td class="line">			p-&gt;Z_is_one = 1;</td></tr>
+<tr><td class="num" id="LN1328">1328</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN1329">1329</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1330">1330</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1331">1331</td><td class="line">	ret = 1;</td></tr>
+<tr><td class="num" id="LN1332">1332</td><td class="line">		</td></tr>
+<tr><td class="num" id="LN1333">1333</td><td class="line"> err:</td></tr>
+<tr><td class="num" id="LN1334">1334</td><td class="line">	BN_CTX_end(ctx);</td></tr>
+<tr><td class="num" id="LN1335">1335</td><td class="line">	<span class='keyword'>if</span> (new_ctx != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN1336">1336</td><td class="line">		BN_CTX_free(new_ctx);</td></tr>
+<tr><td class="num" id="LN1337">1337</td><td class="line">	<span class='keyword'>if</span> (heap != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN1338">1338</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN1339">1339</td><td class="line">		<span class='comment'>/* heap[pow2/2] .. heap[pow2-1] have not been allocated locally! */</span></td></tr>
+<tr><td class="num" id="LN1340">1340</td><td class="line">		<span class='keyword'>for</span> (i = pow2/2 - 1; i &gt; 0; i--)</td></tr>
+<tr><td class="num" id="LN1341">1341</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN1342">1342</td><td class="line">			<span class='keyword'>if</span> (heap[i] != <span class='macro'>NULL<span class='expansion'>((void *)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN1343">1343</td><td class="line">				BN_clear_free(heap[i]);</td></tr>
+<tr><td class="num" id="LN1344">1344</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN1345">1345</td><td class="line">		<span class='macro'>OPENSSL_free(heap)<span class='expansion'>CRYPTO_free(heap)</span></span>;</td></tr>
+<tr><td class="num" id="LN1346">1346</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN1347">1347</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN1348">1348</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN1349">1349</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1350">1350</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1351">1351</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_field_mul(<span class='keyword'>const</span> EC_GROUP *group, BIGNUM *r, <span class='keyword'>const</span> BIGNUM *a, <span class='keyword'>const</span> BIGNUM *b, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN1352">1352</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN1353">1353</td><td class="line">	<span class='keyword'>return</span> BN_mod_mul(r, a, b, &amp;group-&gt;field, ctx);</td></tr>
+<tr><td class="num" id="LN1354">1354</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN1355">1355</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1356">1356</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1357">1357</td><td class="line"><span class='keyword'>int</span> ec_GFp_simple_field_sqr(<span class='keyword'>const</span> EC_GROUP *group, BIGNUM *r, <span class='keyword'>const</span> BIGNUM *a, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN1358">1358</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN1359">1359</td><td class="line">	<span class='keyword'>return</span> BN_mod_sqr(r, a, &amp;group-&gt;field, ctx);</td></tr>
+<tr><td class="num" id="LN1360">1360</td><td class="line">	}</td></tr>
+</table></body></html>

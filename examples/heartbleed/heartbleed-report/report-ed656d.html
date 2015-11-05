@@ -1,0 +1,830 @@
+<!doctype html>
+<html>
+<head>
+<title>s2_pkt.c</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC Value stored to 'j' is never read -->
+
+<!-- BUGTYPE Dead assignment -->
+
+<!-- BUGCATEGORY Dead store -->
+
+<!-- BUGFILE /Users/fran/Desktop/openssl-1.0.1f/ssl/s2_pkt.c -->
+
+<!-- FILENAME s2_pkt.c -->
+
+<!-- FUNCTIONNAME n_do_ssl_write -->
+
+<!-- BUGLINE 587 -->
+
+<!-- BUGCOLUMN 6 -->
+
+<!-- BUGPATHLENGTH 1 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>ssl/s2_pkt.c</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 587, column 6</a></td></tr>
+<tr><td class="rowname">Description:</td><td>Value stored to 'j' is never read</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/* ssl/s2_pkt.c */</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>/* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"> <span class='comment'>* All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"> <span class='comment'>* This package is an SSL implementation written</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"> <span class='comment'>* by Eric Young (eay@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"> <span class='comment'>* The implementation was written so as to conform with Netscapes SSL.</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"> <span class='comment'>* This library is free for commercial and non-commercial use as long as</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"> <span class='comment'>* the following conditions are aheared to.  The following conditions</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"> <span class='comment'>* apply to all code found in this distribution, be it the RC4, RSA,</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"> <span class='comment'>* lhash, DES, etc., code; not just the SSL code.  The SSL documentation</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"> <span class='comment'>* included with this distribution is covered by the same copyright terms</span></td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"> <span class='comment'>* except that the holder is Tim Hudson (tjh@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"> <span class='comment'>* Copyright remains Eric Young's, and as such any Copyright notices in</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"> <span class='comment'>* the code are not to be removed.</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"> <span class='comment'>* If this package is used in a product, Eric Young should be given attribution</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"> <span class='comment'>* as the author of the parts of the library used.</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"> <span class='comment'>* This can be in the form of a textual message at program startup or</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"> <span class='comment'>* in documentation (online or textual) provided with the package.</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"> <span class='comment'>* Redistribution and use in source and binary forms, with or without</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"> <span class='comment'>* modification, are permitted provided that the following conditions</span></td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"> <span class='comment'>* are met:</span></td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"> <span class='comment'>* 1. Redistributions of source code must retain the copyright</span></td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer.</span></td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"> <span class='comment'>* 2. Redistributions in binary form must reproduce the above copyright</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer in the</span></td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"> <span class='comment'>*    documentation and/or other materials provided with the distribution.</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"> <span class='comment'>* 3. All advertising materials mentioning features or use of this software</span></td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> <span class='comment'>*    must display the following acknowledgement:</span></td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"> <span class='comment'>*    "This product includes cryptographic software written by</span></td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"> <span class='comment'>*     Eric Young (eay@cryptsoft.com)"</span></td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"> <span class='comment'>*    The word 'cryptographic' can be left out if the rouines from the library</span></td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line"> <span class='comment'>*    being used are not cryptographic related :-).</span></td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line"> <span class='comment'>* 4. If you include any Windows specific code (or a derivative thereof) from</span> </td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line"> <span class='comment'>*    the apps directory (application code) you must include an acknowledgement:</span></td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line"> <span class='comment'>*    "This product includes software written by Tim Hudson (tjh@cryptsoft.com)"</span></td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line"> <span class='comment'>* THIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND</span></td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line"> <span class='comment'>* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span></td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line"> <span class='comment'>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span></td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line"> <span class='comment'>* ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE</span></td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line"> <span class='comment'>* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span></td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line"> <span class='comment'>* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span></td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line"> <span class='comment'>* OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span></td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line"> <span class='comment'>* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span></td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line"> <span class='comment'>* LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY</span></td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line"> <span class='comment'>* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF</span></td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line"> <span class='comment'>* SUCH DAMAGE.</span></td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line"> <span class='comment'>* The licence and distribution terms for any publically available version or</span></td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line"> <span class='comment'>* derivative of this code cannot be changed.  i.e. this code cannot simply be</span></td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line"> <span class='comment'>* copied and put under another distribution licence</span></td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line"> <span class='comment'>* [including the GNU Public Licence.]</span></td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line"><span class='comment'>/* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line"> <span class='comment'>* Copyright (c) 1998-2001 The OpenSSL Project.  All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line"> <span class='comment'>* Redistribution and use in source and binary forms, with or without</span></td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line"> <span class='comment'>* modification, are permitted provided that the following conditions</span></td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line"> <span class='comment'>* are met:</span></td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line"> <span class='comment'>* 1. Redistributions of source code must retain the above copyright</span></td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer.</span> </td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line"> <span class='comment'>* 2. Redistributions in binary form must reproduce the above copyright</span></td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer in</span></td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line"> <span class='comment'>*    the documentation and/or other materials provided with the</span></td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line"> <span class='comment'>*    distribution.</span></td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line"> <span class='comment'>* 3. All advertising materials mentioning features or use of this</span></td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line"> <span class='comment'>*    software must display the following acknowledgment:</span></td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line"> <span class='comment'>*    "This product includes software developed by the OpenSSL Project</span></td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line"> <span class='comment'>*    for use in the OpenSSL Toolkit. (http://www.openssl.org/)"</span></td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line"> <span class='comment'>* 4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to</span></td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line"> <span class='comment'>*    endorse or promote products derived from this software without</span></td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line"> <span class='comment'>*    prior written permission. For written permission, please contact</span></td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line"> <span class='comment'>*    openssl-core@openssl.org.</span></td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line"> <span class='comment'>* 5. Products derived from this software may not be called "OpenSSL"</span></td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line"> <span class='comment'>*    nor may "OpenSSL" appear in their names without prior written</span></td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line"> <span class='comment'>*    permission of the OpenSSL Project.</span></td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line"> <span class='comment'>* 6. Redistributions of any form whatsoever must retain the following</span></td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line"> <span class='comment'>*    acknowledgment:</span></td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line"> <span class='comment'>*    "This product includes software developed by the OpenSSL Project</span></td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line"> <span class='comment'>*    for use in the OpenSSL Toolkit (http://www.openssl.org/)"</span></td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line"> <span class='comment'>* THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY</span></td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line"> <span class='comment'>* EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span></td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line"> <span class='comment'>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR</span></td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line"> <span class='comment'>* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR</span></td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line"> <span class='comment'>* ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span></td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line"> <span class='comment'>* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT</span></td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line"> <span class='comment'>* NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span></td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line"> <span class='comment'>* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span></td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line"> <span class='comment'>* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span></td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line"> <span class='comment'>* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)</span></td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line"> <span class='comment'>* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED</span></td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line"> <span class='comment'>* OF THE POSSIBILITY OF SUCH DAMAGE.</span></td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line"> <span class='comment'>* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line"> <span class='comment'>* This product includes cryptographic software written by Eric Young</span></td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line"> <span class='comment'>* (eay@cryptsoft.com).  This product includes software written by Tim</span></td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line"> <span class='comment'>* Hudson (tjh@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line"><span class='directive'>#include "ssl_locl.h"</span></td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_SSL2</span></td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line"><span class='directive'>#include &lt;stdio.h&gt;</span></td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line"><span class='directive'>#include &lt;<span class='macro'>errno<span class='expansion'>(*__error())</span></span>.h&gt;</span></td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line"><span class='directive'>#define USE_SOCKETS</span></td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> read_n(SSL *s,<span class='keyword'>unsigned</span> <span class='keyword'>int</span> n,<span class='keyword'>unsigned</span> <span class='keyword'>int</span> max,<span class='keyword'>unsigned</span> <span class='keyword'>int</span> extend);</td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> n_do_ssl_write(SSL *s, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *buf, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> len);</td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> write_pending(SSL *s, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *buf, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> len);</td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> ssl_mt_error(<span class='keyword'>int</span> n);</td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line"><span class='comment'>/* SSL 2.0 imlementation for SSL_read/SSL_peek -</span></td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line"> <span class='comment'>* This routine will return 0 to len bytes, decrypted etc if required.</span></td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> ssl2_read_internal(SSL *s, <span class='keyword'>void</span> *buf, <span class='keyword'>int</span> len, <span class='keyword'>int</span> peek)</td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line">	<span class='keyword'>int</span> n;</td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> mac[<span class='macro'>MAX_MAC_SIZE<span class='expansion'>20</span></span>];</td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *p;</td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line">	<span class='keyword'>int</span> i;</td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line">	<span class='keyword'>int</span> mac_size;</td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line"> ssl2_read_again:</td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>SSL_in_init(s)<span class='expansion'>(SSL_state(s)&amp;(0x1000|0x2000))</span></span> &amp;&amp; !s-&gt;in_handshake)</td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line">		n=s-&gt;handshake_func(s);</td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line">		<span class='keyword'>if</span> (n &lt; 0) <span class='keyword'>return</span>(n);</td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line">		<span class='keyword'>if</span> (n == 0)</td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line">			<span class='macro'>SSLerr(SSL_F_SSL2_READ_INTERNAL,SSL_R_SSL_HANDSHAKE_FAILURE)<span class='expansion'>ERR_put_error(20,(236),(229),"s2_pkt.c",142)</span></span>;</td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">			<span class='keyword'>return</span>(-1);</td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line">	<span class='macro'>clear_sys_error()<span class='expansion'>(*__error())=0</span></span>;</td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line">	s-&gt;rwstate=<span class='macro'>SSL_NOTHING<span class='expansion'>1</span></span>;</td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line">	<span class='keyword'>if</span> (len &lt;= 0) <span class='keyword'>return</span>(len);</td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line">	<span class='keyword'>if</span> (s-&gt;s2-&gt;ract_data_length != 0) <span class='comment'>/* read from buffer */</span></td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line">		<span class='keyword'>if</span> (len &gt; s-&gt;s2-&gt;ract_data_length)</td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line">			n=s-&gt;s2-&gt;ract_data_length;</td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line">			n=len;</td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line">		<span class='macro'>memcpy(buf,s-&gt;s2-&gt;ract_data,(<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)n)<span class='expansion'>__builtin___memcpy_chk (buf, s-&gt;s2-&gt;ract_data, (unsigned<br> int)n, __builtin_object_size (buf, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line">		<span class='keyword'>if</span> (!peek)</td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line">			s-&gt;s2-&gt;ract_data_length-=n;</td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line">			s-&gt;s2-&gt;ract_data+=n;</td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line">			<span class='keyword'>if</span> (s-&gt;s2-&gt;ract_data_length == 0)</td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line">				s-&gt;rstate=<span class='macro'>SSL_ST_READ_HEADER<span class='expansion'>0xF0</span></span>;</td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line">		<span class='keyword'>return</span>(n);</td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line">	<span class='comment'>/* s-&gt;s2-&gt;ract_data_length == 0</span></td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line">	 <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line">	 <span class='comment'>* Fill the buffer, then goto ssl2_read_again.</span></td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line">	 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line">	<span class='keyword'>if</span> (s-&gt;rstate == <span class='macro'>SSL_ST_READ_HEADER<span class='expansion'>0xF0</span></span>)</td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line">		<span class='keyword'>if</span> (s-&gt;first_packet)</td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line">			n=read_n(s,5,<span class='macro'>SSL2_MAX_RECORD_LENGTH_2_BYTE_HEADER<span class='expansion'>32767u</span></span>+2,0);</td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line">			<span class='keyword'>if</span> (n &lt;= 0) <span class='keyword'>return</span>(n); <span class='comment'>/* error or non-blocking */</span></td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">			s-&gt;first_packet=0;</td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line">			p=s-&gt;packet;</td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line">			<span class='keyword'>if</span> (!((p[0] &amp; 0x80) &amp;&amp; (</td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line">				(p[2] == <span class='macro'>SSL2_MT_CLIENT_HELLO<span class='expansion'>1</span></span>) ||</td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line">				(p[2] == <span class='macro'>SSL2_MT_SERVER_HELLO<span class='expansion'>4</span></span>))))</td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line">				<span class='macro'>SSLerr(SSL_F_SSL2_READ_INTERNAL,SSL_R_NON_SSLV2_INITIAL_PACKET)<span class='expansion'>ERR_put_error(20,(236),(175),"s2_pkt.c",187)</span></span>;</td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line">				<span class='keyword'>return</span>(-1);</td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line">			n=read_n(s,2,<span class='macro'>SSL2_MAX_RECORD_LENGTH_2_BYTE_HEADER<span class='expansion'>32767u</span></span>+2,0);</td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line">			<span class='keyword'>if</span> (n &lt;= 0) <span class='keyword'>return</span>(n); <span class='comment'>/* error or non-blocking */</span></td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line">		<span class='comment'>/* part read stuff */</span></td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line">		s-&gt;rstate=<span class='macro'>SSL_ST_READ_BODY<span class='expansion'>0xF1</span></span>;</td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line">		p=s-&gt;packet;</td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line">		<span class='comment'>/* Do header */</span></td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line">		<span class='comment'>/*s-&gt;s2-&gt;padding=0;*/</span></td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line">		s-&gt;s2-&gt;escape=0;</td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line">		s-&gt;s2-&gt;rlength=(((<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)p[0])&lt;&lt;8)|((<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)p[1]);</td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line">		<span class='keyword'>if</span> ((p[0] &amp; <span class='macro'>TWO_BYTE_BIT<span class='expansion'>0x80</span></span>))		<span class='comment'>/* Two byte header? */</span></td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line">			s-&gt;s2-&gt;three_byte_header=0;</td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line">			s-&gt;s2-&gt;rlength&amp;=<span class='macro'>TWO_BYTE_MASK<span class='expansion'>0x7fff</span></span>;	</td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line">			s-&gt;s2-&gt;three_byte_header=1;</td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line">			s-&gt;s2-&gt;rlength&amp;=<span class='macro'>THREE_BYTE_MASK<span class='expansion'>0x3fff</span></span>;</td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line">			<span class='comment'>/* security &gt;s2-&gt;escape */</span></td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line">			s-&gt;s2-&gt;escape=((p[0] &amp; <span class='macro'>SEC_ESC_BIT<span class='expansion'>0x40</span></span>))?1:0;</td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line">	<span class='keyword'>if</span> (s-&gt;rstate == <span class='macro'>SSL_ST_READ_BODY<span class='expansion'>0xF1</span></span>)</td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line">		n=s-&gt;s2-&gt;rlength+2+s-&gt;s2-&gt;three_byte_header;</td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line">		<span class='keyword'>if</span> (n &gt; (<span class='keyword'>int</span>)s-&gt;packet_length)</td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line">			n-=s-&gt;packet_length;</td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line">			i=read_n(s,(<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)n,(<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)n,1);</td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line">			<span class='keyword'>if</span> (i &lt;= 0) <span class='keyword'>return</span>(i); <span class='comment'>/* ERROR */</span></td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN229">229</td><td class="line">		p= &amp;(s-&gt;packet[2]);</td></tr>
+<tr><td class="num" id="LN230">230</td><td class="line">		s-&gt;rstate=<span class='macro'>SSL_ST_READ_HEADER<span class='expansion'>0xF0</span></span>;</td></tr>
+<tr><td class="num" id="LN231">231</td><td class="line">		<span class='keyword'>if</span> (s-&gt;s2-&gt;three_byte_header)</td></tr>
+<tr><td class="num" id="LN232">232</td><td class="line">			s-&gt;s2-&gt;padding= *(p++);</td></tr>
+<tr><td class="num" id="LN233">233</td><td class="line">		<span class='keyword'>else</span>	s-&gt;s2-&gt;padding=0;</td></tr>
+<tr><td class="num" id="LN234">234</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN235">235</td><td class="line">		<span class='comment'>/* Data portion */</span></td></tr>
+<tr><td class="num" id="LN236">236</td><td class="line">		<span class='keyword'>if</span> (s-&gt;s2-&gt;clear_text)</td></tr>
+<tr><td class="num" id="LN237">237</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN238">238</td><td class="line">			mac_size = 0;</td></tr>
+<tr><td class="num" id="LN239">239</td><td class="line">			s-&gt;s2-&gt;mac_data=p;</td></tr>
+<tr><td class="num" id="LN240">240</td><td class="line">			s-&gt;s2-&gt;ract_data=p;</td></tr>
+<tr><td class="num" id="LN241">241</td><td class="line">			<span class='keyword'>if</span> (s-&gt;s2-&gt;padding)</td></tr>
+<tr><td class="num" id="LN242">242</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN243">243</td><td class="line">				<span class='macro'>SSLerr(SSL_F_SSL2_READ_INTERNAL,SSL_R_ILLEGAL_PADDING)<span class='expansion'>ERR_put_error(20,(236),(283),"s2_pkt.c",243)</span></span>;</td></tr>
+<tr><td class="num" id="LN244">244</td><td class="line">				<span class='keyword'>return</span>(-1);</td></tr>
+<tr><td class="num" id="LN245">245</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN246">246</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN247">247</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN248">248</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN249">249</td><td class="line">			mac_size=<span class='macro'>EVP_MD_CTX_size(s-&gt;read_hash)<span class='expansion'>EVP_MD_size(EVP_MD_CTX_md(s-&gt;read_hash))</span></span>;</td></tr>
+<tr><td class="num" id="LN250">250</td><td class="line">			<span class='keyword'>if</span> (mac_size &lt; 0)</td></tr>
+<tr><td class="num" id="LN251">251</td><td class="line">				<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN252">252</td><td class="line">			<span class='macro'>OPENSSL_assert(mac_size &lt;= MAX_MAC_SIZE)<span class='expansion'>(void)((mac_size &lt;= 20) ? 0 : (OpenSSLDie("s2_pkt.c", 252,<br> "mac_size &lt;= MAX_MAC_SIZE"),1))</span></span>;</td></tr>
+<tr><td class="num" id="LN253">253</td><td class="line">			s-&gt;s2-&gt;mac_data=p;</td></tr>
+<tr><td class="num" id="LN254">254</td><td class="line">			s-&gt;s2-&gt;ract_data= &amp;p[mac_size];</td></tr>
+<tr><td class="num" id="LN255">255</td><td class="line">			<span class='keyword'>if</span> (s-&gt;s2-&gt;padding + mac_size &gt; s-&gt;s2-&gt;rlength)</td></tr>
+<tr><td class="num" id="LN256">256</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN257">257</td><td class="line">				<span class='macro'>SSLerr(SSL_F_SSL2_READ_INTERNAL,SSL_R_ILLEGAL_PADDING)<span class='expansion'>ERR_put_error(20,(236),(283),"s2_pkt.c",257)</span></span>;</td></tr>
+<tr><td class="num" id="LN258">258</td><td class="line">				<span class='keyword'>return</span>(-1);</td></tr>
+<tr><td class="num" id="LN259">259</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN260">260</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN261">261</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN262">262</td><td class="line">		s-&gt;s2-&gt;ract_data_length=s-&gt;s2-&gt;rlength;</td></tr>
+<tr><td class="num" id="LN263">263</td><td class="line">		<span class='comment'>/* added a check for length &gt; max_size in case</span></td></tr>
+<tr><td class="num" id="LN264">264</td><td class="line">		 <span class='comment'>* encryption was not turned on yet due to an error */</span></td></tr>
+<tr><td class="num" id="LN265">265</td><td class="line">		<span class='keyword'>if</span> ((!s-&gt;s2-&gt;clear_text) &amp;&amp;</td></tr>
+<tr><td class="num" id="LN266">266</td><td class="line">			(s-&gt;s2-&gt;rlength &gt;= (<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)mac_size))</td></tr>
+<tr><td class="num" id="LN267">267</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN268">268</td><td class="line">			ssl2_enc(s,0);</td></tr>
+<tr><td class="num" id="LN269">269</td><td class="line">			s-&gt;s2-&gt;ract_data_length-=mac_size;</td></tr>
+<tr><td class="num" id="LN270">270</td><td class="line">			ssl2_mac(s,mac,0);</td></tr>
+<tr><td class="num" id="LN271">271</td><td class="line">			s-&gt;s2-&gt;ract_data_length-=s-&gt;s2-&gt;padding;</td></tr>
+<tr><td class="num" id="LN272">272</td><td class="line">			<span class='keyword'>if</span> (	(CRYPTO_memcmp(mac,s-&gt;s2-&gt;mac_data,mac_size) != 0) ||</td></tr>
+<tr><td class="num" id="LN273">273</td><td class="line">				(s-&gt;s2-&gt;rlength%EVP_CIPHER_CTX_block_size(s-&gt;enc_read_ctx) != 0))</td></tr>
+<tr><td class="num" id="LN274">274</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN275">275</td><td class="line">				<span class='macro'>SSLerr(SSL_F_SSL2_READ_INTERNAL,SSL_R_BAD_MAC_DECODE)<span class='expansion'>ERR_put_error(20,(236),(113),"s2_pkt.c",275)</span></span>;</td></tr>
+<tr><td class="num" id="LN276">276</td><td class="line">				<span class='keyword'>return</span>(-1);</td></tr>
+<tr><td class="num" id="LN277">277</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN278">278</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN279">279</td><td class="line">		<span class='macro'>INC32(s-&gt;s2-&gt;read_sequence)<span class='expansion'>((s-&gt;s2-&gt;read_sequence)=((s-&gt;s2-&gt;read_sequence)+1<br>)&amp;0xffffffffL)</span></span>; <span class='comment'>/* expect next number */</span></td></tr>
+<tr><td class="num" id="LN280">280</td><td class="line">		<span class='comment'>/* s-&gt;s2-&gt;ract_data is now available for processing */</span></td></tr>
+<tr><td class="num" id="LN281">281</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN282">282</td><td class="line">		<span class='comment'>/* Possibly the packet that we just read had 0 actual data bytes.</span></td></tr>
+<tr><td class="num" id="LN283">283</td><td class="line">		 <span class='comment'>* (SSLeay/OpenSSL itself never sends such packets; see ssl2_write.)</span></td></tr>
+<tr><td class="num" id="LN284">284</td><td class="line">		 <span class='comment'>* In this case, returning 0 would be interpreted by the caller</span></td></tr>
+<tr><td class="num" id="LN285">285</td><td class="line">		 <span class='comment'>* as indicating EOF, so it's not a good idea.  Instead, we just</span></td></tr>
+<tr><td class="num" id="LN286">286</td><td class="line">		 <span class='comment'>* continue reading; thus ssl2_read_internal may have to process</span></td></tr>
+<tr><td class="num" id="LN287">287</td><td class="line">		 <span class='comment'>* multiple packets before it can return.</span></td></tr>
+<tr><td class="num" id="LN288">288</td><td class="line">		 <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN289">289</td><td class="line">		 <span class='comment'>* [Note that using select() for blocking sockets *never* guarantees</span></td></tr>
+<tr><td class="num" id="LN290">290</td><td class="line">		 <span class='comment'>* that the next SSL_read will not block -- the available</span></td></tr>
+<tr><td class="num" id="LN291">291</td><td class="line">		 <span class='comment'>* data may contain incomplete packets, and except for SSL 2,</span></td></tr>
+<tr><td class="num" id="LN292">292</td><td class="line">		 <span class='comment'>* renegotiation can confuse things even more.] */</span></td></tr>
+<tr><td class="num" id="LN293">293</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN294">294</td><td class="line">		<span class='keyword'>goto</span> ssl2_read_again; <span class='comment'>/* This should really be</span></td></tr>
+<tr><td class="num" id="LN295">295</td><td class="line">		                       <span class='comment'>* "return ssl2_read(s,buf,len)",</span></td></tr>
+<tr><td class="num" id="LN296">296</td><td class="line">		                       <span class='comment'>* but that would allow for</span></td></tr>
+<tr><td class="num" id="LN297">297</td><td class="line">		                       <span class='comment'>* denial-of-service attacks if a</span></td></tr>
+<tr><td class="num" id="LN298">298</td><td class="line">		                       <span class='comment'>* C compiler is used that does not</span></td></tr>
+<tr><td class="num" id="LN299">299</td><td class="line">		                       <span class='comment'>* recognize end-recursion. */</span></td></tr>
+<tr><td class="num" id="LN300">300</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN301">301</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN302">302</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN303">303</td><td class="line">		<span class='macro'>SSLerr(SSL_F_SSL2_READ_INTERNAL,SSL_R_BAD_STATE)<span class='expansion'>ERR_put_error(20,(236),(126),"s2_pkt.c",303)</span></span>;</td></tr>
+<tr><td class="num" id="LN304">304</td><td class="line">			<span class='keyword'>return</span>(-1);</td></tr>
+<tr><td class="num" id="LN305">305</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN306">306</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN307">307</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN308">308</td><td class="line"><span class='keyword'>int</span> ssl2_read(SSL *s, <span class='keyword'>void</span> *buf, <span class='keyword'>int</span> len)</td></tr>
+<tr><td class="num" id="LN309">309</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN310">310</td><td class="line">	<span class='keyword'>return</span> ssl2_read_internal(s, buf, len, 0);</td></tr>
+<tr><td class="num" id="LN311">311</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN312">312</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN313">313</td><td class="line"><span class='keyword'>int</span> ssl2_peek(SSL *s, <span class='keyword'>void</span> *buf, <span class='keyword'>int</span> len)</td></tr>
+<tr><td class="num" id="LN314">314</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN315">315</td><td class="line">	<span class='keyword'>return</span> ssl2_read_internal(s, buf, len, 1);</td></tr>
+<tr><td class="num" id="LN316">316</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN317">317</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN318">318</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> read_n(SSL *s, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> n, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> max,</td></tr>
+<tr><td class="num" id="LN319">319</td><td class="line">	     <span class='keyword'>unsigned</span> <span class='keyword'>int</span> extend)</td></tr>
+<tr><td class="num" id="LN320">320</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN321">321</td><td class="line">	<span class='keyword'>int</span> i,off,newb;</td></tr>
+<tr><td class="num" id="LN322">322</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN323">323</td><td class="line">	<span class='comment'>/* if there is stuff still in the buffer from a previous read,</span></td></tr>
+<tr><td class="num" id="LN324">324</td><td class="line">	 <span class='comment'>* and there is more than we want, take some. */</span></td></tr>
+<tr><td class="num" id="LN325">325</td><td class="line">	<span class='keyword'>if</span> (s-&gt;s2-&gt;rbuf_left &gt;= (<span class='keyword'>int</span>)n)</td></tr>
+<tr><td class="num" id="LN326">326</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN327">327</td><td class="line">		<span class='keyword'>if</span> (extend)</td></tr>
+<tr><td class="num" id="LN328">328</td><td class="line">			s-&gt;packet_length+=n;</td></tr>
+<tr><td class="num" id="LN329">329</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN330">330</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN331">331</td><td class="line">			s-&gt;packet= &amp;(s-&gt;s2-&gt;rbuf[s-&gt;s2-&gt;rbuf_offs]);</td></tr>
+<tr><td class="num" id="LN332">332</td><td class="line">			s-&gt;packet_length=n;</td></tr>
+<tr><td class="num" id="LN333">333</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN334">334</td><td class="line">		s-&gt;s2-&gt;rbuf_left-=n;</td></tr>
+<tr><td class="num" id="LN335">335</td><td class="line">		s-&gt;s2-&gt;rbuf_offs+=n;</td></tr>
+<tr><td class="num" id="LN336">336</td><td class="line">		<span class='keyword'>return</span>(n);</td></tr>
+<tr><td class="num" id="LN337">337</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN338">338</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN339">339</td><td class="line">	<span class='keyword'>if</span> (!s-&gt;read_ahead) max=n;</td></tr>
+<tr><td class="num" id="LN340">340</td><td class="line">	<span class='keyword'>if</span> (max &gt; (<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)(<span class='macro'>SSL2_MAX_RECORD_LENGTH_2_BYTE_HEADER<span class='expansion'>32767u</span></span>+2))</td></tr>
+<tr><td class="num" id="LN341">341</td><td class="line">		max=<span class='macro'>SSL2_MAX_RECORD_LENGTH_2_BYTE_HEADER<span class='expansion'>32767u</span></span>+2;</td></tr>
+<tr><td class="num" id="LN342">342</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN343">343</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN344">344</td><td class="line">	<span class='comment'>/* Else we want more than we have.</span></td></tr>
+<tr><td class="num" id="LN345">345</td><td class="line">	 <span class='comment'>* First, if there is some left or we want to extend */</span></td></tr>
+<tr><td class="num" id="LN346">346</td><td class="line">	off=0;</td></tr>
+<tr><td class="num" id="LN347">347</td><td class="line">	<span class='keyword'>if</span> ((s-&gt;s2-&gt;rbuf_left != 0) || ((s-&gt;packet_length != 0) &amp;&amp; extend))</td></tr>
+<tr><td class="num" id="LN348">348</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN349">349</td><td class="line">		newb=s-&gt;s2-&gt;rbuf_left;</td></tr>
+<tr><td class="num" id="LN350">350</td><td class="line">		<span class='keyword'>if</span> (extend)</td></tr>
+<tr><td class="num" id="LN351">351</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN352">352</td><td class="line">			off=s-&gt;packet_length;</td></tr>
+<tr><td class="num" id="LN353">353</td><td class="line">			<span class='keyword'>if</span> (s-&gt;packet != s-&gt;s2-&gt;rbuf)</td></tr>
+<tr><td class="num" id="LN354">354</td><td class="line">				<span class='macro'>memcpy(s-&gt;s2-&gt;rbuf,s-&gt;packet,<span class='expansion'>__builtin___memcpy_chk (s-&gt;s2-&gt;rbuf, s-&gt;packet, (unsigned<br> int)newb+off, __builtin_object_size (s-&gt;s2-&gt;rbuf, 0))</span></span></td></tr>
+<tr><td class="num" id="LN355">355</td><td class="line">					<span class='macro'>(<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)newb+off)<span class='expansion'>__builtin___memcpy_chk (s-&gt;s2-&gt;rbuf, s-&gt;packet, (unsigned<br> int)newb+off, __builtin_object_size (s-&gt;s2-&gt;rbuf, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN356">356</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN357">357</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> (s-&gt;s2-&gt;rbuf_offs != 0)</td></tr>
+<tr><td class="num" id="LN358">358</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN359">359</td><td class="line">			<span class='macro'>memcpy(s-&gt;s2-&gt;rbuf,&amp;(s-&gt;s2-&gt;rbuf[s-&gt;s2-&gt;rbuf_offs]),<span class='expansion'>__builtin___memcpy_chk (s-&gt;s2-&gt;rbuf, &amp;(s-&gt;s2-&gt;<br>rbuf[s-&gt;s2-&gt;rbuf_offs]), (unsigned int)newb, __builtin_object_size<br> (s-&gt;s2-&gt;rbuf, 0))</span></span></td></tr>
+<tr><td class="num" id="LN360">360</td><td class="line">				<span class='macro'>(<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)newb)<span class='expansion'>__builtin___memcpy_chk (s-&gt;s2-&gt;rbuf, &amp;(s-&gt;s2-&gt;<br>rbuf[s-&gt;s2-&gt;rbuf_offs]), (unsigned int)newb, __builtin_object_size<br> (s-&gt;s2-&gt;rbuf, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN361">361</td><td class="line">			s-&gt;s2-&gt;rbuf_offs=0;</td></tr>
+<tr><td class="num" id="LN362">362</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN363">363</td><td class="line">		s-&gt;s2-&gt;rbuf_left=0;</td></tr>
+<tr><td class="num" id="LN364">364</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN365">365</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN366">366</td><td class="line">		newb=0;</td></tr>
+<tr><td class="num" id="LN367">367</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN368">368</td><td class="line">	<span class='comment'>/* off is the offset to start writing too.</span></td></tr>
+<tr><td class="num" id="LN369">369</td><td class="line">	 <span class='comment'>* r-&gt;s2-&gt;rbuf_offs is the 'unread data', now 0.</span> </td></tr>
+<tr><td class="num" id="LN370">370</td><td class="line">	 <span class='comment'>* newb is the number of new bytes so far</span></td></tr>
+<tr><td class="num" id="LN371">371</td><td class="line">	 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN372">372</td><td class="line">	s-&gt;packet=s-&gt;s2-&gt;rbuf;</td></tr>
+<tr><td class="num" id="LN373">373</td><td class="line">	<span class='keyword'>while</span> (newb &lt; (<span class='keyword'>int</span>)n)</td></tr>
+<tr><td class="num" id="LN374">374</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN375">375</td><td class="line">		<span class='macro'>clear_sys_error()<span class='expansion'>(*__error())=0</span></span>;</td></tr>
+<tr><td class="num" id="LN376">376</td><td class="line">		<span class='keyword'>if</span> (s-&gt;rbio != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN377">377</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN378">378</td><td class="line">			s-&gt;rwstate=<span class='macro'>SSL_READING<span class='expansion'>3</span></span>;</td></tr>
+<tr><td class="num" id="LN379">379</td><td class="line">			i=BIO_read(s-&gt;rbio,(<span class='keyword'>char</span> *)&amp;(s-&gt;s2-&gt;rbuf[off+newb]),</td></tr>
+<tr><td class="num" id="LN380">380</td><td class="line">				max-newb);</td></tr>
+<tr><td class="num" id="LN381">381</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN382">382</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN383">383</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN384">384</td><td class="line">			<span class='macro'>SSLerr(SSL_F_READ_N,SSL_R_READ_BIO_NOT_SET)<span class='expansion'>ERR_put_error(20,(112),(211),"s2_pkt.c",384)</span></span>;</td></tr>
+<tr><td class="num" id="LN385">385</td><td class="line">			i= -1;</td></tr>
+<tr><td class="num" id="LN386">386</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN387">387</td><td class="line"><span class='directive'>#ifdef PKT_DEBUG</span></td></tr>
+<tr><td class="num" id="LN388">388</td><td class="line">		<span class='keyword'>if</span> (s-&gt;debug &amp; 0x01) sleep(1);</td></tr>
+<tr><td class="num" id="LN389">389</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN390">390</td><td class="line">		<span class='keyword'>if</span> (i &lt;= 0)</td></tr>
+<tr><td class="num" id="LN391">391</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN392">392</td><td class="line">			s-&gt;s2-&gt;rbuf_left+=newb;</td></tr>
+<tr><td class="num" id="LN393">393</td><td class="line">			<span class='keyword'>return</span>(i);</td></tr>
+<tr><td class="num" id="LN394">394</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN395">395</td><td class="line">		newb+=i;</td></tr>
+<tr><td class="num" id="LN396">396</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN397">397</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN398">398</td><td class="line">	<span class='comment'>/* record unread data */</span></td></tr>
+<tr><td class="num" id="LN399">399</td><td class="line">	<span class='keyword'>if</span> (newb &gt; (<span class='keyword'>int</span>)n)</td></tr>
+<tr><td class="num" id="LN400">400</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN401">401</td><td class="line">		s-&gt;s2-&gt;rbuf_offs=n+off;</td></tr>
+<tr><td class="num" id="LN402">402</td><td class="line">		s-&gt;s2-&gt;rbuf_left=newb-n;</td></tr>
+<tr><td class="num" id="LN403">403</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN404">404</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN405">405</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN406">406</td><td class="line">		s-&gt;s2-&gt;rbuf_offs=0;</td></tr>
+<tr><td class="num" id="LN407">407</td><td class="line">		s-&gt;s2-&gt;rbuf_left=0;</td></tr>
+<tr><td class="num" id="LN408">408</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN409">409</td><td class="line">	<span class='keyword'>if</span> (extend)</td></tr>
+<tr><td class="num" id="LN410">410</td><td class="line">		s-&gt;packet_length+=n;</td></tr>
+<tr><td class="num" id="LN411">411</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN412">412</td><td class="line">		s-&gt;packet_length=n;</td></tr>
+<tr><td class="num" id="LN413">413</td><td class="line">	s-&gt;rwstate=<span class='macro'>SSL_NOTHING<span class='expansion'>1</span></span>;</td></tr>
+<tr><td class="num" id="LN414">414</td><td class="line">	<span class='keyword'>return</span>(n);</td></tr>
+<tr><td class="num" id="LN415">415</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN416">416</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN417">417</td><td class="line"><span class='keyword'>int</span> ssl2_write(SSL *s, <span class='keyword'>const</span> <span class='keyword'>void</span> *_buf, <span class='keyword'>int</span> len)</td></tr>
+<tr><td class="num" id="LN418">418</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN419">419</td><td class="line">	<span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *buf=_buf;</td></tr>
+<tr><td class="num" id="LN420">420</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>int</span> n,tot;</td></tr>
+<tr><td class="num" id="LN421">421</td><td class="line">	<span class='keyword'>int</span> i;</td></tr>
+<tr><td class="num" id="LN422">422</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN423">423</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>SSL_in_init(s)<span class='expansion'>(SSL_state(s)&amp;(0x1000|0x2000))</span></span> &amp;&amp; !s-&gt;in_handshake)</td></tr>
+<tr><td class="num" id="LN424">424</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN425">425</td><td class="line">		i=s-&gt;handshake_func(s);</td></tr>
+<tr><td class="num" id="LN426">426</td><td class="line">		<span class='keyword'>if</span> (i &lt; 0) <span class='keyword'>return</span>(i);</td></tr>
+<tr><td class="num" id="LN427">427</td><td class="line">		<span class='keyword'>if</span> (i == 0)</td></tr>
+<tr><td class="num" id="LN428">428</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN429">429</td><td class="line">			<span class='macro'>SSLerr(SSL_F_SSL2_WRITE,SSL_R_SSL_HANDSHAKE_FAILURE)<span class='expansion'>ERR_put_error(20,(127),(229),"s2_pkt.c",429)</span></span>;</td></tr>
+<tr><td class="num" id="LN430">430</td><td class="line">			<span class='keyword'>return</span>(-1);</td></tr>
+<tr><td class="num" id="LN431">431</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN432">432</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN433">433</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN434">434</td><td class="line">	<span class='keyword'>if</span> (s-&gt;error)</td></tr>
+<tr><td class="num" id="LN435">435</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN436">436</td><td class="line">		ssl2_write_error(s);</td></tr>
+<tr><td class="num" id="LN437">437</td><td class="line">		<span class='keyword'>if</span> (s-&gt;error)</td></tr>
+<tr><td class="num" id="LN438">438</td><td class="line">			<span class='keyword'>return</span>(-1);</td></tr>
+<tr><td class="num" id="LN439">439</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN440">440</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN441">441</td><td class="line">	<span class='macro'>clear_sys_error()<span class='expansion'>(*__error())=0</span></span>;</td></tr>
+<tr><td class="num" id="LN442">442</td><td class="line">	s-&gt;rwstate=<span class='macro'>SSL_NOTHING<span class='expansion'>1</span></span>;</td></tr>
+<tr><td class="num" id="LN443">443</td><td class="line">	<span class='keyword'>if</span> (len &lt;= 0) <span class='keyword'>return</span>(len);</td></tr>
+<tr><td class="num" id="LN444">444</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN445">445</td><td class="line">	tot=s-&gt;s2-&gt;wnum;</td></tr>
+<tr><td class="num" id="LN446">446</td><td class="line">	s-&gt;s2-&gt;wnum=0;</td></tr>
+<tr><td class="num" id="LN447">447</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN448">448</td><td class="line">	n=(len-tot);</td></tr>
+<tr><td class="num" id="LN449">449</td><td class="line">	<span class='keyword'>for</span> (;;)</td></tr>
+<tr><td class="num" id="LN450">450</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN451">451</td><td class="line">		i=n_do_ssl_write(s,&amp;(buf[tot]),n);</td></tr>
+<tr><td class="num" id="LN452">452</td><td class="line">		<span class='keyword'>if</span> (i &lt;= 0)</td></tr>
+<tr><td class="num" id="LN453">453</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN454">454</td><td class="line">			s-&gt;s2-&gt;wnum=tot;</td></tr>
+<tr><td class="num" id="LN455">455</td><td class="line">			<span class='keyword'>return</span>(i);</td></tr>
+<tr><td class="num" id="LN456">456</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN457">457</td><td class="line">		<span class='keyword'>if</span> ((i == (<span class='keyword'>int</span>)n) ||</td></tr>
+<tr><td class="num" id="LN458">458</td><td class="line">			(s-&gt;mode &amp; <span class='macro'>SSL_MODE_ENABLE_PARTIAL_WRITE<span class='expansion'>0x00000001L</span></span>))</td></tr>
+<tr><td class="num" id="LN459">459</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN460">460</td><td class="line">			<span class='keyword'>return</span>(tot+i);</td></tr>
+<tr><td class="num" id="LN461">461</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN462">462</td><td class="line">		</td></tr>
+<tr><td class="num" id="LN463">463</td><td class="line">		n-=i;</td></tr>
+<tr><td class="num" id="LN464">464</td><td class="line">		tot+=i;</td></tr>
+<tr><td class="num" id="LN465">465</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN466">466</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN467">467</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN468">468</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> write_pending(SSL *s, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *buf, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> len)</td></tr>
+<tr><td class="num" id="LN469">469</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN470">470</td><td class="line">	<span class='keyword'>int</span> i;</td></tr>
+<tr><td class="num" id="LN471">471</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN472">472</td><td class="line">	<span class='comment'>/* s-&gt;s2-&gt;wpend_len != 0 MUST be true. */</span></td></tr>
+<tr><td class="num" id="LN473">473</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN474">474</td><td class="line">	<span class='comment'>/* check that they have given us the same buffer to</span></td></tr>
+<tr><td class="num" id="LN475">475</td><td class="line">	 <span class='comment'>* write */</span></td></tr>
+<tr><td class="num" id="LN476">476</td><td class="line">	<span class='keyword'>if</span> ((s-&gt;s2-&gt;wpend_tot &gt; (<span class='keyword'>int</span>)len) ||</td></tr>
+<tr><td class="num" id="LN477">477</td><td class="line">		((s-&gt;s2-&gt;wpend_buf != buf) &amp;&amp;</td></tr>
+<tr><td class="num" id="LN478">478</td><td class="line">		 !(s-&gt;mode &amp; <span class='macro'>SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER<span class='expansion'>0x00000002L</span></span>)))</td></tr>
+<tr><td class="num" id="LN479">479</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN480">480</td><td class="line">		<span class='macro'>SSLerr(SSL_F_WRITE_PENDING,SSL_R_BAD_WRITE_RETRY)<span class='expansion'>ERR_put_error(20,(212),(127),"s2_pkt.c",480)</span></span>;</td></tr>
+<tr><td class="num" id="LN481">481</td><td class="line">		<span class='keyword'>return</span>(-1);</td></tr>
+<tr><td class="num" id="LN482">482</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN483">483</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN484">484</td><td class="line">	<span class='keyword'>for</span> (;;)</td></tr>
+<tr><td class="num" id="LN485">485</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN486">486</td><td class="line">		<span class='macro'>clear_sys_error()<span class='expansion'>(*__error())=0</span></span>;</td></tr>
+<tr><td class="num" id="LN487">487</td><td class="line">		<span class='keyword'>if</span> (s-&gt;wbio != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN488">488</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN489">489</td><td class="line">			s-&gt;rwstate=<span class='macro'>SSL_WRITING<span class='expansion'>2</span></span>;</td></tr>
+<tr><td class="num" id="LN490">490</td><td class="line">			i=BIO_write(s-&gt;wbio,</td></tr>
+<tr><td class="num" id="LN491">491</td><td class="line">				(<span class='keyword'>char</span> *)&amp;(s-&gt;s2-&gt;write_ptr[s-&gt;s2-&gt;wpend_off]),</td></tr>
+<tr><td class="num" id="LN492">492</td><td class="line">				(<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)s-&gt;s2-&gt;wpend_len);</td></tr>
+<tr><td class="num" id="LN493">493</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN494">494</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN495">495</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN496">496</td><td class="line">			<span class='macro'>SSLerr(SSL_F_WRITE_PENDING,SSL_R_WRITE_BIO_NOT_SET)<span class='expansion'>ERR_put_error(20,(212),(260),"s2_pkt.c",496)</span></span>;</td></tr>
+<tr><td class="num" id="LN497">497</td><td class="line">			i= -1;</td></tr>
+<tr><td class="num" id="LN498">498</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN499">499</td><td class="line"><span class='directive'>#ifdef PKT_DEBUG</span></td></tr>
+<tr><td class="num" id="LN500">500</td><td class="line">		<span class='keyword'>if</span> (s-&gt;debug &amp; 0x01) sleep(1);</td></tr>
+<tr><td class="num" id="LN501">501</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN502">502</td><td class="line">		<span class='keyword'>if</span> (i == s-&gt;s2-&gt;wpend_len)</td></tr>
+<tr><td class="num" id="LN503">503</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN504">504</td><td class="line">			s-&gt;s2-&gt;wpend_len=0;</td></tr>
+<tr><td class="num" id="LN505">505</td><td class="line">			s-&gt;rwstate=<span class='macro'>SSL_NOTHING<span class='expansion'>1</span></span>;</td></tr>
+<tr><td class="num" id="LN506">506</td><td class="line">			<span class='keyword'>return</span>(s-&gt;s2-&gt;wpend_ret);</td></tr>
+<tr><td class="num" id="LN507">507</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN508">508</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> (i &lt;= 0)</td></tr>
+<tr><td class="num" id="LN509">509</td><td class="line">			<span class='keyword'>return</span>(i);</td></tr>
+<tr><td class="num" id="LN510">510</td><td class="line">		s-&gt;s2-&gt;wpend_off+=i;</td></tr>
+<tr><td class="num" id="LN511">511</td><td class="line">		s-&gt;s2-&gt;wpend_len-=i;</td></tr>
+<tr><td class="num" id="LN512">512</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN513">513</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN514">514</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN515">515</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> n_do_ssl_write(SSL *s, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *buf, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> len)</td></tr>
+<tr><td class="num" id="LN516">516</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN517">517</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>int</span> j,k,olen,p,bs;</td></tr>
+<tr><td class="num" id="LN518">518</td><td class="line">	<span class='keyword'>int</span> mac_size;</td></tr>
+<tr><td class="num" id="LN519">519</td><td class="line">	<span class='keyword'>register</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *pp;</td></tr>
+<tr><td class="num" id="LN520">520</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN521">521</td><td class="line">	olen=len;</td></tr>
+<tr><td class="num" id="LN522">522</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN523">523</td><td class="line">	<span class='comment'>/* first check if there is data from an encryption waiting to</span></td></tr>
+<tr><td class="num" id="LN524">524</td><td class="line">	 <span class='comment'>* be sent - it must be sent because the other end is waiting.</span></td></tr>
+<tr><td class="num" id="LN525">525</td><td class="line">	 <span class='comment'>* This will happen with non-blocking IO.  We print it and then</span></td></tr>
+<tr><td class="num" id="LN526">526</td><td class="line">	 <span class='comment'>* return.</span></td></tr>
+<tr><td class="num" id="LN527">527</td><td class="line">	 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN528">528</td><td class="line">	<span class='keyword'>if</span> (s-&gt;s2-&gt;wpend_len != 0) <span class='keyword'>return</span>(write_pending(s,buf,len));</td></tr>
+<tr><td class="num" id="LN529">529</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN530">530</td><td class="line">	<span class='comment'>/* set mac_size to mac size */</span></td></tr>
+<tr><td class="num" id="LN531">531</td><td class="line">	<span class='keyword'>if</span> (s-&gt;s2-&gt;clear_text)</td></tr>
+<tr><td class="num" id="LN532">532</td><td class="line">		mac_size=0;</td></tr>
+<tr><td class="num" id="LN533">533</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN534">534</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN535">535</td><td class="line">		mac_size=<span class='macro'>EVP_MD_CTX_size(s-&gt;write_hash)<span class='expansion'>EVP_MD_size(EVP_MD_CTX_md(s-&gt;write_hash))</span></span>;</td></tr>
+<tr><td class="num" id="LN536">536</td><td class="line">		<span class='keyword'>if</span> (mac_size &lt; 0)</td></tr>
+<tr><td class="num" id="LN537">537</td><td class="line">			<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN538">538</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN539">539</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN540">540</td><td class="line">	<span class='comment'>/* lets set the pad p */</span></td></tr>
+<tr><td class="num" id="LN541">541</td><td class="line">	<span class='keyword'>if</span> (s-&gt;s2-&gt;clear_text)</td></tr>
+<tr><td class="num" id="LN542">542</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN543">543</td><td class="line">		<span class='keyword'>if</span> (len &gt; <span class='macro'>SSL2_MAX_RECORD_LENGTH_2_BYTE_HEADER<span class='expansion'>32767u</span></span>)</td></tr>
+<tr><td class="num" id="LN544">544</td><td class="line">			len=<span class='macro'>SSL2_MAX_RECORD_LENGTH_2_BYTE_HEADER<span class='expansion'>32767u</span></span>;</td></tr>
+<tr><td class="num" id="LN545">545</td><td class="line">		p=0;</td></tr>
+<tr><td class="num" id="LN546">546</td><td class="line">		s-&gt;s2-&gt;three_byte_header=0;</td></tr>
+<tr><td class="num" id="LN547">547</td><td class="line">		<span class='comment'>/* len=len; */</span></td></tr>
+<tr><td class="num" id="LN548">548</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN549">549</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN550">550</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN551">551</td><td class="line">		bs=EVP_CIPHER_CTX_block_size(s-&gt;enc_read_ctx);</td></tr>
+<tr><td class="num" id="LN552">552</td><td class="line">		j=len+mac_size;</td></tr>
+<tr><td class="num" id="LN553">553</td><td class="line">		<span class='comment'>/* Two-byte headers allow for a larger record length than</span></td></tr>
+<tr><td class="num" id="LN554">554</td><td class="line">		 <span class='comment'>* three-byte headers, but we can't use them if we need</span></td></tr>
+<tr><td class="num" id="LN555">555</td><td class="line">		 <span class='comment'>* padding or if we have to set the escape bit. */</span></td></tr>
+<tr><td class="num" id="LN556">556</td><td class="line">		<span class='keyword'>if</span> ((j &gt; <span class='macro'>SSL2_MAX_RECORD_LENGTH_3_BYTE_HEADER<span class='expansion'>16383</span></span>) &amp;&amp;</td></tr>
+<tr><td class="num" id="LN557">557</td><td class="line">			(!s-&gt;s2-&gt;escape))</td></tr>
+<tr><td class="num" id="LN558">558</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN559">559</td><td class="line">			<span class='keyword'>if</span> (j &gt; <span class='macro'>SSL2_MAX_RECORD_LENGTH_2_BYTE_HEADER<span class='expansion'>32767u</span></span>)</td></tr>
+<tr><td class="num" id="LN560">560</td><td class="line">				j=<span class='macro'>SSL2_MAX_RECORD_LENGTH_2_BYTE_HEADER<span class='expansion'>32767u</span></span>;</td></tr>
+<tr><td class="num" id="LN561">561</td><td class="line">			<span class='comment'>/* set k to the max number of bytes with 2</span></td></tr>
+<tr><td class="num" id="LN562">562</td><td class="line">			 <span class='comment'>* byte header */</span></td></tr>
+<tr><td class="num" id="LN563">563</td><td class="line">			k=j-(j%bs);</td></tr>
+<tr><td class="num" id="LN564">564</td><td class="line">			<span class='comment'>/* how many data bytes? */</span></td></tr>
+<tr><td class="num" id="LN565">565</td><td class="line">			len=k-mac_size; </td></tr>
+<tr><td class="num" id="LN566">566</td><td class="line">			s-&gt;s2-&gt;three_byte_header=0;</td></tr>
+<tr><td class="num" id="LN567">567</td><td class="line">			p=0;</td></tr>
+<tr><td class="num" id="LN568">568</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN569">569</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> ((bs &lt;= 1) &amp;&amp; (!s-&gt;s2-&gt;escape))</td></tr>
+<tr><td class="num" id="LN570">570</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN571">571</td><td class="line">			<span class='comment'>/* j &lt;= SSL2_MAX_RECORD_LENGTH_3_BYTE_HEADER, thus</span></td></tr>
+<tr><td class="num" id="LN572">572</td><td class="line">			 <span class='comment'>* j &lt; SSL2_MAX_RECORD_LENGTH_2_BYTE_HEADER */</span></td></tr>
+<tr><td class="num" id="LN573">573</td><td class="line">			s-&gt;s2-&gt;three_byte_header=0;</td></tr>
+<tr><td class="num" id="LN574">574</td><td class="line">			p=0;</td></tr>
+<tr><td class="num" id="LN575">575</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN576">576</td><td class="line">		<span class='keyword'>else</span> <span class='comment'>/* we may have to use a 3 byte header */</span></td></tr>
+<tr><td class="num" id="LN577">577</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN578">578</td><td class="line">			<span class='comment'>/* If s-&gt;s2-&gt;escape is not set, then</span></td></tr>
+<tr><td class="num" id="LN579">579</td><td class="line">			 <span class='comment'>* j &lt;= SSL2_MAX_RECORD_LENGTH_3_BYTE_HEADER, and thus</span></td></tr>
+<tr><td class="num" id="LN580">580</td><td class="line">			 <span class='comment'>* j &lt; SSL2_MAX_RECORD_LENGTH_2_BYTE_HEADER. */</span></td></tr>
+<tr><td class="num" id="LN581">581</td><td class="line">			p=(j%bs);</td></tr>
+<tr><td class="num" id="LN582">582</td><td class="line">			p=(p == 0)?0:(bs-p);</td></tr>
+<tr><td class="num" id="LN583">583</td><td class="line">			<span class='keyword'>if</span> (s-&gt;s2-&gt;escape)</td></tr>
+<tr><td class="num" id="LN584">584</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN585">585</td><td class="line">				s-&gt;s2-&gt;three_byte_header=1;</td></tr>
+<tr><td class="num" id="LN586">586</td><td class="line">				<span class='keyword'>if</span> (j &gt; <span class='macro'>SSL2_MAX_RECORD_LENGTH_3_BYTE_HEADER<span class='expansion'>16383</span></span>)</td></tr>
+<tr><td class="num" id="LN587">587</td><td class="line">					j=<span class="mrange"><span class='macro'>SSL2_MAX_RECORD_LENGTH_3_BYTE_HEADER<span class='expansion'>16383</span></span></span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgEvent" style="margin-left:41ex">Value stored to 'j' is never read</div></td></tr>
+<tr><td class="num" id="LN588">588</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN589">589</td><td class="line">			<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN590">590</td><td class="line">				s-&gt;s2-&gt;three_byte_header=(p == 0)?0:1;</td></tr>
+<tr><td class="num" id="LN591">591</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN592">592</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN593">593</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN594">594</td><td class="line">	<span class='comment'>/* Now</span></td></tr>
+<tr><td class="num" id="LN595">595</td><td class="line">	 <span class='comment'>*      j &lt;= SSL2_MAX_RECORD_LENGTH_2_BYTE_HEADER</span></td></tr>
+<tr><td class="num" id="LN596">596</td><td class="line">	 <span class='comment'>* holds, and if s-&gt;s2-&gt;three_byte_header is set, then even</span></td></tr>
+<tr><td class="num" id="LN597">597</td><td class="line">	 <span class='comment'>*      j &lt;= SSL2_MAX_RECORD_LENGTH_3_BYTE_HEADER.</span></td></tr>
+<tr><td class="num" id="LN598">598</td><td class="line">	 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN599">599</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN600">600</td><td class="line">	<span class='comment'>/* mac_size is the number of MAC bytes</span></td></tr>
+<tr><td class="num" id="LN601">601</td><td class="line">	 <span class='comment'>* len is the number of data bytes we are going to send</span></td></tr>
+<tr><td class="num" id="LN602">602</td><td class="line">	 <span class='comment'>* p is the number of padding bytes</span></td></tr>
+<tr><td class="num" id="LN603">603</td><td class="line">	 <span class='comment'>* (if it is a two-byte header, then p == 0) */</span></td></tr>
+<tr><td class="num" id="LN604">604</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN605">605</td><td class="line">	s-&gt;s2-&gt;wlength=len;</td></tr>
+<tr><td class="num" id="LN606">606</td><td class="line">	s-&gt;s2-&gt;padding=p;</td></tr>
+<tr><td class="num" id="LN607">607</td><td class="line">	s-&gt;s2-&gt;mac_data= &amp;(s-&gt;s2-&gt;wbuf[3]);</td></tr>
+<tr><td class="num" id="LN608">608</td><td class="line">	s-&gt;s2-&gt;wact_data= &amp;(s-&gt;s2-&gt;wbuf[3+mac_size]);</td></tr>
+<tr><td class="num" id="LN609">609</td><td class="line">	<span class='comment'>/* we copy the data into s-&gt;s2-&gt;wbuf */</span></td></tr>
+<tr><td class="num" id="LN610">610</td><td class="line">	<span class='macro'>memcpy(s-&gt;s2-&gt;wact_data,buf,len)<span class='expansion'>__builtin___memcpy_chk (s-&gt;s2-&gt;wact_data, buf, len, __builtin_object_size<br> (s-&gt;s2-&gt;wact_data, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN611">611</td><td class="line">	<span class='keyword'>if</span> (p)</td></tr>
+<tr><td class="num" id="LN612">612</td><td class="line">		<span class='macro'>memset(&amp;(s-&gt;s2-&gt;wact_data[len]),0,p)<span class='expansion'>__builtin___memset_chk (&amp;(s-&gt;s2-&gt;wact_data[len]), 0<br>, p, __builtin_object_size (&amp;(s-&gt;s2-&gt;wact_data[len]<br>), 0))</span></span>; <span class='comment'>/* arbitrary padding */</span></td></tr>
+<tr><td class="num" id="LN613">613</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN614">614</td><td class="line">	<span class='keyword'>if</span> (!s-&gt;s2-&gt;clear_text)</td></tr>
+<tr><td class="num" id="LN615">615</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN616">616</td><td class="line">		s-&gt;s2-&gt;wact_data_length=len+p;</td></tr>
+<tr><td class="num" id="LN617">617</td><td class="line">		ssl2_mac(s,s-&gt;s2-&gt;mac_data,1);</td></tr>
+<tr><td class="num" id="LN618">618</td><td class="line">		s-&gt;s2-&gt;wlength+=p+mac_size;</td></tr>
+<tr><td class="num" id="LN619">619</td><td class="line">		ssl2_enc(s,1);</td></tr>
+<tr><td class="num" id="LN620">620</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN621">621</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN622">622</td><td class="line">	<span class='comment'>/* package up the header */</span></td></tr>
+<tr><td class="num" id="LN623">623</td><td class="line">	s-&gt;s2-&gt;wpend_len=s-&gt;s2-&gt;wlength;</td></tr>
+<tr><td class="num" id="LN624">624</td><td class="line">	<span class='keyword'>if</span> (s-&gt;s2-&gt;three_byte_header) <span class='comment'>/* 3 byte header */</span></td></tr>
+<tr><td class="num" id="LN625">625</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN626">626</td><td class="line">		pp=s-&gt;s2-&gt;mac_data;</td></tr>
+<tr><td class="num" id="LN627">627</td><td class="line">		pp-=3;</td></tr>
+<tr><td class="num" id="LN628">628</td><td class="line">		pp[0]=(s-&gt;s2-&gt;wlength&gt;&gt;8)&amp;(<span class='macro'>THREE_BYTE_MASK<span class='expansion'>0x3fff</span></span>&gt;&gt;8);</td></tr>
+<tr><td class="num" id="LN629">629</td><td class="line">		<span class='keyword'>if</span> (s-&gt;s2-&gt;escape) pp[0]|=<span class='macro'>SEC_ESC_BIT<span class='expansion'>0x40</span></span>;</td></tr>
+<tr><td class="num" id="LN630">630</td><td class="line">		pp[1]=s-&gt;s2-&gt;wlength&amp;0xff;</td></tr>
+<tr><td class="num" id="LN631">631</td><td class="line">		pp[2]=s-&gt;s2-&gt;padding;</td></tr>
+<tr><td class="num" id="LN632">632</td><td class="line">		s-&gt;s2-&gt;wpend_len+=3;</td></tr>
+<tr><td class="num" id="LN633">633</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN634">634</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN635">635</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN636">636</td><td class="line">		pp=s-&gt;s2-&gt;mac_data;</td></tr>
+<tr><td class="num" id="LN637">637</td><td class="line">		pp-=2;</td></tr>
+<tr><td class="num" id="LN638">638</td><td class="line">		pp[0]=((s-&gt;s2-&gt;wlength&gt;&gt;8)&amp;(<span class='macro'>TWO_BYTE_MASK<span class='expansion'>0x7fff</span></span>&gt;&gt;8))|<span class='macro'>TWO_BYTE_BIT<span class='expansion'>0x80</span></span>;</td></tr>
+<tr><td class="num" id="LN639">639</td><td class="line">		pp[1]=s-&gt;s2-&gt;wlength&amp;0xff;</td></tr>
+<tr><td class="num" id="LN640">640</td><td class="line">		s-&gt;s2-&gt;wpend_len+=2;</td></tr>
+<tr><td class="num" id="LN641">641</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN642">642</td><td class="line">	s-&gt;s2-&gt;write_ptr=pp;</td></tr>
+<tr><td class="num" id="LN643">643</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN644">644</td><td class="line">	<span class='macro'>INC32(s-&gt;s2-&gt;write_sequence)<span class='expansion'>((s-&gt;s2-&gt;write_sequence)=((s-&gt;s2-&gt;write_sequence)<br>+1)&amp;0xffffffffL)</span></span>; <span class='comment'>/* expect next number */</span></td></tr>
+<tr><td class="num" id="LN645">645</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN646">646</td><td class="line">	<span class='comment'>/* lets try to actually write the data */</span></td></tr>
+<tr><td class="num" id="LN647">647</td><td class="line">	s-&gt;s2-&gt;wpend_tot=olen;</td></tr>
+<tr><td class="num" id="LN648">648</td><td class="line">	s-&gt;s2-&gt;wpend_buf=buf;</td></tr>
+<tr><td class="num" id="LN649">649</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN650">650</td><td class="line">	s-&gt;s2-&gt;wpend_ret=len;</td></tr>
+<tr><td class="num" id="LN651">651</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN652">652</td><td class="line">	s-&gt;s2-&gt;wpend_off=0;</td></tr>
+<tr><td class="num" id="LN653">653</td><td class="line">	<span class='keyword'>return</span>(write_pending(s,buf,olen));</td></tr>
+<tr><td class="num" id="LN654">654</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN655">655</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN656">656</td><td class="line"><span class='keyword'>int</span> ssl2_part_read(SSL *s, <span class='keyword'>unsigned</span> <span class='keyword'>long</span> f, <span class='keyword'>int</span> i)</td></tr>
+<tr><td class="num" id="LN657">657</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN658">658</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *p;</td></tr>
+<tr><td class="num" id="LN659">659</td><td class="line">	<span class='keyword'>int</span> j;</td></tr>
+<tr><td class="num" id="LN660">660</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN661">661</td><td class="line">	<span class='keyword'>if</span> (i &lt; 0)</td></tr>
+<tr><td class="num" id="LN662">662</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN663">663</td><td class="line">		<span class='comment'>/* ssl2_return_error(s); */</span></td></tr>
+<tr><td class="num" id="LN664">664</td><td class="line">		<span class='comment'>/* for non-blocking io,</span></td></tr>
+<tr><td class="num" id="LN665">665</td><td class="line">		 <span class='comment'>* this is not necessarily fatal */</span></td></tr>
+<tr><td class="num" id="LN666">666</td><td class="line">		<span class='keyword'>return</span>(i);</td></tr>
+<tr><td class="num" id="LN667">667</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN668">668</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN669">669</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN670">670</td><td class="line">		s-&gt;init_num+=i;</td></tr>
+<tr><td class="num" id="LN671">671</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN672">672</td><td class="line">		<span class='comment'>/* Check for error.  While there are recoverable errors,</span></td></tr>
+<tr><td class="num" id="LN673">673</td><td class="line">		 <span class='comment'>* this function is not called when those must be expected;</span></td></tr>
+<tr><td class="num" id="LN674">674</td><td class="line">		 <span class='comment'>* any error detected here is fatal. */</span></td></tr>
+<tr><td class="num" id="LN675">675</td><td class="line">		<span class='keyword'>if</span> (s-&gt;init_num &gt;= 3)</td></tr>
+<tr><td class="num" id="LN676">676</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN677">677</td><td class="line">			p=(<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *)s-&gt;init_buf-&gt;data;</td></tr>
+<tr><td class="num" id="LN678">678</td><td class="line">			<span class='keyword'>if</span> (p[0] == <span class='macro'>SSL2_MT_ERROR<span class='expansion'>0</span></span>)</td></tr>
+<tr><td class="num" id="LN679">679</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN680">680</td><td class="line">				j=(p[1]&lt;&lt;8)|p[2];</td></tr>
+<tr><td class="num" id="LN681">681</td><td class="line">				<span class='macro'>SSLerr((<span class='keyword'>int</span>)f,ssl_mt_error(j))<span class='expansion'>ERR_put_error(20,((int)f),(ssl_mt_error(j)),"s2_pkt.c",681)</span></span>;</td></tr>
+<tr><td class="num" id="LN682">682</td><td class="line">				s-&gt;init_num -= 3;</td></tr>
+<tr><td class="num" id="LN683">683</td><td class="line">				<span class='keyword'>if</span> (s-&gt;init_num &gt; 0)</td></tr>
+<tr><td class="num" id="LN684">684</td><td class="line">					<span class='macro'>memmove(p, p+3, s-&gt;init_num)<span class='expansion'>__builtin___memmove_chk (p, p+3, s-&gt;init_num, __builtin_object_size<br> (p, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN685">685</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN686">686</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN687">687</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN688">688</td><td class="line">		<span class='comment'>/* If it's not an error message, we have some error anyway --</span></td></tr>
+<tr><td class="num" id="LN689">689</td><td class="line">		 <span class='comment'>* the message was shorter than expected.  This too is treated</span></td></tr>
+<tr><td class="num" id="LN690">690</td><td class="line">		 <span class='comment'>* as fatal (at least if SSL_get_error is asked for its opinion). */</span></td></tr>
+<tr><td class="num" id="LN691">691</td><td class="line">		<span class='keyword'>return</span>(0);</td></tr>
+<tr><td class="num" id="LN692">692</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN693">693</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN694">694</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN695">695</td><td class="line"><span class='keyword'>int</span> ssl2_do_write(SSL *s)</td></tr>
+<tr><td class="num" id="LN696">696</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN697">697</td><td class="line">	<span class='keyword'>int</span> ret;</td></tr>
+<tr><td class="num" id="LN698">698</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN699">699</td><td class="line">	ret=ssl2_write(s,&amp;s-&gt;init_buf-&gt;data[s-&gt;init_off],s-&gt;init_num);</td></tr>
+<tr><td class="num" id="LN700">700</td><td class="line">	<span class='keyword'>if</span> (ret == s-&gt;init_num)</td></tr>
+<tr><td class="num" id="LN701">701</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN702">702</td><td class="line">		<span class='keyword'>if</span> (s-&gt;msg_callback)</td></tr>
+<tr><td class="num" id="LN703">703</td><td class="line">			s-&gt;msg_callback(1, s-&gt;version, 0, s-&gt;init_buf-&gt;data, (size_t)(s-&gt;init_off + s-&gt;init_num), s, s-&gt;msg_callback_arg);</td></tr>
+<tr><td class="num" id="LN704">704</td><td class="line">		<span class='keyword'>return</span>(1);</td></tr>
+<tr><td class="num" id="LN705">705</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN706">706</td><td class="line">	<span class='keyword'>if</span> (ret &lt; 0)</td></tr>
+<tr><td class="num" id="LN707">707</td><td class="line">		<span class='keyword'>return</span>(-1);</td></tr>
+<tr><td class="num" id="LN708">708</td><td class="line">	s-&gt;init_off+=ret;</td></tr>
+<tr><td class="num" id="LN709">709</td><td class="line">	s-&gt;init_num-=ret;</td></tr>
+<tr><td class="num" id="LN710">710</td><td class="line">	<span class='keyword'>return</span>(0);</td></tr>
+<tr><td class="num" id="LN711">711</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN712">712</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN713">713</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> ssl_mt_error(<span class='keyword'>int</span> n)</td></tr>
+<tr><td class="num" id="LN714">714</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN715">715</td><td class="line">	<span class='keyword'>int</span> ret;</td></tr>
+<tr><td class="num" id="LN716">716</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN717">717</td><td class="line">	<span class='keyword'>switch</span> (n)</td></tr>
+<tr><td class="num" id="LN718">718</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN719">719</td><td class="line">	<span class='keyword'>case</span> <span class='macro'>SSL2_PE_NO_CIPHER<span class='expansion'>0x0001</span></span>:</td></tr>
+<tr><td class="num" id="LN720">720</td><td class="line">		ret=<span class='macro'>SSL_R_PEER_ERROR_NO_CIPHER<span class='expansion'>203</span></span>;</td></tr>
+<tr><td class="num" id="LN721">721</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN722">722</td><td class="line">	<span class='keyword'>case</span> <span class='macro'>SSL2_PE_NO_CERTIFICATE<span class='expansion'>0x0002</span></span>:</td></tr>
+<tr><td class="num" id="LN723">723</td><td class="line">		ret=<span class='macro'>SSL_R_PEER_ERROR_NO_CERTIFICATE<span class='expansion'>202</span></span>;</td></tr>
+<tr><td class="num" id="LN724">724</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN725">725</td><td class="line">	<span class='keyword'>case</span> <span class='macro'>SSL2_PE_BAD_CERTIFICATE<span class='expansion'>0x0004</span></span>:</td></tr>
+<tr><td class="num" id="LN726">726</td><td class="line">		ret=<span class='macro'>SSL_R_PEER_ERROR_CERTIFICATE<span class='expansion'>201</span></span>;</td></tr>
+<tr><td class="num" id="LN727">727</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN728">728</td><td class="line">	<span class='keyword'>case</span> <span class='macro'>SSL2_PE_UNSUPPORTED_CERTIFICATE_TYPE<span class='expansion'>0x0006</span></span>:</td></tr>
+<tr><td class="num" id="LN729">729</td><td class="line">		ret=<span class='macro'>SSL_R_PEER_ERROR_UNSUPPORTED_CERTIFICATE_TYPE<span class='expansion'>204</span></span>;</td></tr>
+<tr><td class="num" id="LN730">730</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN731">731</td><td class="line">	<span class='keyword'>default</span>:</td></tr>
+<tr><td class="num" id="LN732">732</td><td class="line">		ret=<span class='macro'>SSL_R_UNKNOWN_REMOTE_ERROR_TYPE<span class='expansion'>253</span></span>;</td></tr>
+<tr><td class="num" id="LN733">733</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN734">734</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN735">735</td><td class="line">	<span class='keyword'>return</span>(ret);</td></tr>
+<tr><td class="num" id="LN736">736</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN737">737</td><td class="line"><span class='directive'>#else /* !OPENSSL_NO_SSL2 */</span></td></tr>
+<tr><td class="num" id="LN738">738</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN739">739</td><td class="line"><span class='directive'># if PEDANTIC</span></td></tr>
+<tr><td class="num" id="LN740">740</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>void</span> *dummy=&amp;dummy;</td></tr>
+<tr><td class="num" id="LN741">741</td><td class="line"><span class='directive'># endif</span></td></tr>
+<tr><td class="num" id="LN742">742</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN743">743</td><td class="line"><span class='directive'>#endif</span></td></tr>
+</table></body></html>

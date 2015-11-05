@@ -1,0 +1,636 @@
+<!doctype html>
+<html>
+<head>
+<title>engine.c</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC Value stored to 'l' is never read -->
+
+<!-- BUGTYPE Dead increment -->
+
+<!-- BUGCATEGORY Dead store -->
+
+<!-- BUGFILE /Users/fran/Desktop/openssl-1.0.1f/apps/engine.c -->
+
+<!-- FILENAME engine.c -->
+
+<!-- FUNCTIONNAME append_buf -->
+
+<!-- BUGLINE 114 -->
+
+<!-- BUGCOLUMN 3 -->
+
+<!-- BUGPATHLENGTH 1 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>apps/engine.c</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 114, column 3</a></td></tr>
+<tr><td class="rowname">Description:</td><td>Value stored to 'l' is never read</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/* apps/engine.c -*- mode: C; c-file-style: "eay" -*- */</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>/* Written by Richard Levitte &lt;richard@levitte.org&gt; for the OpenSSL</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"> <span class='comment'>* project 2000.</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"><span class='comment'>/* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"> <span class='comment'>* Copyright (c) 2000 The OpenSSL Project.  All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"> <span class='comment'>* Redistribution and use in source and binary forms, with or without</span></td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"> <span class='comment'>* modification, are permitted provided that the following conditions</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"> <span class='comment'>* are met:</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"> <span class='comment'>* 1. Redistributions of source code must retain the above copyright</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer.</span> </td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> <span class='comment'>* 2. Redistributions in binary form must reproduce the above copyright</span></td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer in</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"> <span class='comment'>*    the documentation and/or other materials provided with the</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"> <span class='comment'>*    distribution.</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"> <span class='comment'>* 3. All advertising materials mentioning features or use of this</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"> <span class='comment'>*    software must display the following acknowledgment:</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"> <span class='comment'>*    "This product includes software developed by the OpenSSL Project</span></td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"> <span class='comment'>*    for use in the OpenSSL Toolkit. (http://www.OpenSSL.org/)"</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"> <span class='comment'>* 4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to</span></td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"> <span class='comment'>*    endorse or promote products derived from this software without</span></td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"> <span class='comment'>*    prior written permission. For written permission, please contact</span></td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"> <span class='comment'>*    licensing@OpenSSL.org.</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"> <span class='comment'>* 5. Products derived from this software may not be called "OpenSSL"</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"> <span class='comment'>*    nor may "OpenSSL" appear in their names without prior written</span></td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> <span class='comment'>*    permission of the OpenSSL Project.</span></td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"> <span class='comment'>* 6. Redistributions of any form whatsoever must retain the following</span></td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"> <span class='comment'>*    acknowledgment:</span></td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line"> <span class='comment'>*    "This product includes software developed by the OpenSSL Project</span></td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line"> <span class='comment'>*    for use in the OpenSSL Toolkit (http://www.OpenSSL.org/)"</span></td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line"> <span class='comment'>* THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY</span></td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line"> <span class='comment'>* EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span></td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line"> <span class='comment'>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR</span></td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line"> <span class='comment'>* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR</span></td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line"> <span class='comment'>* ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span></td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line"> <span class='comment'>* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT</span></td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line"> <span class='comment'>* NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span></td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line"> <span class='comment'>* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span></td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line"> <span class='comment'>* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span></td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line"> <span class='comment'>* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)</span></td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line"> <span class='comment'>* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED</span></td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line"> <span class='comment'>* OF THE POSSIBILITY OF SUCH DAMAGE.</span></td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line"> <span class='comment'>* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line"> <span class='comment'>* This product includes cryptographic software written by Eric Young</span></td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line"> <span class='comment'>* (eay@cryptsoft.com).  This product includes software written by Tim</span></td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line"> <span class='comment'>* Hudson (tjh@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line"><span class='directive'>#include &lt;stdio.h&gt;</span></td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line"><span class='directive'>#include &lt;stdlib.h&gt;</span></td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line"><span class='directive'>#include &lt;string.h&gt;</span></td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line"><span class='directive'>#ifdef OPENSSL_NO_STDIO</span></td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line"><span class='directive'>#define APPS_WIN16</span></td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line"><span class='directive'>#include "apps.h"</span></td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line"><span class='directive'>#include &lt;openssl/err.h&gt;</span></td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_ENGINE</span></td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line"><span class='directive'>#include &lt;openssl/engine.h&gt;</span></td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line"><span class='directive'>#include &lt;openssl/ssl.h&gt;</span></td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line"><span class='directive'>#undef <span class='macro'>PROG<span class='expansion'>engine_main</span></span></span></td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line"><span class='directive'>#define <span class='macro'>PROG<span class='expansion'>engine_main</span></span>	engine_main</span></td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span> *engine_usage[]={</td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line"><span class='string_literal'>"usage: engine opts [engine ...]\n"</span>,</td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line"><span class='string_literal'>" -v[v[v[v]]] - verbose mode, for each engine, list its 'control commands'\n"</span>,</td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line"><span class='string_literal'>"               -vv will additionally display each command's description\n"</span>,</td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line"><span class='string_literal'>"               -vvv will also add the input flags for each command\n"</span>,</td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line"><span class='string_literal'>"               -vvvv will also show internal input flags\n"</span>,</td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line"><span class='string_literal'>" -c          - for each engine, also list the capabilities\n"</span>,</td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line"><span class='string_literal'>" -t[t]       - for each engine, check that they are really available\n"</span>,</td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line"><span class='string_literal'>"               -tt will display error trace for unavailable engines\n"</span>,</td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line"><span class='string_literal'>" -pre &lt;cmd&gt;  - runs command 'cmd' against the ENGINE before any attempts\n"</span>,</td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line"><span class='string_literal'>"               to load it (if -t is used)\n"</span>,</td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line"><span class='string_literal'>" -post &lt;cmd&gt; - runs command 'cmd' against the ENGINE after loading it\n"</span>,</td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line"><span class='string_literal'>"               (only used if -t is also provided)\n"</span>,</td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line"><span class='string_literal'>" NB: -pre and -post will be applied to all ENGINEs supplied on the command\n"</span>,</td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line"><span class='string_literal'>" line, or all supported ENGINEs if none are specified.\n"</span>,</td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line"><span class='string_literal'>" Eg. '-pre \"SO_PATH:/lib/libdriver.so\"' calls command \"SO_PATH\" with\n"</span>,</td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line"><span class='string_literal'>" argument \"/lib/libdriver.so\".\n"</span>,</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line"><span class='macro'>NULL<span class='expansion'>((void*)0)</span></span></td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">};</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>void</span> identity(<span class='keyword'>char</span> *ptr)</td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">	<span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> append_buf(<span class='keyword'>char</span> **buf, <span class='keyword'>const</span> <span class='keyword'>char</span> *s, <span class='keyword'>int</span> *size, <span class='keyword'>int</span> step)</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line">	<span class='keyword'>int</span> l = strlen(s);</td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line">	<span class='keyword'>if</span> (*buf == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line">		*size = step;</td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line">		*buf = <span class='macro'>OPENSSL_malloc(*size)<span class='expansion'>CRYPTO_malloc((int)*size,"engine.c",107)</span></span>;</td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line">		<span class='keyword'>if</span> (*buf == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line">		**buf = '\0';</td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line">	<span class='keyword'>if</span> (**buf != '\0')</td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">		l += <span class="mrange">2</span>;		<span class='comment'>/* ", " */</span></td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgEvent" style="margin-left:17ex">Value stored to 'l' is never read</div></td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line">	<span class='keyword'>if</span> (strlen(*buf) + strlen(s) &gt;= (<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)*size)</td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line">		*size += step;</td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line">		*buf = <span class='macro'>OPENSSL_realloc(*buf, *size)<span class='expansion'>CRYPTO_realloc((char *)*buf,(int)*size,"engine.c",119)</span></span>;</td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line">	<span class='keyword'>if</span> (*buf == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line">	<span class='keyword'>if</span> (**buf != '\0')</td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line">		BUF_strlcat(*buf, <span class='string_literal'>", "</span>, *size);</td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line">	BUF_strlcat(*buf, s, *size);</td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> util_flags(BIO *bio_out, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> flags, <span class='keyword'>const</span> <span class='keyword'>char</span> *indent)</td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line">	<span class='keyword'>int</span> started = 0, err = 0;</td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line">	<span class='comment'>/* Indent before displaying input flags */</span></td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line">	BIO_printf(bio_out, <span class='string_literal'>"%s%s(input flags): "</span>, indent, indent);</td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line">	<span class='keyword'>if</span>(flags == 0)</td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line">		BIO_printf(bio_out, <span class='string_literal'>"&lt;no flags&gt;\n"</span>);</td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line">		<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line">        <span class='comment'>/* If the object is internal, mark it in a way that shows instead of</span></td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">         <span class='comment'>* having it part of all the other flags, even if it really is. */</span></td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line">	<span class='keyword'>if</span>(flags &amp; <span class='macro'>ENGINE_CMD_FLAG_INTERNAL<span class='expansion'>(unsigned int)0x0008</span></span>)</td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line">		BIO_printf(bio_out, <span class='string_literal'>"[Internal] "</span>);</td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line">	<span class='keyword'>if</span>(flags &amp; <span class='macro'>ENGINE_CMD_FLAG_NUMERIC<span class='expansion'>(unsigned int)0x0001</span></span>)</td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line">		BIO_printf(bio_out, <span class='string_literal'>"NUMERIC"</span>);</td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line">		started = 1;</td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line">	<span class='comment'>/* Now we check that no combinations of the mutually exclusive NUMERIC,</span></td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line">	 <span class='comment'>* STRING, and NO_INPUT flags have been used. Future flags that can be</span></td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line">	 <span class='comment'>* OR'd together with these would need to added after these to preserve</span></td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line">	 <span class='comment'>* the testing logic. */</span></td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line">	<span class='keyword'>if</span>(flags &amp; <span class='macro'>ENGINE_CMD_FLAG_STRING<span class='expansion'>(unsigned int)0x0002</span></span>)</td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line">		<span class='keyword'>if</span>(started)</td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line">			BIO_printf(bio_out, <span class='string_literal'>"|"</span>);</td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line">			err = 1;</td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line">		BIO_printf(bio_out, <span class='string_literal'>"STRING"</span>);</td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line">		started = 1;</td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line">	<span class='keyword'>if</span>(flags &amp; <span class='macro'>ENGINE_CMD_FLAG_NO_INPUT<span class='expansion'>(unsigned int)0x0004</span></span>)</td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line">		<span class='keyword'>if</span>(started)</td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line">			BIO_printf(bio_out, <span class='string_literal'>"|"</span>);</td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line">			err = 1;</td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line">		BIO_printf(bio_out, <span class='string_literal'>"NO_INPUT"</span>);</td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line">		started = 1;</td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line">	<span class='comment'>/* Check for unknown flags */</span></td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line">	flags = flags &amp; ~<span class='macro'>ENGINE_CMD_FLAG_NUMERIC<span class='expansion'>(unsigned int)0x0001</span></span> &amp;</td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line">			~<span class='macro'>ENGINE_CMD_FLAG_STRING<span class='expansion'>(unsigned int)0x0002</span></span> &amp;</td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">			~<span class='macro'>ENGINE_CMD_FLAG_NO_INPUT<span class='expansion'>(unsigned int)0x0004</span></span> &amp;</td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line">			~<span class='macro'>ENGINE_CMD_FLAG_INTERNAL<span class='expansion'>(unsigned int)0x0008</span></span>;</td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line">	<span class='keyword'>if</span>(flags)</td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line">		<span class='keyword'>if</span>(started) BIO_printf(bio_out, <span class='string_literal'>"|"</span>);</td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line">		BIO_printf(bio_out, <span class='string_literal'>"&lt;0x%04X&gt;"</span>, flags);</td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line">	<span class='keyword'>if</span>(err)</td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line">		BIO_printf(bio_out, <span class='string_literal'>"  &lt;illegal flags!&gt;"</span>);</td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">	BIO_printf(bio_out, <span class='string_literal'>"\n"</span>);</td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> util_verbose(ENGINE *e, <span class='keyword'>int</span> verbose, BIO *bio_out, <span class='keyword'>const</span> <span class='keyword'>char</span> *indent)</td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line">	<span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>int</span> line_wrap = 78;</td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line">	<span class='keyword'>int</span> num;</td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line">	<span class='keyword'>int</span> ret = 0;</td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line">	<span class='keyword'>char</span> *name = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line">	<span class='keyword'>char</span> *desc = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line">	<span class='keyword'>int</span> flags;</td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line">	<span class='keyword'>int</span> xpos = 0;</td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line">	<span class='macro'>STACK_OF(OPENSSL_STRING)<span class='expansion'>struct stack_st_OPENSSL_STRING</span></span> *cmds = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line">	<span class='keyword'>if</span>(!ENGINE_ctrl(e, <span class='macro'>ENGINE_CTRL_HAS_CTRL_FUNCTION<span class='expansion'>10</span></span>, 0, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) ||</td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line">			((num = ENGINE_ctrl(e, <span class='macro'>ENGINE_CTRL_GET_FIRST_CMD_TYPE<span class='expansion'>11</span></span>,</td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line">					0, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)) &lt;= 0))</td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line"><span class='directive'>#if 0</span></td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line">		BIO_printf(bio_out, <span class='string_literal'>"%s&lt;no control commands&gt;\n"</span>, indent);</td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line">		<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line">	cmds = <span class='macro'>sk_OPENSSL_STRING_new_null()<span class='expansion'>((struct stack_st_OPENSSL_STRING *)sk_new_null())</span></span>;</td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line">	<span class='keyword'>if</span>(!cmds)</td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line">	<span class='keyword'>do</span> {</td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line">		<span class='keyword'>int</span> len;</td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line">		<span class='comment'>/* Get the command input flags */</span></td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line">		<span class='keyword'>if</span>((flags = ENGINE_ctrl(e, <span class='macro'>ENGINE_CTRL_GET_CMD_FLAGS<span class='expansion'>18</span></span>, num,</td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line">					<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)) &lt; 0)</td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line">			<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line">                <span class='keyword'>if</span> (!(flags &amp; <span class='macro'>ENGINE_CMD_FLAG_INTERNAL<span class='expansion'>(unsigned int)0x0008</span></span>) || verbose &gt;= 4)</td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line">                        {</td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line">                        <span class='comment'>/* Get the command name */</span></td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line">                        <span class='keyword'>if</span>((len = ENGINE_ctrl(e, <span class='macro'>ENGINE_CTRL_GET_NAME_LEN_FROM_CMD<span class='expansion'>14</span></span>, num,</td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line">                                <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)) &lt;= 0)</td></tr>
+<tr><td class="num" id="LN229">229</td><td class="line">                                <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN230">230</td><td class="line">                        <span class='keyword'>if</span>((name = <span class='macro'>OPENSSL_malloc(len + 1)<span class='expansion'>CRYPTO_malloc((int)len + 1,"engine.c",230)</span></span>) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN231">231</td><td class="line">                                <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN232">232</td><td class="line">                        <span class='keyword'>if</span>(ENGINE_ctrl(e, <span class='macro'>ENGINE_CTRL_GET_NAME_FROM_CMD<span class='expansion'>15</span></span>, num, name,</td></tr>
+<tr><td class="num" id="LN233">233</td><td class="line">                                <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) &lt;= 0)</td></tr>
+<tr><td class="num" id="LN234">234</td><td class="line">                                <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN235">235</td><td class="line">                        <span class='comment'>/* Get the command description */</span></td></tr>
+<tr><td class="num" id="LN236">236</td><td class="line">                        <span class='keyword'>if</span>((len = ENGINE_ctrl(e, <span class='macro'>ENGINE_CTRL_GET_DESC_LEN_FROM_CMD<span class='expansion'>16</span></span>, num,</td></tr>
+<tr><td class="num" id="LN237">237</td><td class="line">                                <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)) &lt; 0)</td></tr>
+<tr><td class="num" id="LN238">238</td><td class="line">                                <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN239">239</td><td class="line">                        <span class='keyword'>if</span>(len &gt; 0)</td></tr>
+<tr><td class="num" id="LN240">240</td><td class="line">                                {</td></tr>
+<tr><td class="num" id="LN241">241</td><td class="line">                                <span class='keyword'>if</span>((desc = <span class='macro'>OPENSSL_malloc(len + 1)<span class='expansion'>CRYPTO_malloc((int)len + 1,"engine.c",241)</span></span>) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN242">242</td><td class="line">                                        <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN243">243</td><td class="line">                                <span class='keyword'>if</span>(ENGINE_ctrl(e, <span class='macro'>ENGINE_CTRL_GET_DESC_FROM_CMD<span class='expansion'>17</span></span>, num, desc,</td></tr>
+<tr><td class="num" id="LN244">244</td><td class="line">                                        <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) &lt;= 0)</td></tr>
+<tr><td class="num" id="LN245">245</td><td class="line">                                        <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN246">246</td><td class="line">                                }</td></tr>
+<tr><td class="num" id="LN247">247</td><td class="line">                        <span class='comment'>/* Now decide on the output */</span></td></tr>
+<tr><td class="num" id="LN248">248</td><td class="line">                        <span class='keyword'>if</span>(xpos == 0)</td></tr>
+<tr><td class="num" id="LN249">249</td><td class="line">                                <span class='comment'>/* Do an indent */</span></td></tr>
+<tr><td class="num" id="LN250">250</td><td class="line">                                xpos = BIO_puts(bio_out, indent);</td></tr>
+<tr><td class="num" id="LN251">251</td><td class="line">                        <span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN252">252</td><td class="line">                                <span class='comment'>/* Otherwise prepend a ", " */</span></td></tr>
+<tr><td class="num" id="LN253">253</td><td class="line">                                xpos += BIO_printf(bio_out, <span class='string_literal'>", "</span>);</td></tr>
+<tr><td class="num" id="LN254">254</td><td class="line">                        <span class='keyword'>if</span>(verbose == 1)</td></tr>
+<tr><td class="num" id="LN255">255</td><td class="line">                                {</td></tr>
+<tr><td class="num" id="LN256">256</td><td class="line">                                <span class='comment'>/* We're just listing names, comma-delimited */</span></td></tr>
+<tr><td class="num" id="LN257">257</td><td class="line">                                <span class='keyword'>if</span>((xpos &gt; (<span class='keyword'>int</span>)strlen(indent)) &amp;&amp;</td></tr>
+<tr><td class="num" id="LN258">258</td><td class="line">					(xpos + (<span class='keyword'>int</span>)strlen(name) &gt; line_wrap))</td></tr>
+<tr><td class="num" id="LN259">259</td><td class="line">                                        {</td></tr>
+<tr><td class="num" id="LN260">260</td><td class="line">                                        BIO_printf(bio_out, <span class='string_literal'>"\n"</span>);</td></tr>
+<tr><td class="num" id="LN261">261</td><td class="line">                                        xpos = BIO_puts(bio_out, indent);</td></tr>
+<tr><td class="num" id="LN262">262</td><td class="line">                                        }</td></tr>
+<tr><td class="num" id="LN263">263</td><td class="line">                                xpos += BIO_printf(bio_out, <span class='string_literal'>"%s"</span>, name);</td></tr>
+<tr><td class="num" id="LN264">264</td><td class="line">                                }</td></tr>
+<tr><td class="num" id="LN265">265</td><td class="line">                        <span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN266">266</td><td class="line">                                {</td></tr>
+<tr><td class="num" id="LN267">267</td><td class="line">                                <span class='comment'>/* We're listing names plus descriptions */</span></td></tr>
+<tr><td class="num" id="LN268">268</td><td class="line">                                BIO_printf(bio_out, <span class='string_literal'>"%s: %s\n"</span>, name,</td></tr>
+<tr><td class="num" id="LN269">269</td><td class="line">                                        (desc == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) ? <span class='string_literal'>"&lt;no description&gt;"</span> : desc);</td></tr>
+<tr><td class="num" id="LN270">270</td><td class="line">                                <span class='comment'>/* ... and sometimes input flags */</span></td></tr>
+<tr><td class="num" id="LN271">271</td><td class="line">                                <span class='keyword'>if</span>((verbose &gt;= 3) &amp;&amp; !util_flags(bio_out, flags,</td></tr>
+<tr><td class="num" id="LN272">272</td><td class="line">                                        indent))</td></tr>
+<tr><td class="num" id="LN273">273</td><td class="line">                                        <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN274">274</td><td class="line">                                xpos = 0;</td></tr>
+<tr><td class="num" id="LN275">275</td><td class="line">                                }</td></tr>
+<tr><td class="num" id="LN276">276</td><td class="line">                        }</td></tr>
+<tr><td class="num" id="LN277">277</td><td class="line">		<span class='macro'>OPENSSL_free(name)<span class='expansion'>CRYPTO_free(name)</span></span>; name = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN278">278</td><td class="line">		<span class='keyword'>if</span>(desc) { <span class='macro'>OPENSSL_free(desc)<span class='expansion'>CRYPTO_free(desc)</span></span>; desc = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>; }</td></tr>
+<tr><td class="num" id="LN279">279</td><td class="line">		<span class='comment'>/* Move to the next command */</span></td></tr>
+<tr><td class="num" id="LN280">280</td><td class="line">		num = ENGINE_ctrl(e, <span class='macro'>ENGINE_CTRL_GET_NEXT_CMD_TYPE<span class='expansion'>12</span></span>,</td></tr>
+<tr><td class="num" id="LN281">281</td><td class="line">					num, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>);</td></tr>
+<tr><td class="num" id="LN282">282</td><td class="line">		} <span class='keyword'>while</span>(num &gt; 0);</td></tr>
+<tr><td class="num" id="LN283">283</td><td class="line">	<span class='keyword'>if</span>(xpos &gt; 0)</td></tr>
+<tr><td class="num" id="LN284">284</td><td class="line">		BIO_printf(bio_out, <span class='string_literal'>"\n"</span>);</td></tr>
+<tr><td class="num" id="LN285">285</td><td class="line">	ret = 1;</td></tr>
+<tr><td class="num" id="LN286">286</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN287">287</td><td class="line">	<span class='keyword'>if</span>(cmds) <span class='macro'>sk_OPENSSL_STRING_pop_free(cmds, identity)<span class='expansion'>sk_pop_free(((_STACK*) (1 ? cmds : (struct stack_st_OPENSSL_STRING<br>*)0)), ((void (*)(void *)) ((1 ? identity : (void (*)(OPENSSL_STRING<br>))0))))</span></span>;</td></tr>
+<tr><td class="num" id="LN288">288</td><td class="line">	<span class='keyword'>if</span>(name) <span class='macro'>OPENSSL_free(name)<span class='expansion'>CRYPTO_free(name)</span></span>;</td></tr>
+<tr><td class="num" id="LN289">289</td><td class="line">	<span class='keyword'>if</span>(desc) <span class='macro'>OPENSSL_free(desc)<span class='expansion'>CRYPTO_free(desc)</span></span>;</td></tr>
+<tr><td class="num" id="LN290">290</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN291">291</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN292">292</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN293">293</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>void</span> util_do_cmds(ENGINE *e, <span class='macro'>STACK_OF(OPENSSL_STRING)<span class='expansion'>struct stack_st_OPENSSL_STRING</span></span> *cmds,</td></tr>
+<tr><td class="num" id="LN294">294</td><td class="line">			BIO *bio_out, <span class='keyword'>const</span> <span class='keyword'>char</span> *indent)</td></tr>
+<tr><td class="num" id="LN295">295</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN296">296</td><td class="line">	<span class='keyword'>int</span> loop, res, num = <span class='macro'>sk_OPENSSL_STRING_num(cmds)<span class='expansion'>sk_num(((_STACK*) (1 ? cmds : (struct stack_st_OPENSSL_STRING<br>*)0)))</span></span>;</td></tr>
+<tr><td class="num" id="LN297">297</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN298">298</td><td class="line">	<span class='keyword'>if</span>(num &lt; 0)</td></tr>
+<tr><td class="num" id="LN299">299</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN300">300</td><td class="line">		BIO_printf(bio_out, <span class='string_literal'>"[Error]: internal stack error\n"</span>);</td></tr>
+<tr><td class="num" id="LN301">301</td><td class="line">		<span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN302">302</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN303">303</td><td class="line">	<span class='keyword'>for</span>(loop = 0; loop &lt; num; loop++)</td></tr>
+<tr><td class="num" id="LN304">304</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN305">305</td><td class="line">		<span class='keyword'>char</span> buf[256];</td></tr>
+<tr><td class="num" id="LN306">306</td><td class="line">		<span class='keyword'>const</span> <span class='keyword'>char</span> *cmd, *arg;</td></tr>
+<tr><td class="num" id="LN307">307</td><td class="line">		cmd = <span class='macro'>sk_OPENSSL_STRING_value(cmds, loop)<span class='expansion'>((OPENSSL_STRING)sk_value(((_STACK*) (1 ? cmds : (struct stack_st_OPENSSL_STRING<br>*)0)), loop))</span></span>;</td></tr>
+<tr><td class="num" id="LN308">308</td><td class="line">		res = 1; <span class='comment'>/* assume success */</span></td></tr>
+<tr><td class="num" id="LN309">309</td><td class="line">		<span class='comment'>/* Check if this command has no ":arg" */</span></td></tr>
+<tr><td class="num" id="LN310">310</td><td class="line">		<span class='keyword'>if</span>((arg = strstr(cmd, <span class='string_literal'>":"</span>)) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN311">311</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN312">312</td><td class="line">			<span class='keyword'>if</span>(!ENGINE_ctrl_cmd_string(e, cmd, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, 0))</td></tr>
+<tr><td class="num" id="LN313">313</td><td class="line">				res = 0;</td></tr>
+<tr><td class="num" id="LN314">314</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN315">315</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN316">316</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN317">317</td><td class="line">			<span class='keyword'>if</span>((<span class='keyword'>int</span>)(arg - cmd) &gt; 254)</td></tr>
+<tr><td class="num" id="LN318">318</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN319">319</td><td class="line">				BIO_printf(bio_out,<span class='string_literal'>"[Error]: command name too long\n"</span>);</td></tr>
+<tr><td class="num" id="LN320">320</td><td class="line">				<span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN321">321</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN322">322</td><td class="line">			<span class='macro'>memcpy(buf, cmd, (<span class='keyword'>int</span>)(arg - cmd))<span class='expansion'>__builtin___memcpy_chk (buf, cmd, (int)(arg - cmd), __builtin_object_size<br> (buf, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN323">323</td><td class="line">			buf[arg-cmd] = '\0';</td></tr>
+<tr><td class="num" id="LN324">324</td><td class="line">			arg++; <span class='comment'>/* Move past the ":" */</span></td></tr>
+<tr><td class="num" id="LN325">325</td><td class="line">			<span class='comment'>/* Call the command with the argument */</span></td></tr>
+<tr><td class="num" id="LN326">326</td><td class="line">			<span class='keyword'>if</span>(!ENGINE_ctrl_cmd_string(e, buf, arg, 0))</td></tr>
+<tr><td class="num" id="LN327">327</td><td class="line">				res = 0;</td></tr>
+<tr><td class="num" id="LN328">328</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN329">329</td><td class="line">		<span class='keyword'>if</span>(res)</td></tr>
+<tr><td class="num" id="LN330">330</td><td class="line">			BIO_printf(bio_out, <span class='string_literal'>"[Success]: %s\n"</span>, cmd);</td></tr>
+<tr><td class="num" id="LN331">331</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN332">332</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN333">333</td><td class="line">			BIO_printf(bio_out, <span class='string_literal'>"[Failure]: %s\n"</span>, cmd);</td></tr>
+<tr><td class="num" id="LN334">334</td><td class="line">			ERR_print_errors(bio_out);</td></tr>
+<tr><td class="num" id="LN335">335</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN336">336</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN337">337</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN338">338</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN339">339</td><td class="line"><span class='keyword'>int</span> <span class='macro'>MAIN(<span class='keyword'>int</span>, <span class='keyword'>char</span> **)<span class='expansion'>engine_main(int,char **)</span></span>;</td></tr>
+<tr><td class="num" id="LN340">340</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN341">341</td><td class="line"><span class='keyword'>int</span> <span class='macro'>MAIN(<span class='keyword'>int</span> argc, <span class='keyword'>char</span> **argv)<span class='expansion'>engine_main(int argc,char **argv)</span></span></td></tr>
+<tr><td class="num" id="LN342">342</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN343">343</td><td class="line">	<span class='keyword'>int</span> ret=1,i;</td></tr>
+<tr><td class="num" id="LN344">344</td><td class="line">	<span class='keyword'>const</span> <span class='keyword'>char</span> **pp;</td></tr>
+<tr><td class="num" id="LN345">345</td><td class="line">	<span class='keyword'>int</span> verbose=0, list_cap=0, test_avail=0, test_avail_noise = 0;</td></tr>
+<tr><td class="num" id="LN346">346</td><td class="line">	ENGINE *e;</td></tr>
+<tr><td class="num" id="LN347">347</td><td class="line">	<span class='macro'>STACK_OF(OPENSSL_STRING)<span class='expansion'>struct stack_st_OPENSSL_STRING</span></span> *engines = <span class='macro'>sk_OPENSSL_STRING_new_null()<span class='expansion'>((struct stack_st_OPENSSL_STRING *)sk_new_null())</span></span>;</td></tr>
+<tr><td class="num" id="LN348">348</td><td class="line">	<span class='macro'>STACK_OF(OPENSSL_STRING)<span class='expansion'>struct stack_st_OPENSSL_STRING</span></span> *pre_cmds = <span class='macro'>sk_OPENSSL_STRING_new_null()<span class='expansion'>((struct stack_st_OPENSSL_STRING *)sk_new_null())</span></span>;</td></tr>
+<tr><td class="num" id="LN349">349</td><td class="line">	<span class='macro'>STACK_OF(OPENSSL_STRING)<span class='expansion'>struct stack_st_OPENSSL_STRING</span></span> *post_cmds = <span class='macro'>sk_OPENSSL_STRING_new_null()<span class='expansion'>((struct stack_st_OPENSSL_STRING *)sk_new_null())</span></span>;</td></tr>
+<tr><td class="num" id="LN350">350</td><td class="line">	<span class='keyword'>int</span> badops=1;</td></tr>
+<tr><td class="num" id="LN351">351</td><td class="line">	BIO *bio_out=<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN352">352</td><td class="line">	<span class='keyword'>const</span> <span class='keyword'>char</span> *indent = <span class='string_literal'>"     "</span>;</td></tr>
+<tr><td class="num" id="LN353">353</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN354">354</td><td class="line">	<span class='macro'>apps_startup()<span class='expansion'>signal(13,(void (*)(int))1)</span></span>;</td></tr>
+<tr><td class="num" id="LN355">355</td><td class="line">	SSL_load_error_strings();</td></tr>
+<tr><td class="num" id="LN356">356</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN357">357</td><td class="line">	<span class='keyword'>if</span> (bio_err == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN358">358</td><td class="line">		bio_err=BIO_new_fp(<span class='macro'>stderr<span class='expansion'>__stderrp</span></span>,<span class='macro'>BIO_NOCLOSE<span class='expansion'>0x00</span></span>);</td></tr>
+<tr><td class="num" id="LN359">359</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN360">360</td><td class="line">	<span class='keyword'>if</span> (!load_config(bio_err, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>))</td></tr>
+<tr><td class="num" id="LN361">361</td><td class="line">		<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN362">362</td><td class="line">	bio_out=BIO_new_fp(<span class='macro'>stdout<span class='expansion'>__stdoutp</span></span>,<span class='macro'>BIO_NOCLOSE<span class='expansion'>0x00</span></span>);</td></tr>
+<tr><td class="num" id="LN363">363</td><td class="line"><span class='directive'>#ifdef OPENSSL_SYS_VMS</span></td></tr>
+<tr><td class="num" id="LN364">364</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN365">365</td><td class="line">	BIO *tmpbio = BIO_new(BIO_f_linebuffer());</td></tr>
+<tr><td class="num" id="LN366">366</td><td class="line">	bio_out = BIO_push(tmpbio, bio_out);</td></tr>
+<tr><td class="num" id="LN367">367</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN368">368</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN369">369</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN370">370</td><td class="line">	argc--;</td></tr>
+<tr><td class="num" id="LN371">371</td><td class="line">	argv++;</td></tr>
+<tr><td class="num" id="LN372">372</td><td class="line">	<span class='keyword'>while</span> (argc &gt;= 1)</td></tr>
+<tr><td class="num" id="LN373">373</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN374">374</td><td class="line">		<span class='keyword'>if</span> (strncmp(*argv,<span class='string_literal'>"-v"</span>,2) == 0)</td></tr>
+<tr><td class="num" id="LN375">375</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN376">376</td><td class="line">			<span class='keyword'>if</span>(strspn(*argv + 1, <span class='string_literal'>"v"</span>) &lt; strlen(*argv + 1))</td></tr>
+<tr><td class="num" id="LN377">377</td><td class="line">				<span class='keyword'>goto</span> skip_arg_loop;</td></tr>
+<tr><td class="num" id="LN378">378</td><td class="line">			<span class='keyword'>if</span>((verbose=strlen(*argv + 1)) &gt; 4)</td></tr>
+<tr><td class="num" id="LN379">379</td><td class="line">				<span class='keyword'>goto</span> skip_arg_loop;</td></tr>
+<tr><td class="num" id="LN380">380</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN381">381</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> (strcmp(*argv,<span class='string_literal'>"-c"</span>) == 0)</td></tr>
+<tr><td class="num" id="LN382">382</td><td class="line">			list_cap=1;</td></tr>
+<tr><td class="num" id="LN383">383</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> (strncmp(*argv,<span class='string_literal'>"-t"</span>,2) == 0)</td></tr>
+<tr><td class="num" id="LN384">384</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN385">385</td><td class="line">			test_avail=1;</td></tr>
+<tr><td class="num" id="LN386">386</td><td class="line">			<span class='keyword'>if</span>(strspn(*argv + 1, <span class='string_literal'>"t"</span>) &lt; strlen(*argv + 1))</td></tr>
+<tr><td class="num" id="LN387">387</td><td class="line">				<span class='keyword'>goto</span> skip_arg_loop;</td></tr>
+<tr><td class="num" id="LN388">388</td><td class="line">			<span class='keyword'>if</span>((test_avail_noise = strlen(*argv + 1) - 1) &gt; 1)</td></tr>
+<tr><td class="num" id="LN389">389</td><td class="line">				<span class='keyword'>goto</span> skip_arg_loop;</td></tr>
+<tr><td class="num" id="LN390">390</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN391">391</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> (strcmp(*argv,<span class='string_literal'>"-pre"</span>) == 0)</td></tr>
+<tr><td class="num" id="LN392">392</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN393">393</td><td class="line">			argc--; argv++;</td></tr>
+<tr><td class="num" id="LN394">394</td><td class="line">			<span class='keyword'>if</span> (argc == 0)</td></tr>
+<tr><td class="num" id="LN395">395</td><td class="line">				<span class='keyword'>goto</span> skip_arg_loop;</td></tr>
+<tr><td class="num" id="LN396">396</td><td class="line">			<span class='macro'>sk_OPENSSL_STRING_push(pre_cmds,*argv)<span class='expansion'>sk_push(((_STACK*) (1 ? pre_cmds : (struct stack_st_OPENSSL_STRING<br>*)0)), ((void*) (1 ? *argv : (char*)0)))</span></span>;</td></tr>
+<tr><td class="num" id="LN397">397</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN398">398</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> (strcmp(*argv,<span class='string_literal'>"-post"</span>) == 0)</td></tr>
+<tr><td class="num" id="LN399">399</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN400">400</td><td class="line">			argc--; argv++;</td></tr>
+<tr><td class="num" id="LN401">401</td><td class="line">			<span class='keyword'>if</span> (argc == 0)</td></tr>
+<tr><td class="num" id="LN402">402</td><td class="line">				<span class='keyword'>goto</span> skip_arg_loop;</td></tr>
+<tr><td class="num" id="LN403">403</td><td class="line">			<span class='macro'>sk_OPENSSL_STRING_push(post_cmds,*argv)<span class='expansion'>sk_push(((_STACK*) (1 ? post_cmds : (struct stack_st_OPENSSL_STRING<br>*)0)), ((void*) (1 ? *argv : (char*)0)))</span></span>;</td></tr>
+<tr><td class="num" id="LN404">404</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN405">405</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> ((strncmp(*argv,<span class='string_literal'>"-h"</span>,2) == 0) ||</td></tr>
+<tr><td class="num" id="LN406">406</td><td class="line">				(strcmp(*argv,<span class='string_literal'>"-?"</span>) == 0))</td></tr>
+<tr><td class="num" id="LN407">407</td><td class="line">			<span class='keyword'>goto</span> skip_arg_loop;</td></tr>
+<tr><td class="num" id="LN408">408</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN409">409</td><td class="line">			<span class='macro'>sk_OPENSSL_STRING_push(engines,*argv)<span class='expansion'>sk_push(((_STACK*) (1 ? engines : (struct stack_st_OPENSSL_STRING<br>*)0)), ((void*) (1 ? *argv : (char*)0)))</span></span>;</td></tr>
+<tr><td class="num" id="LN410">410</td><td class="line">		argc--;</td></tr>
+<tr><td class="num" id="LN411">411</td><td class="line">		argv++;</td></tr>
+<tr><td class="num" id="LN412">412</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN413">413</td><td class="line">	<span class='comment'>/* Looks like everything went OK */</span></td></tr>
+<tr><td class="num" id="LN414">414</td><td class="line">	badops = 0;</td></tr>
+<tr><td class="num" id="LN415">415</td><td class="line">skip_arg_loop:</td></tr>
+<tr><td class="num" id="LN416">416</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN417">417</td><td class="line">	<span class='keyword'>if</span> (badops)</td></tr>
+<tr><td class="num" id="LN418">418</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN419">419</td><td class="line">		<span class='keyword'>for</span> (pp=engine_usage; (*pp != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>); pp++)</td></tr>
+<tr><td class="num" id="LN420">420</td><td class="line">			BIO_printf(bio_err,<span class='string_literal'>"%s"</span>,*pp);</td></tr>
+<tr><td class="num" id="LN421">421</td><td class="line">		<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN422">422</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN423">423</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN424">424</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>sk_OPENSSL_STRING_num(engines)<span class='expansion'>sk_num(((_STACK*) (1 ? engines : (struct stack_st_OPENSSL_STRING<br>*)0)))</span></span> == 0)</td></tr>
+<tr><td class="num" id="LN425">425</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN426">426</td><td class="line">		<span class='keyword'>for</span>(e = ENGINE_get_first(); e != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>; e = ENGINE_get_next(e))</td></tr>
+<tr><td class="num" id="LN427">427</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN428">428</td><td class="line">			<span class='macro'>sk_OPENSSL_STRING_push(engines,(<span class='keyword'>char</span> *)ENGINE_get_id(e))<span class='expansion'>sk_push(((_STACK*) (1 ? engines : (struct stack_st_OPENSSL_STRING<br>*)0)), ((void*) (1 ? (char *)ENGINE_get_id(e) : (char*)0)))</span></span>;</td></tr>
+<tr><td class="num" id="LN429">429</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN430">430</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN431">431</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN432">432</td><td class="line">	<span class='keyword'>for</span> (i=0; i&lt;<span class='macro'>sk_OPENSSL_STRING_num(engines)<span class='expansion'>sk_num(((_STACK*) (1 ? engines : (struct stack_st_OPENSSL_STRING<br>*)0)))</span></span>; i++)</td></tr>
+<tr><td class="num" id="LN433">433</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN434">434</td><td class="line">		<span class='keyword'>const</span> <span class='keyword'>char</span> *id = <span class='macro'>sk_OPENSSL_STRING_value(engines,i)<span class='expansion'>((OPENSSL_STRING)sk_value(((_STACK*) (1 ? engines : (struct stack_st_OPENSSL_STRING<br>*)0)), i))</span></span>;</td></tr>
+<tr><td class="num" id="LN435">435</td><td class="line">		<span class='keyword'>if</span> ((e = ENGINE_by_id(id)) != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN436">436</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN437">437</td><td class="line">			<span class='keyword'>const</span> <span class='keyword'>char</span> *name = ENGINE_get_name(e);</td></tr>
+<tr><td class="num" id="LN438">438</td><td class="line">			<span class='comment'>/* Do "id" first, then "name". Easier to auto-parse. */</span></td></tr>
+<tr><td class="num" id="LN439">439</td><td class="line">			BIO_printf(bio_out, <span class='string_literal'>"(%s) %s\n"</span>, id, name);</td></tr>
+<tr><td class="num" id="LN440">440</td><td class="line">			util_do_cmds(e, pre_cmds, bio_out, indent);</td></tr>
+<tr><td class="num" id="LN441">441</td><td class="line">			<span class='keyword'>if</span> (strcmp(ENGINE_get_id(e), id) != 0)</td></tr>
+<tr><td class="num" id="LN442">442</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN443">443</td><td class="line">				BIO_printf(bio_out, <span class='string_literal'>"Loaded: (%s) %s\n"</span>,</td></tr>
+<tr><td class="num" id="LN444">444</td><td class="line">					ENGINE_get_id(e), ENGINE_get_name(e));</td></tr>
+<tr><td class="num" id="LN445">445</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN446">446</td><td class="line">			<span class='keyword'>if</span> (list_cap)</td></tr>
+<tr><td class="num" id="LN447">447</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN448">448</td><td class="line">				<span class='keyword'>int</span> cap_size = 256;</td></tr>
+<tr><td class="num" id="LN449">449</td><td class="line">				<span class='keyword'>char</span> *cap_buf = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN450">450</td><td class="line">				<span class='keyword'>int</span> k,n;</td></tr>
+<tr><td class="num" id="LN451">451</td><td class="line">				<span class='keyword'>const</span> <span class='keyword'>int</span> *nids;</td></tr>
+<tr><td class="num" id="LN452">452</td><td class="line">				ENGINE_CIPHERS_PTR fn_c;</td></tr>
+<tr><td class="num" id="LN453">453</td><td class="line">				ENGINE_DIGESTS_PTR fn_d;</td></tr>
+<tr><td class="num" id="LN454">454</td><td class="line">				ENGINE_PKEY_METHS_PTR fn_pk;</td></tr>
+<tr><td class="num" id="LN455">455</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN456">456</td><td class="line">				<span class='keyword'>if</span> (ENGINE_get_RSA(e) != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span></td></tr>
+<tr><td class="num" id="LN457">457</td><td class="line">					&amp;&amp; !append_buf(&amp;cap_buf, <span class='string_literal'>"RSA"</span>,</td></tr>
+<tr><td class="num" id="LN458">458</td><td class="line">						&amp;cap_size, 256))</td></tr>
+<tr><td class="num" id="LN459">459</td><td class="line">					<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN460">460</td><td class="line">				<span class='keyword'>if</span> (ENGINE_get_DSA(e) != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span></td></tr>
+<tr><td class="num" id="LN461">461</td><td class="line">					&amp;&amp; !append_buf(&amp;cap_buf, <span class='string_literal'>"DSA"</span>,</td></tr>
+<tr><td class="num" id="LN462">462</td><td class="line">						&amp;cap_size, 256))</td></tr>
+<tr><td class="num" id="LN463">463</td><td class="line">					<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN464">464</td><td class="line">				<span class='keyword'>if</span> (ENGINE_get_DH(e) != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span></td></tr>
+<tr><td class="num" id="LN465">465</td><td class="line">					&amp;&amp; !append_buf(&amp;cap_buf, <span class='string_literal'>"DH"</span>,</td></tr>
+<tr><td class="num" id="LN466">466</td><td class="line">						&amp;cap_size, 256))</td></tr>
+<tr><td class="num" id="LN467">467</td><td class="line">					<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN468">468</td><td class="line">				<span class='keyword'>if</span> (ENGINE_get_RAND(e) != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span></td></tr>
+<tr><td class="num" id="LN469">469</td><td class="line">					&amp;&amp; !append_buf(&amp;cap_buf, <span class='string_literal'>"RAND"</span>,</td></tr>
+<tr><td class="num" id="LN470">470</td><td class="line">						&amp;cap_size, 256))</td></tr>
+<tr><td class="num" id="LN471">471</td><td class="line">					<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN472">472</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN473">473</td><td class="line">				fn_c = ENGINE_get_ciphers(e);</td></tr>
+<tr><td class="num" id="LN474">474</td><td class="line">				<span class='keyword'>if</span>(!fn_c) <span class='keyword'>goto</span> skip_ciphers;</td></tr>
+<tr><td class="num" id="LN475">475</td><td class="line">				n = fn_c(e, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, &amp;nids, 0);</td></tr>
+<tr><td class="num" id="LN476">476</td><td class="line">				<span class='keyword'>for</span>(k=0 ; k &lt; n ; ++k)</td></tr>
+<tr><td class="num" id="LN477">477</td><td class="line">					<span class='keyword'>if</span>(!append_buf(&amp;cap_buf,</td></tr>
+<tr><td class="num" id="LN478">478</td><td class="line">						       OBJ_nid2sn(nids[k]),</td></tr>
+<tr><td class="num" id="LN479">479</td><td class="line">						       &amp;cap_size, 256))</td></tr>
+<tr><td class="num" id="LN480">480</td><td class="line">						<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN481">481</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN482">482</td><td class="line">skip_ciphers:</td></tr>
+<tr><td class="num" id="LN483">483</td><td class="line">				fn_d = ENGINE_get_digests(e);</td></tr>
+<tr><td class="num" id="LN484">484</td><td class="line">				<span class='keyword'>if</span>(!fn_d) <span class='keyword'>goto</span> skip_digests;</td></tr>
+<tr><td class="num" id="LN485">485</td><td class="line">				n = fn_d(e, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, &amp;nids, 0);</td></tr>
+<tr><td class="num" id="LN486">486</td><td class="line">				<span class='keyword'>for</span>(k=0 ; k &lt; n ; ++k)</td></tr>
+<tr><td class="num" id="LN487">487</td><td class="line">					<span class='keyword'>if</span>(!append_buf(&amp;cap_buf,</td></tr>
+<tr><td class="num" id="LN488">488</td><td class="line">						       OBJ_nid2sn(nids[k]),</td></tr>
+<tr><td class="num" id="LN489">489</td><td class="line">						       &amp;cap_size, 256))</td></tr>
+<tr><td class="num" id="LN490">490</td><td class="line">						<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN491">491</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN492">492</td><td class="line">skip_digests:</td></tr>
+<tr><td class="num" id="LN493">493</td><td class="line">				fn_pk = ENGINE_get_pkey_meths(e);</td></tr>
+<tr><td class="num" id="LN494">494</td><td class="line">				<span class='keyword'>if</span>(!fn_pk) <span class='keyword'>goto</span> skip_pmeths;</td></tr>
+<tr><td class="num" id="LN495">495</td><td class="line">				n = fn_pk(e, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, &amp;nids, 0);</td></tr>
+<tr><td class="num" id="LN496">496</td><td class="line">				<span class='keyword'>for</span>(k=0 ; k &lt; n ; ++k)</td></tr>
+<tr><td class="num" id="LN497">497</td><td class="line">					<span class='keyword'>if</span>(!append_buf(&amp;cap_buf,</td></tr>
+<tr><td class="num" id="LN498">498</td><td class="line">						       OBJ_nid2sn(nids[k]),</td></tr>
+<tr><td class="num" id="LN499">499</td><td class="line">						       &amp;cap_size, 256))</td></tr>
+<tr><td class="num" id="LN500">500</td><td class="line">						<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN501">501</td><td class="line">skip_pmeths:</td></tr>
+<tr><td class="num" id="LN502">502</td><td class="line">				<span class='keyword'>if</span> (cap_buf &amp;&amp; (*cap_buf != '\0'))</td></tr>
+<tr><td class="num" id="LN503">503</td><td class="line">					BIO_printf(bio_out, <span class='string_literal'>" [%s]\n"</span>, cap_buf);</td></tr>
+<tr><td class="num" id="LN504">504</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN505">505</td><td class="line">				<span class='macro'>OPENSSL_free(cap_buf)<span class='expansion'>CRYPTO_free(cap_buf)</span></span>;</td></tr>
+<tr><td class="num" id="LN506">506</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN507">507</td><td class="line">			<span class='keyword'>if</span>(test_avail)</td></tr>
+<tr><td class="num" id="LN508">508</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN509">509</td><td class="line">				BIO_printf(bio_out, <span class='string_literal'>"%s"</span>, indent);</td></tr>
+<tr><td class="num" id="LN510">510</td><td class="line">				<span class='keyword'>if</span> (ENGINE_init(e))</td></tr>
+<tr><td class="num" id="LN511">511</td><td class="line">					{</td></tr>
+<tr><td class="num" id="LN512">512</td><td class="line">					BIO_printf(bio_out, <span class='string_literal'>"[ available ]\n"</span>);</td></tr>
+<tr><td class="num" id="LN513">513</td><td class="line">					util_do_cmds(e, post_cmds, bio_out, indent);</td></tr>
+<tr><td class="num" id="LN514">514</td><td class="line">					ENGINE_finish(e);</td></tr>
+<tr><td class="num" id="LN515">515</td><td class="line">					}</td></tr>
+<tr><td class="num" id="LN516">516</td><td class="line">				<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN517">517</td><td class="line">					{</td></tr>
+<tr><td class="num" id="LN518">518</td><td class="line">					BIO_printf(bio_out, <span class='string_literal'>"[ unavailable ]\n"</span>);</td></tr>
+<tr><td class="num" id="LN519">519</td><td class="line">					<span class='keyword'>if</span>(test_avail_noise)</td></tr>
+<tr><td class="num" id="LN520">520</td><td class="line">						ERR_print_errors_fp(<span class='macro'>stdout<span class='expansion'>__stdoutp</span></span>);</td></tr>
+<tr><td class="num" id="LN521">521</td><td class="line">					ERR_clear_error();</td></tr>
+<tr><td class="num" id="LN522">522</td><td class="line">					}</td></tr>
+<tr><td class="num" id="LN523">523</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN524">524</td><td class="line">			<span class='keyword'>if</span>((verbose &gt; 0) &amp;&amp; !util_verbose(e, verbose, bio_out, indent))</td></tr>
+<tr><td class="num" id="LN525">525</td><td class="line">				<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN526">526</td><td class="line">			ENGINE_free(e);</td></tr>
+<tr><td class="num" id="LN527">527</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN528">528</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN529">529</td><td class="line">			ERR_print_errors(bio_err);</td></tr>
+<tr><td class="num" id="LN530">530</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN531">531</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN532">532</td><td class="line">	ret=0;</td></tr>
+<tr><td class="num" id="LN533">533</td><td class="line">end:</td></tr>
+<tr><td class="num" id="LN534">534</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN535">535</td><td class="line">	ERR_print_errors(bio_err);</td></tr>
+<tr><td class="num" id="LN536">536</td><td class="line">	<span class='macro'>sk_OPENSSL_STRING_pop_free(engines, identity)<span class='expansion'>sk_pop_free(((_STACK*) (1 ? engines : (struct stack_st_OPENSSL_STRING<br>*)0)), ((void (*)(void *)) ((1 ? identity : (void (*)(OPENSSL_STRING<br>))0))))</span></span>;</td></tr>
+<tr><td class="num" id="LN537">537</td><td class="line">	<span class='macro'>sk_OPENSSL_STRING_pop_free(pre_cmds, identity)<span class='expansion'>sk_pop_free(((_STACK*) (1 ? pre_cmds : (struct stack_st_OPENSSL_STRING<br>*)0)), ((void (*)(void *)) ((1 ? identity : (void (*)(OPENSSL_STRING<br>))0))))</span></span>;</td></tr>
+<tr><td class="num" id="LN538">538</td><td class="line">	<span class='macro'>sk_OPENSSL_STRING_pop_free(post_cmds, identity)<span class='expansion'>sk_pop_free(((_STACK*) (1 ? post_cmds : (struct stack_st_OPENSSL_STRING<br>*)0)), ((void (*)(void *)) ((1 ? identity : (void (*)(OPENSSL_STRING<br>))0))))</span></span>;</td></tr>
+<tr><td class="num" id="LN539">539</td><td class="line">	<span class='keyword'>if</span> (bio_out != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) BIO_free_all(bio_out);</td></tr>
+<tr><td class="num" id="LN540">540</td><td class="line">	apps_shutdown();</td></tr>
+<tr><td class="num" id="LN541">541</td><td class="line">	<span class='macro'>OPENSSL_EXIT(ret)<span class='expansion'>return(ret)</span></span>;</td></tr>
+<tr><td class="num" id="LN542">542</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN543">543</td><td class="line"><span class='directive'>#else</span></td></tr>
+<tr><td class="num" id="LN544">544</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN545">545</td><td class="line"><span class='directive'># if PEDANTIC</span></td></tr>
+<tr><td class="num" id="LN546">546</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>void</span> *dummy=&amp;dummy;</td></tr>
+<tr><td class="num" id="LN547">547</td><td class="line"><span class='directive'># endif</span></td></tr>
+<tr><td class="num" id="LN548">548</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN549">549</td><td class="line"><span class='directive'>#endif</span></td></tr>
+</table></body></html>

@@ -1,0 +1,1074 @@
+<!doctype html>
+<html>
+<head>
+<title>e_4758cca.c</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC Value stored to 'len' is never read -->
+
+<!-- BUGTYPE Dead increment -->
+
+<!-- BUGCATEGORY Dead store -->
+
+<!-- BUGFILE /Users/fran/Desktop/openssl-1.0.1f/engines/e_4758cca.c -->
+
+<!-- FILENAME e_4758cca.c -->
+
+<!-- FUNCTIONNAME getModulusAndExponent -->
+
+<!-- BUGLINE 892 -->
+
+<!-- BUGCOLUMN 3 -->
+
+<!-- BUGPATHLENGTH 1 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>engines/e_4758cca.c</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 892, column 3</a></td></tr>
+<tr><td class="rowname">Description:</td><td>Value stored to 'len' is never read</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/* Author: Maurice Gittens &lt;maurice@gittens.nl&gt;                       */</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>/* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"> <span class='comment'>* Copyright (c) 1999 The OpenSSL Project.  All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"> <span class='comment'>* Redistribution and use in source and binary forms, with or without</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"> <span class='comment'>* modification, are permitted provided that the following conditions</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"> <span class='comment'>* are met:</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"> <span class='comment'>* 1. Redistributions of source code must retain the above copyright</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer.</span> </td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"> <span class='comment'>* 2. Redistributions in binary form must reproduce the above copyright</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer in</span></td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"> <span class='comment'>*    the documentation and/or other materials provided with the</span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> <span class='comment'>*    distribution.</span></td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"> <span class='comment'>* 3. All advertising materials mentioning features or use of this</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"> <span class='comment'>*    software must display the following acknowledgment:</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"> <span class='comment'>*    "This product includes software developed by the OpenSSL Project</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"> <span class='comment'>*    for use in the OpenSSL Toolkit. (http://www.OpenSSL.org/)"</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"> <span class='comment'>* 4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to</span></td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"> <span class='comment'>*    endorse or promote products derived from this software without</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"> <span class='comment'>*    prior written permission. For written permission, please contact</span></td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"> <span class='comment'>*    licensing@OpenSSL.org.</span></td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"> <span class='comment'>* 5. Products derived from this software may not be called "OpenSSL"</span></td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"> <span class='comment'>*    nor may "OpenSSL" appear in their names without prior written</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"> <span class='comment'>*    permission of the OpenSSL Project.</span></td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"> <span class='comment'>* 6. Redistributions of any form whatsoever must retain the following</span></td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> <span class='comment'>*    acknowledgment:</span></td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"> <span class='comment'>*    "This product includes software developed by the OpenSSL Project</span></td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"> <span class='comment'>*    for use in the OpenSSL Toolkit (http://www.OpenSSL.org/)"</span></td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line"> <span class='comment'>* THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY</span></td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line"> <span class='comment'>* EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span></td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line"> <span class='comment'>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR</span></td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line"> <span class='comment'>* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR</span></td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line"> <span class='comment'>* ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span></td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line"> <span class='comment'>* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT</span></td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line"> <span class='comment'>* NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span></td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line"> <span class='comment'>* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span></td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line"> <span class='comment'>* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span></td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line"> <span class='comment'>* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)</span></td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line"> <span class='comment'>* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED</span></td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line"> <span class='comment'>* OF THE POSSIBILITY OF SUCH DAMAGE.</span></td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line"> <span class='comment'>* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line"> <span class='comment'>* This product includes cryptographic software written by Eric Young</span></td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line"> <span class='comment'>* (eay@cryptsoft.com).  This product includes software written by Tim</span></td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line"> <span class='comment'>* Hudson (tjh@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line"><span class='directive'>#include &lt;stdio.h&gt;</span></td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line"><span class='directive'>#include &lt;string.h&gt;</span></td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line"><span class='directive'>#include &lt;openssl/crypto.h&gt;</span></td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line"><span class='directive'>#include &lt;openssl/dso.h&gt;</span></td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line"><span class='directive'>#include &lt;openssl/x509.h&gt;</span></td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line"><span class='directive'>#include &lt;openssl/objects.h&gt;</span></td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line"><span class='directive'>#include &lt;openssl/engine.h&gt;</span></td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line"><span class='directive'>#include &lt;openssl/rand.h&gt;</span></td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line"><span class='directive'>#include &lt;openssl/rsa.h&gt;</span></td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line"><span class='directive'>#include &lt;openssl/bn.h&gt;</span></td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_HW</span></td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_HW_4758_CCA</span></td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line"><span class='directive'>#ifdef FLAT_INC</span></td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line"><span class='directive'>#include "hw_4758_cca.h"</span></td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line"><span class='directive'>#else</span></td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line"><span class='directive'>#include "vendor_defns/hw_4758_cca.h"</span></td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line"><span class='directive'>#include "e_4758cca_err.c"</span></td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> ibm_4758_cca_destroy(ENGINE *e);</td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> ibm_4758_cca_init(ENGINE *e);</td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> ibm_4758_cca_finish(ENGINE *e);</td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> ibm_4758_cca_ctrl(ENGINE *e, <span class='keyword'>int</span> cmd, <span class='keyword'>long</span> i, <span class='keyword'>void</span> *p, <span class='keyword'>void</span> (*f)(<span class='keyword'>void</span>));</td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line"><span class='comment'>/* rsa functions */</span></td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line"><span class='comment'>/*---------------*/</span></td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> cca_rsa_pub_enc(<span class='keyword'>int</span> flen, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *from,</td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line">		<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *to, RSA *rsa,<span class='keyword'>int</span> padding);</td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> cca_rsa_priv_dec(<span class='keyword'>int</span> flen, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *from,</td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">		<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *to, RSA *rsa,<span class='keyword'>int</span> padding);</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> cca_rsa_sign(<span class='keyword'>int</span> type, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *m, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> m_len,</td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">		<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *sigret, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> *siglen, <span class='keyword'>const</span> RSA *rsa);</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> cca_rsa_verify(<span class='keyword'>int</span> dtype, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *m, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> m_len,</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line">	<span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *sigbuf, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> siglen, <span class='keyword'>const</span> RSA *rsa);</td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line"><span class='comment'>/* utility functions */</span></td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line"><span class='comment'>/*-----------------------*/</span></td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line"><span class='keyword'>static</span> EVP_PKEY *ibm_4758_load_privkey(ENGINE*, <span class='keyword'>const</span> <span class='keyword'>char</span>*,</td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line">		UI_METHOD *ui_method, <span class='keyword'>void</span> *callback_data);</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line"><span class='keyword'>static</span> EVP_PKEY *ibm_4758_load_pubkey(ENGINE*, <span class='keyword'>const</span> <span class='keyword'>char</span>*,</td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line">		UI_METHOD *ui_method, <span class='keyword'>void</span> *callback_data);</td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> getModulusAndExponent(<span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *token, <span class='keyword'>long</span> *exponentLength,</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line">		<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *exponent, <span class='keyword'>long</span> *modulusLength,</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line">		<span class='keyword'>long</span> *modulusFieldLength, <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *modulus);</td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line"><span class='comment'>/* RAND number functions */</span></td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line"><span class='comment'>/*-----------------------*/</span></td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> cca_get_random_bytes(<span class='keyword'>unsigned</span> <span class='keyword'>char</span>*, <span class='keyword'>int</span>);</td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> cca_random_status(<span class='keyword'>void</span>);</td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>void</span> cca_ex_free(<span class='keyword'>void</span> *obj, <span class='keyword'>void</span> *item, CRYPTO_EX_DATA *ad,</td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line">		<span class='keyword'>int</span> idx,<span class='keyword'>long</span> argl, <span class='keyword'>void</span> *argp);</td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line"><span class='comment'>/* Function pointers for CCA verbs */</span></td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line"><span class='comment'>/*---------------------------------*/</span></td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line"><span class='keyword'>static</span> F_KEYRECORDREAD keyRecordRead;</td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line"><span class='keyword'>static</span> F_DIGITALSIGNATUREGENERATE digitalSignatureGenerate;</td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line"><span class='keyword'>static</span> F_DIGITALSIGNATUREVERIFY digitalSignatureVerify;</td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line"><span class='keyword'>static</span> F_PUBLICKEYEXTRACT publicKeyExtract;</td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line"><span class='keyword'>static</span> F_PKAENCRYPT pkaEncrypt;</td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line"><span class='keyword'>static</span> F_PKADECRYPT pkaDecrypt;</td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line"><span class='keyword'>static</span> F_RANDOMNUMBERGENERATE randomNumberGenerate;</td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line"><span class='comment'>/* static variables */</span></td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line"><span class='comment'>/*------------------*/</span></td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span> *CCA4758_LIB_NAME = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span> *get_CCA4758_LIB_NAME(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line">	<span class='keyword'>if</span>(CCA4758_LIB_NAME)</td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line">		<span class='keyword'>return</span> CCA4758_LIB_NAME;</td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line">	<span class='keyword'>return</span> <span class='macro'>CCA_LIB_NAME<span class='expansion'>"CSUNSAPI"</span></span>;</td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>void</span> free_CCA4758_LIB_NAME(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line">	<span class='keyword'>if</span>(CCA4758_LIB_NAME)</td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">		<span class='macro'>OPENSSL_free((<span class='keyword'>void</span>*)CCA4758_LIB_NAME)<span class='expansion'>CRYPTO_free((void*)CCA4758_LIB_NAME)</span></span>;</td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line">	CCA4758_LIB_NAME = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>long</span> set_CCA4758_LIB_NAME(<span class='keyword'>const</span> <span class='keyword'>char</span> *name)</td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line">	free_CCA4758_LIB_NAME();</td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line">	<span class='keyword'>return</span> (((CCA4758_LIB_NAME = BUF_strdup(name)) != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) ? 1 : 0);</td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span>* n_keyRecordRead = <span class='macro'>CSNDKRR<span class='expansion'>"CSNDKRR"</span></span>;</td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span>* n_digitalSignatureGenerate = <span class='macro'>CSNDDSG<span class='expansion'>"CSNDDSG"</span></span>;</td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span>* n_digitalSignatureVerify = <span class='macro'>CSNDDSV<span class='expansion'>"CSNDDSV"</span></span>;</td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span>* n_publicKeyExtract = <span class='macro'>CSNDPKX<span class='expansion'>"CSNDPKX"</span></span>;</td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span>* n_pkaEncrypt = <span class='macro'>CSNDPKE<span class='expansion'>"CSNDPKE"</span></span>;</td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span>* n_pkaDecrypt = <span class='macro'>CSNDPKD<span class='expansion'>"CSNDPKD"</span></span>;</td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span>* n_randomNumberGenerate = <span class='macro'>CSNBRNG<span class='expansion'>"CSNBRNG"</span></span>;</td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> hndidx = -1;</td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line"><span class='keyword'>static</span> DSO *dso = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line"><span class='comment'>/* openssl engine initialization structures */</span></td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line"><span class='comment'>/*------------------------------------------*/</span></td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line"><span class='directive'>#define <span class='macro'>CCA4758_CMD_SO_PATH<span class='expansion'>200</span></span>		<span class='macro'>ENGINE_CMD_BASE<span class='expansion'>200</span></span></span></td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> ENGINE_CMD_DEFN	cca4758_cmd_defns[] = {</td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line">	{<span class='macro'>CCA4758_CMD_SO_PATH<span class='expansion'>200</span></span>,</td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line">		<span class='string_literal'>"SO_PATH"</span>,</td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line">		<span class='string_literal'>"Specifies the path to the '4758cca' shared library"</span>,</td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line">		<span class='macro'>ENGINE_CMD_FLAG_STRING<span class='expansion'>(unsigned int)0x0002</span></span>},</td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line">	{0, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, 0}</td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line">	};</td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line"><span class='keyword'>static</span> RSA_METHOD ibm_4758_cca_rsa =</td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">	<span class='string_literal'>"IBM 4758 CCA RSA method"</span>,</td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line">	cca_rsa_pub_enc,</td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,</td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,</td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line">	cca_rsa_priv_dec,</td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='comment'>/*rsa_mod_exp,*/</span></td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='comment'>/*mod_exp_mont,*/</span></td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='comment'>/* init */</span></td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='comment'>/* finish */</span></td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">	<span class='macro'>RSA_FLAG_SIGN_VER<span class='expansion'>0x0040</span></span>,	  <span class='comment'>/* flags */</span></td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='comment'>/* app_data */</span></td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line">	cca_rsa_sign, <span class='comment'>/* rsa_sign */</span></td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line">	cca_rsa_verify, <span class='comment'>/* rsa_verify */</span></td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span> <span class='comment'>/* rsa_keygen */</span></td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line">	};</td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line"><span class='keyword'>static</span> RAND_METHOD ibm_4758_cca_rand =</td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line">	<span class='comment'>/* "IBM 4758 RAND method", */</span></td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='comment'>/* seed */</span></td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line">	cca_get_random_bytes, <span class='comment'>/* get random bytes from the card */</span></td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='comment'>/* cleanup */</span></td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='comment'>/* add */</span></td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line">	cca_get_random_bytes, <span class='comment'>/* pseudo rand */</span></td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line">	cca_random_status, <span class='comment'>/* status */</span></td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line">	};</td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span> *engine_4758_cca_id = <span class='string_literal'>"4758cca"</span>;</td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span> *engine_4758_cca_name = <span class='string_literal'>"IBM 4758 CCA hardware engine support"</span>;</td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_DYNAMIC_ENGINE</span> </td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line"><span class='comment'>/* Compatibility hack, the dynamic library uses this form in the path */</span></td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span> *engine_4758_cca_id_alt = <span class='string_literal'>"4758_cca"</span>;</td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line"><span class='comment'>/* engine implementation */</span></td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line"><span class='comment'>/*-----------------------*/</span></td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> bind_helper(ENGINE *e)</td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line">	<span class='keyword'>if</span>(!ENGINE_set_id(e, engine_4758_cca_id) ||</td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line">			!ENGINE_set_name(e, engine_4758_cca_name) ||</td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line">			!ENGINE_set_RSA(e, &amp;ibm_4758_cca_rsa) ||</td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line">			!ENGINE_set_RAND(e, &amp;ibm_4758_cca_rand) ||</td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line">			!ENGINE_set_destroy_function(e, ibm_4758_cca_destroy) ||</td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line">			!ENGINE_set_init_function(e, ibm_4758_cca_init) ||</td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line">			!ENGINE_set_finish_function(e, ibm_4758_cca_finish) ||</td></tr>
+<tr><td class="num" id="LN229">229</td><td class="line">			!ENGINE_set_ctrl_function(e, ibm_4758_cca_ctrl) ||</td></tr>
+<tr><td class="num" id="LN230">230</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN231">231</td><td class="line">			!ENGINE_set_load_privkey_function(e, ibm_4758_load_privkey) ||</td></tr>
+<tr><td class="num" id="LN232">232</td><td class="line">			!ENGINE_set_load_pubkey_function(e, ibm_4758_load_pubkey) ||</td></tr>
+<tr><td class="num" id="LN233">233</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN234">234</td><td class="line">			!ENGINE_set_cmd_defns(e, cca4758_cmd_defns))</td></tr>
+<tr><td class="num" id="LN235">235</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN236">236</td><td class="line">	<span class='comment'>/* Ensure the error handling is set up */</span></td></tr>
+<tr><td class="num" id="LN237">237</td><td class="line">	ERR_load_CCA4758_strings();</td></tr>
+<tr><td class="num" id="LN238">238</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN239">239</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN240">240</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN241">241</td><td class="line"><span class='directive'>#ifdef OPENSSL_NO_DYNAMIC_ENGINE</span></td></tr>
+<tr><td class="num" id="LN242">242</td><td class="line"><span class='keyword'>static</span> ENGINE *engine_4758_cca(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN243">243</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN244">244</td><td class="line">	ENGINE *ret = ENGINE_new();</td></tr>
+<tr><td class="num" id="LN245">245</td><td class="line">	<span class='keyword'>if</span>(!ret)</td></tr>
+<tr><td class="num" id="LN246">246</td><td class="line">		<span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN247">247</td><td class="line">	<span class='keyword'>if</span>(!bind_helper(ret))</td></tr>
+<tr><td class="num" id="LN248">248</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN249">249</td><td class="line">		ENGINE_free(ret);</td></tr>
+<tr><td class="num" id="LN250">250</td><td class="line">		<span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN251">251</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN252">252</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN253">253</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN254">254</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN255">255</td><td class="line"><span class='keyword'>void</span> ENGINE_load_4758cca(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN256">256</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN257">257</td><td class="line">	ENGINE *e_4758 = engine_4758_cca();</td></tr>
+<tr><td class="num" id="LN258">258</td><td class="line">	<span class='keyword'>if</span> (!e_4758) <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN259">259</td><td class="line">	ENGINE_add(e_4758);</td></tr>
+<tr><td class="num" id="LN260">260</td><td class="line">	ENGINE_free(e_4758);</td></tr>
+<tr><td class="num" id="LN261">261</td><td class="line">	ERR_clear_error();   </td></tr>
+<tr><td class="num" id="LN262">262</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN263">263</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN264">264</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN265">265</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> ibm_4758_cca_destroy(ENGINE *e)</td></tr>
+<tr><td class="num" id="LN266">266</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN267">267</td><td class="line">	ERR_unload_CCA4758_strings();</td></tr>
+<tr><td class="num" id="LN268">268</td><td class="line">	free_CCA4758_LIB_NAME();</td></tr>
+<tr><td class="num" id="LN269">269</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN270">270</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN271">271</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN272">272</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> ibm_4758_cca_init(ENGINE *e)</td></tr>
+<tr><td class="num" id="LN273">273</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN274">274</td><td class="line">	<span class='keyword'>if</span>(dso)</td></tr>
+<tr><td class="num" id="LN275">275</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN276">276</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_CCA_INIT,CCA4758_R_ALREADY_LOADED)<span class='expansion'>ERR_CCA4758_error((102),(100),"e_4758cca.c",276)</span></span>;</td></tr>
+<tr><td class="num" id="LN277">277</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN278">278</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN279">279</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN280">280</td><td class="line">	dso = DSO_load(<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, get_CCA4758_LIB_NAME(), <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, 0);</td></tr>
+<tr><td class="num" id="LN281">281</td><td class="line">	<span class='keyword'>if</span>(!dso)</td></tr>
+<tr><td class="num" id="LN282">282</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN283">283</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_CCA_INIT,CCA4758_R_DSO_FAILURE)<span class='expansion'>ERR_CCA4758_error((102),(103),"e_4758cca.c",283)</span></span>;</td></tr>
+<tr><td class="num" id="LN284">284</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN285">285</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN286">286</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN287">287</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN288">288</td><td class="line">	<span class='keyword'>if</span>(!(keyRecordRead = (F_KEYRECORDREAD)</td></tr>
+<tr><td class="num" id="LN289">289</td><td class="line">				DSO_bind_func(dso, n_keyRecordRead)) ||</td></tr>
+<tr><td class="num" id="LN290">290</td><td class="line">			!(randomNumberGenerate = (F_RANDOMNUMBERGENERATE)</td></tr>
+<tr><td class="num" id="LN291">291</td><td class="line">				DSO_bind_func(dso, n_randomNumberGenerate)) ||</td></tr>
+<tr><td class="num" id="LN292">292</td><td class="line">			!(digitalSignatureGenerate = (F_DIGITALSIGNATUREGENERATE)</td></tr>
+<tr><td class="num" id="LN293">293</td><td class="line">				DSO_bind_func(dso, n_digitalSignatureGenerate)) ||</td></tr>
+<tr><td class="num" id="LN294">294</td><td class="line">			!(digitalSignatureVerify = (F_DIGITALSIGNATUREVERIFY)</td></tr>
+<tr><td class="num" id="LN295">295</td><td class="line">				DSO_bind_func(dso, n_digitalSignatureVerify)) ||</td></tr>
+<tr><td class="num" id="LN296">296</td><td class="line">			!(publicKeyExtract = (F_PUBLICKEYEXTRACT)</td></tr>
+<tr><td class="num" id="LN297">297</td><td class="line">				DSO_bind_func(dso, n_publicKeyExtract)) ||</td></tr>
+<tr><td class="num" id="LN298">298</td><td class="line">			!(pkaEncrypt = (F_PKAENCRYPT)</td></tr>
+<tr><td class="num" id="LN299">299</td><td class="line">				DSO_bind_func(dso, n_pkaEncrypt)) ||</td></tr>
+<tr><td class="num" id="LN300">300</td><td class="line">			!(pkaDecrypt = (F_PKADECRYPT)</td></tr>
+<tr><td class="num" id="LN301">301</td><td class="line">				DSO_bind_func(dso, n_pkaDecrypt)))</td></tr>
+<tr><td class="num" id="LN302">302</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN303">303</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_CCA_INIT,CCA4758_R_DSO_FAILURE)<span class='expansion'>ERR_CCA4758_error((102),(103),"e_4758cca.c",303)</span></span>;</td></tr>
+<tr><td class="num" id="LN304">304</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN305">305</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN306">306</td><td class="line"><span class='directive'>#else</span></td></tr>
+<tr><td class="num" id="LN307">307</td><td class="line">	<span class='keyword'>if</span>(!(randomNumberGenerate = (F_RANDOMNUMBERGENERATE)</td></tr>
+<tr><td class="num" id="LN308">308</td><td class="line">				DSO_bind_func(dso, n_randomNumberGenerate)))</td></tr>
+<tr><td class="num" id="LN309">309</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN310">310</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_CCA_INIT,CCA4758_R_DSO_FAILURE)<span class='expansion'>ERR_CCA4758_error((102),(103),"e_4758cca.c",310)</span></span>;</td></tr>
+<tr><td class="num" id="LN311">311</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN312">312</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN313">313</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN314">314</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN315">315</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN316">316</td><td class="line">	hndidx = RSA_get_ex_new_index(0, <span class='string_literal'>"IBM 4758 CCA RSA key handle"</span>,</td></tr>
+<tr><td class="num" id="LN317">317</td><td class="line">		<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, cca_ex_free);</td></tr>
+<tr><td class="num" id="LN318">318</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN319">319</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN320">320</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN321">321</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN322">322</td><td class="line">	<span class='keyword'>if</span>(dso)</td></tr>
+<tr><td class="num" id="LN323">323</td><td class="line">		DSO_free(dso);</td></tr>
+<tr><td class="num" id="LN324">324</td><td class="line">	dso = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN325">325</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN326">326</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN327">327</td><td class="line">	keyRecordRead = (F_KEYRECORDREAD)0;</td></tr>
+<tr><td class="num" id="LN328">328</td><td class="line">	digitalSignatureGenerate = (F_DIGITALSIGNATUREGENERATE)0;</td></tr>
+<tr><td class="num" id="LN329">329</td><td class="line">	digitalSignatureVerify = (F_DIGITALSIGNATUREVERIFY)0;</td></tr>
+<tr><td class="num" id="LN330">330</td><td class="line">	publicKeyExtract = (F_PUBLICKEYEXTRACT)0;</td></tr>
+<tr><td class="num" id="LN331">331</td><td class="line">	pkaEncrypt = (F_PKAENCRYPT)0;</td></tr>
+<tr><td class="num" id="LN332">332</td><td class="line">	pkaDecrypt = (F_PKADECRYPT)0;</td></tr>
+<tr><td class="num" id="LN333">333</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN334">334</td><td class="line">	randomNumberGenerate = (F_RANDOMNUMBERGENERATE)0;</td></tr>
+<tr><td class="num" id="LN335">335</td><td class="line">	<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN336">336</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN337">337</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN338">338</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> ibm_4758_cca_finish(ENGINE *e)</td></tr>
+<tr><td class="num" id="LN339">339</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN340">340</td><td class="line">	free_CCA4758_LIB_NAME();</td></tr>
+<tr><td class="num" id="LN341">341</td><td class="line">	<span class='keyword'>if</span>(!dso)</td></tr>
+<tr><td class="num" id="LN342">342</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN343">343</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_CCA_FINISH,<span class='expansion'>ERR_CCA4758_error((101),(106),"e_4758cca.c",344)</span></span></td></tr>
+<tr><td class="num" id="LN344">344</td><td class="line">				<span class='macro'>CCA4758_R_NOT_LOADED)<span class='expansion'>ERR_CCA4758_error((101),(106),"e_4758cca.c",344)</span></span>;</td></tr>
+<tr><td class="num" id="LN345">345</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN346">346</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN347">347</td><td class="line">	<span class='keyword'>if</span>(!DSO_free(dso))</td></tr>
+<tr><td class="num" id="LN348">348</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN349">349</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_CCA_FINISH,<span class='expansion'>ERR_CCA4758_error((101),(108),"e_4758cca.c",350)</span></span></td></tr>
+<tr><td class="num" id="LN350">350</td><td class="line">				<span class='macro'>CCA4758_R_UNIT_FAILURE)<span class='expansion'>ERR_CCA4758_error((101),(108),"e_4758cca.c",350)</span></span>;</td></tr>
+<tr><td class="num" id="LN351">351</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN352">352</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN353">353</td><td class="line">	dso = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN354">354</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN355">355</td><td class="line">	keyRecordRead = (F_KEYRECORDREAD)0;</td></tr>
+<tr><td class="num" id="LN356">356</td><td class="line">	randomNumberGenerate = (F_RANDOMNUMBERGENERATE)0;</td></tr>
+<tr><td class="num" id="LN357">357</td><td class="line">	digitalSignatureGenerate = (F_DIGITALSIGNATUREGENERATE)0;</td></tr>
+<tr><td class="num" id="LN358">358</td><td class="line">	digitalSignatureVerify = (F_DIGITALSIGNATUREVERIFY)0;</td></tr>
+<tr><td class="num" id="LN359">359</td><td class="line">	publicKeyExtract = (F_PUBLICKEYEXTRACT)0;</td></tr>
+<tr><td class="num" id="LN360">360</td><td class="line">	pkaEncrypt = (F_PKAENCRYPT)0;</td></tr>
+<tr><td class="num" id="LN361">361</td><td class="line">	pkaDecrypt = (F_PKADECRYPT)0;</td></tr>
+<tr><td class="num" id="LN362">362</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN363">363</td><td class="line">	randomNumberGenerate = (F_RANDOMNUMBERGENERATE)0;</td></tr>
+<tr><td class="num" id="LN364">364</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN365">365</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN366">366</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN367">367</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> ibm_4758_cca_ctrl(ENGINE *e, <span class='keyword'>int</span> cmd, <span class='keyword'>long</span> i, <span class='keyword'>void</span> *p, <span class='keyword'>void</span> (*f)(<span class='keyword'>void</span>))</td></tr>
+<tr><td class="num" id="LN368">368</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN369">369</td><td class="line">	<span class='keyword'>int</span> initialised = ((dso == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) ? 0 : 1);</td></tr>
+<tr><td class="num" id="LN370">370</td><td class="line">	<span class='keyword'>switch</span>(cmd)</td></tr>
+<tr><td class="num" id="LN371">371</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN372">372</td><td class="line">	<span class='keyword'>case</span> <span class='macro'>CCA4758_CMD_SO_PATH<span class='expansion'>200</span></span>:</td></tr>
+<tr><td class="num" id="LN373">373</td><td class="line">		<span class='keyword'>if</span>(p == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN374">374</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN375">375</td><td class="line">			<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_CCA_CTRL,<span class='expansion'>ERR_CCA4758_error((100),((3|64)),"e_4758cca.c",376)</span></span></td></tr>
+<tr><td class="num" id="LN376">376</td><td class="line">					<span class='macro'>ERR_R_PASSED_NULL_PARAMETER)<span class='expansion'>ERR_CCA4758_error((100),((3|64)),"e_4758cca.c",376)</span></span>;</td></tr>
+<tr><td class="num" id="LN377">377</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN378">378</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN379">379</td><td class="line">		<span class='keyword'>if</span>(initialised)</td></tr>
+<tr><td class="num" id="LN380">380</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN381">381</td><td class="line">			<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_CCA_CTRL,<span class='expansion'>ERR_CCA4758_error((100),(100),"e_4758cca.c",382)</span></span></td></tr>
+<tr><td class="num" id="LN382">382</td><td class="line">					<span class='macro'>CCA4758_R_ALREADY_LOADED)<span class='expansion'>ERR_CCA4758_error((100),(100),"e_4758cca.c",382)</span></span>;</td></tr>
+<tr><td class="num" id="LN383">383</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN384">384</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN385">385</td><td class="line">		<span class='keyword'>return</span> set_CCA4758_LIB_NAME((<span class='keyword'>const</span> <span class='keyword'>char</span> *)p);</td></tr>
+<tr><td class="num" id="LN386">386</td><td class="line">	<span class='keyword'>default</span>:</td></tr>
+<tr><td class="num" id="LN387">387</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN388">388</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN389">389</td><td class="line">	<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_CCA_CTRL,<span class='expansion'>ERR_CCA4758_error((100),(102),"e_4758cca.c",390)</span></span></td></tr>
+<tr><td class="num" id="LN390">390</td><td class="line">			<span class='macro'>CCA4758_R_COMMAND_NOT_IMPLEMENTED)<span class='expansion'>ERR_CCA4758_error((100),(102),"e_4758cca.c",390)</span></span>;</td></tr>
+<tr><td class="num" id="LN391">391</td><td class="line">	<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN392">392</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN393">393</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN394">394</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN395">395</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN396">396</td><td class="line"><span class='directive'>#define <span class='macro'>MAX_CCA_PKA_TOKEN_SIZE<span class='expansion'>2500</span></span> 2500</span></td></tr>
+<tr><td class="num" id="LN397">397</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN398">398</td><td class="line"><span class='keyword'>static</span> EVP_PKEY *ibm_4758_load_privkey(ENGINE* e, <span class='keyword'>const</span> <span class='keyword'>char</span>* key_id,</td></tr>
+<tr><td class="num" id="LN399">399</td><td class="line">			UI_METHOD *ui_method, <span class='keyword'>void</span> *callback_data)</td></tr>
+<tr><td class="num" id="LN400">400</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN401">401</td><td class="line">	RSA *rtmp = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN402">402</td><td class="line">	EVP_PKEY *res = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN403">403</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span>* keyToken = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN404">404</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> pubKeyToken[<span class='macro'>MAX_CCA_PKA_TOKEN_SIZE<span class='expansion'>2500</span></span>];</td></tr>
+<tr><td class="num" id="LN405">405</td><td class="line">	<span class='keyword'>long</span> pubKeyTokenLength = <span class='macro'>MAX_CCA_PKA_TOKEN_SIZE<span class='expansion'>2500</span></span>;</td></tr>
+<tr><td class="num" id="LN406">406</td><td class="line">	<span class='keyword'>long</span> keyTokenLength = <span class='macro'>MAX_CCA_PKA_TOKEN_SIZE<span class='expansion'>2500</span></span>;</td></tr>
+<tr><td class="num" id="LN407">407</td><td class="line">	<span class='keyword'>long</span> returnCode;</td></tr>
+<tr><td class="num" id="LN408">408</td><td class="line">	<span class='keyword'>long</span> reasonCode;</td></tr>
+<tr><td class="num" id="LN409">409</td><td class="line">	<span class='keyword'>long</span> exitDataLength = 0;</td></tr>
+<tr><td class="num" id="LN410">410</td><td class="line">	<span class='keyword'>long</span> ruleArrayLength = 0;</td></tr>
+<tr><td class="num" id="LN411">411</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> exitData[8];</td></tr>
+<tr><td class="num" id="LN412">412</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> ruleArray[8];</td></tr>
+<tr><td class="num" id="LN413">413</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> keyLabel[64];</td></tr>
+<tr><td class="num" id="LN414">414</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>long</span> keyLabelLength = strlen(key_id);</td></tr>
+<tr><td class="num" id="LN415">415</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> modulus[256];</td></tr>
+<tr><td class="num" id="LN416">416</td><td class="line">	<span class='keyword'>long</span> modulusFieldLength = <span class='keyword'>sizeof</span>(modulus);</td></tr>
+<tr><td class="num" id="LN417">417</td><td class="line">	<span class='keyword'>long</span> modulusLength = 0;</td></tr>
+<tr><td class="num" id="LN418">418</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> exponent[256];</td></tr>
+<tr><td class="num" id="LN419">419</td><td class="line">	<span class='keyword'>long</span> exponentLength = <span class='keyword'>sizeof</span>(exponent);</td></tr>
+<tr><td class="num" id="LN420">420</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN421">421</td><td class="line">	<span class='keyword'>if</span> (keyLabelLength &gt; <span class='keyword'>sizeof</span>(keyLabel))</td></tr>
+<tr><td class="num" id="LN422">422</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN423">423</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_LOAD_PRIVKEY,<span class='expansion'>ERR_CCA4758_error((103),(107),"e_4758cca.c",424)</span></span></td></tr>
+<tr><td class="num" id="LN424">424</td><td class="line">		<span class='macro'>CCA4758_R_SIZE_TOO_LARGE_OR_TOO_SMALL)<span class='expansion'>ERR_CCA4758_error((103),(107),"e_4758cca.c",424)</span></span>;</td></tr>
+<tr><td class="num" id="LN425">425</td><td class="line">		<span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN426">426</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN427">427</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN428">428</td><td class="line">	<span class='macro'>memset(keyLabel,' ', <span class='keyword'>sizeof</span>(keyLabel))<span class='expansion'>__builtin___memset_chk (keyLabel, ' ', sizeof(keyLabel), __builtin_object_size<br> (keyLabel, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN429">429</td><td class="line">	<span class='macro'>memcpy(keyLabel, key_id, keyLabelLength)<span class='expansion'>__builtin___memcpy_chk (keyLabel, key_id, keyLabelLength, __builtin_object_size<br> (keyLabel, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN430">430</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN431">431</td><td class="line">	keyToken = <span class='macro'>OPENSSL_malloc(MAX_CCA_PKA_TOKEN_SIZE + <span class='keyword'>sizeof</span>(<span class='keyword'>long</span>))<span class='expansion'>CRYPTO_malloc((int)2500 + sizeof(long),"e_4758cca.c",431)</span></span>;</td></tr>
+<tr><td class="num" id="LN432">432</td><td class="line">	<span class='keyword'>if</span> (!keyToken)</td></tr>
+<tr><td class="num" id="LN433">433</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN434">434</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_LOAD_PRIVKEY,<span class='expansion'>ERR_CCA4758_error((103),((1|64)),"e_4758cca.c",435)</span></span></td></tr>
+<tr><td class="num" id="LN435">435</td><td class="line">				<span class='macro'>ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_CCA4758_error((103),((1|64)),"e_4758cca.c",435)</span></span>;</td></tr>
+<tr><td class="num" id="LN436">436</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN437">437</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN438">438</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN439">439</td><td class="line">	keyRecordRead(&amp;returnCode, &amp;reasonCode, &amp;exitDataLength,</td></tr>
+<tr><td class="num" id="LN440">440</td><td class="line">		exitData, &amp;ruleArrayLength, ruleArray, keyLabel,</td></tr>
+<tr><td class="num" id="LN441">441</td><td class="line">		&amp;keyTokenLength, keyToken+<span class='keyword'>sizeof</span>(<span class='keyword'>long</span>));</td></tr>
+<tr><td class="num" id="LN442">442</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN443">443</td><td class="line">	<span class='keyword'>if</span> (returnCode)</td></tr>
+<tr><td class="num" id="LN444">444</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN445">445</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_LOAD_PRIVKEY,<span class='expansion'>ERR_CCA4758_error((103),(104),"e_4758cca.c",446)</span></span></td></tr>
+<tr><td class="num" id="LN446">446</td><td class="line">			<span class='macro'>CCA4758_R_FAILED_LOADING_PRIVATE_KEY)<span class='expansion'>ERR_CCA4758_error((103),(104),"e_4758cca.c",446)</span></span>;</td></tr>
+<tr><td class="num" id="LN447">447</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN448">448</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN449">449</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN450">450</td><td class="line">	publicKeyExtract(&amp;returnCode, &amp;reasonCode, &amp;exitDataLength,</td></tr>
+<tr><td class="num" id="LN451">451</td><td class="line">		exitData, &amp;ruleArrayLength, ruleArray, &amp;keyTokenLength,</td></tr>
+<tr><td class="num" id="LN452">452</td><td class="line">		keyToken+<span class='keyword'>sizeof</span>(<span class='keyword'>long</span>), &amp;pubKeyTokenLength, pubKeyToken);</td></tr>
+<tr><td class="num" id="LN453">453</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN454">454</td><td class="line">	<span class='keyword'>if</span> (returnCode)</td></tr>
+<tr><td class="num" id="LN455">455</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN456">456</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_LOAD_PRIVKEY,<span class='expansion'>ERR_CCA4758_error((103),(104),"e_4758cca.c",457)</span></span></td></tr>
+<tr><td class="num" id="LN457">457</td><td class="line">			<span class='macro'>CCA4758_R_FAILED_LOADING_PRIVATE_KEY)<span class='expansion'>ERR_CCA4758_error((103),(104),"e_4758cca.c",457)</span></span>;</td></tr>
+<tr><td class="num" id="LN458">458</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN459">459</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN460">460</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN461">461</td><td class="line">	<span class='keyword'>if</span> (!getModulusAndExponent(pubKeyToken, &amp;exponentLength,</td></tr>
+<tr><td class="num" id="LN462">462</td><td class="line">			exponent, &amp;modulusLength, &amp;modulusFieldLength,</td></tr>
+<tr><td class="num" id="LN463">463</td><td class="line">			modulus))</td></tr>
+<tr><td class="num" id="LN464">464</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN465">465</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_LOAD_PRIVKEY,<span class='expansion'>ERR_CCA4758_error((103),(104),"e_4758cca.c",466)</span></span></td></tr>
+<tr><td class="num" id="LN466">466</td><td class="line">			<span class='macro'>CCA4758_R_FAILED_LOADING_PRIVATE_KEY)<span class='expansion'>ERR_CCA4758_error((103),(104),"e_4758cca.c",466)</span></span>;</td></tr>
+<tr><td class="num" id="LN467">467</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN468">468</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN469">469</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN470">470</td><td class="line">	(*(<span class='keyword'>long</span>*)keyToken) = keyTokenLength;</td></tr>
+<tr><td class="num" id="LN471">471</td><td class="line">	rtmp = RSA_new_method(e);</td></tr>
+<tr><td class="num" id="LN472">472</td><td class="line">	RSA_set_ex_data(rtmp, hndidx, (<span class='keyword'>char</span> *)keyToken);</td></tr>
+<tr><td class="num" id="LN473">473</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN474">474</td><td class="line">	rtmp-&gt;e = BN_bin2bn(exponent, exponentLength, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>);</td></tr>
+<tr><td class="num" id="LN475">475</td><td class="line">	rtmp-&gt;n = BN_bin2bn(modulus, modulusFieldLength, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>);</td></tr>
+<tr><td class="num" id="LN476">476</td><td class="line">	rtmp-&gt;flags |= <span class='macro'>RSA_FLAG_EXT_PKEY<span class='expansion'>0x0020</span></span>;</td></tr>
+<tr><td class="num" id="LN477">477</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN478">478</td><td class="line">	res = EVP_PKEY_new();</td></tr>
+<tr><td class="num" id="LN479">479</td><td class="line">	<span class='macro'>EVP_PKEY_assign_RSA(res, rtmp)<span class='expansion'>EVP_PKEY_assign((res),6, (char *)(rtmp))</span></span>;</td></tr>
+<tr><td class="num" id="LN480">480</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN481">481</td><td class="line">	<span class='keyword'>return</span> res;</td></tr>
+<tr><td class="num" id="LN482">482</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN483">483</td><td class="line">	<span class='keyword'>if</span> (keyToken)</td></tr>
+<tr><td class="num" id="LN484">484</td><td class="line">		<span class='macro'>OPENSSL_free(keyToken)<span class='expansion'>CRYPTO_free(keyToken)</span></span>;</td></tr>
+<tr><td class="num" id="LN485">485</td><td class="line">	<span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN486">486</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN487">487</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN488">488</td><td class="line"><span class='keyword'>static</span> EVP_PKEY *ibm_4758_load_pubkey(ENGINE* e, <span class='keyword'>const</span> <span class='keyword'>char</span>* key_id,</td></tr>
+<tr><td class="num" id="LN489">489</td><td class="line">			UI_METHOD *ui_method, <span class='keyword'>void</span> *callback_data)</td></tr>
+<tr><td class="num" id="LN490">490</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN491">491</td><td class="line">	RSA *rtmp = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN492">492</td><td class="line">	EVP_PKEY *res = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN493">493</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span>* keyToken = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN494">494</td><td class="line">	<span class='keyword'>long</span> keyTokenLength = <span class='macro'>MAX_CCA_PKA_TOKEN_SIZE<span class='expansion'>2500</span></span>;</td></tr>
+<tr><td class="num" id="LN495">495</td><td class="line">	<span class='keyword'>long</span> returnCode;</td></tr>
+<tr><td class="num" id="LN496">496</td><td class="line">	<span class='keyword'>long</span> reasonCode;</td></tr>
+<tr><td class="num" id="LN497">497</td><td class="line">	<span class='keyword'>long</span> exitDataLength = 0;</td></tr>
+<tr><td class="num" id="LN498">498</td><td class="line">	<span class='keyword'>long</span> ruleArrayLength = 0;</td></tr>
+<tr><td class="num" id="LN499">499</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> exitData[8];</td></tr>
+<tr><td class="num" id="LN500">500</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> ruleArray[8];</td></tr>
+<tr><td class="num" id="LN501">501</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> keyLabel[64];</td></tr>
+<tr><td class="num" id="LN502">502</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>long</span> keyLabelLength = strlen(key_id);</td></tr>
+<tr><td class="num" id="LN503">503</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> modulus[512];</td></tr>
+<tr><td class="num" id="LN504">504</td><td class="line">	<span class='keyword'>long</span> modulusFieldLength = <span class='keyword'>sizeof</span>(modulus);</td></tr>
+<tr><td class="num" id="LN505">505</td><td class="line">	<span class='keyword'>long</span> modulusLength = 0;</td></tr>
+<tr><td class="num" id="LN506">506</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> exponent[512];</td></tr>
+<tr><td class="num" id="LN507">507</td><td class="line">	<span class='keyword'>long</span> exponentLength = <span class='keyword'>sizeof</span>(exponent);</td></tr>
+<tr><td class="num" id="LN508">508</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN509">509</td><td class="line">	<span class='keyword'>if</span> (keyLabelLength &gt; <span class='keyword'>sizeof</span>(keyLabel))</td></tr>
+<tr><td class="num" id="LN510">510</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN511">511</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_LOAD_PUBKEY,<span class='expansion'>ERR_CCA4758_error((104),(107),"e_4758cca.c",512)</span></span></td></tr>
+<tr><td class="num" id="LN512">512</td><td class="line">			<span class='macro'>CCA4758_R_SIZE_TOO_LARGE_OR_TOO_SMALL)<span class='expansion'>ERR_CCA4758_error((104),(107),"e_4758cca.c",512)</span></span>;</td></tr>
+<tr><td class="num" id="LN513">513</td><td class="line">		<span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN514">514</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN515">515</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN516">516</td><td class="line">	<span class='macro'>memset(keyLabel,' ', <span class='keyword'>sizeof</span>(keyLabel))<span class='expansion'>__builtin___memset_chk (keyLabel, ' ', sizeof(keyLabel), __builtin_object_size<br> (keyLabel, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN517">517</td><td class="line">	<span class='macro'>memcpy(keyLabel, key_id, keyLabelLength)<span class='expansion'>__builtin___memcpy_chk (keyLabel, key_id, keyLabelLength, __builtin_object_size<br> (keyLabel, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN518">518</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN519">519</td><td class="line">	keyToken = <span class='macro'>OPENSSL_malloc(MAX_CCA_PKA_TOKEN_SIZE + <span class='keyword'>sizeof</span>(<span class='keyword'>long</span>))<span class='expansion'>CRYPTO_malloc((int)2500 + sizeof(long),"e_4758cca.c",519)</span></span>;</td></tr>
+<tr><td class="num" id="LN520">520</td><td class="line">	<span class='keyword'>if</span> (!keyToken)</td></tr>
+<tr><td class="num" id="LN521">521</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN522">522</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_LOAD_PUBKEY,<span class='expansion'>ERR_CCA4758_error((104),((1|64)),"e_4758cca.c",523)</span></span></td></tr>
+<tr><td class="num" id="LN523">523</td><td class="line">				<span class='macro'>ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_CCA4758_error((104),((1|64)),"e_4758cca.c",523)</span></span>;</td></tr>
+<tr><td class="num" id="LN524">524</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN525">525</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN526">526</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN527">527</td><td class="line">	keyRecordRead(&amp;returnCode, &amp;reasonCode, &amp;exitDataLength, exitData,</td></tr>
+<tr><td class="num" id="LN528">528</td><td class="line">		&amp;ruleArrayLength, ruleArray, keyLabel, &amp;keyTokenLength,</td></tr>
+<tr><td class="num" id="LN529">529</td><td class="line">		keyToken+<span class='keyword'>sizeof</span>(<span class='keyword'>long</span>));</td></tr>
+<tr><td class="num" id="LN530">530</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN531">531</td><td class="line">	<span class='keyword'>if</span> (returnCode)</td></tr>
+<tr><td class="num" id="LN532">532</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN533">533</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_LOAD_PUBKEY,<span class='expansion'>ERR_CCA4758_error((104),((1|64)),"e_4758cca.c",534)</span></span></td></tr>
+<tr><td class="num" id="LN534">534</td><td class="line">				<span class='macro'>ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_CCA4758_error((104),((1|64)),"e_4758cca.c",534)</span></span>;</td></tr>
+<tr><td class="num" id="LN535">535</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN536">536</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN537">537</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN538">538</td><td class="line">	<span class='keyword'>if</span> (!getModulusAndExponent(keyToken+<span class='keyword'>sizeof</span>(<span class='keyword'>long</span>), &amp;exponentLength,</td></tr>
+<tr><td class="num" id="LN539">539</td><td class="line">			exponent, &amp;modulusLength, &amp;modulusFieldLength, modulus))</td></tr>
+<tr><td class="num" id="LN540">540</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN541">541</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_IBM_4758_LOAD_PUBKEY,<span class='expansion'>ERR_CCA4758_error((104),(105),"e_4758cca.c",542)</span></span></td></tr>
+<tr><td class="num" id="LN542">542</td><td class="line">			<span class='macro'>CCA4758_R_FAILED_LOADING_PUBLIC_KEY)<span class='expansion'>ERR_CCA4758_error((104),(105),"e_4758cca.c",542)</span></span>;</td></tr>
+<tr><td class="num" id="LN543">543</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN544">544</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN545">545</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN546">546</td><td class="line">	(*(<span class='keyword'>long</span>*)keyToken) = keyTokenLength;</td></tr>
+<tr><td class="num" id="LN547">547</td><td class="line">	rtmp = RSA_new_method(e);</td></tr>
+<tr><td class="num" id="LN548">548</td><td class="line">	RSA_set_ex_data(rtmp, hndidx, (<span class='keyword'>char</span> *)keyToken);</td></tr>
+<tr><td class="num" id="LN549">549</td><td class="line">	rtmp-&gt;e = BN_bin2bn(exponent, exponentLength, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>);</td></tr>
+<tr><td class="num" id="LN550">550</td><td class="line">	rtmp-&gt;n = BN_bin2bn(modulus, modulusFieldLength, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>);</td></tr>
+<tr><td class="num" id="LN551">551</td><td class="line">	rtmp-&gt;flags |= <span class='macro'>RSA_FLAG_EXT_PKEY<span class='expansion'>0x0020</span></span>;</td></tr>
+<tr><td class="num" id="LN552">552</td><td class="line">	res = EVP_PKEY_new();</td></tr>
+<tr><td class="num" id="LN553">553</td><td class="line">	<span class='macro'>EVP_PKEY_assign_RSA(res, rtmp)<span class='expansion'>EVP_PKEY_assign((res),6, (char *)(rtmp))</span></span>;</td></tr>
+<tr><td class="num" id="LN554">554</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN555">555</td><td class="line">	<span class='keyword'>return</span> res;</td></tr>
+<tr><td class="num" id="LN556">556</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN557">557</td><td class="line">	<span class='keyword'>if</span> (keyToken)</td></tr>
+<tr><td class="num" id="LN558">558</td><td class="line">		<span class='macro'>OPENSSL_free(keyToken)<span class='expansion'>CRYPTO_free(keyToken)</span></span>;</td></tr>
+<tr><td class="num" id="LN559">559</td><td class="line">	<span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN560">560</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN561">561</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN562">562</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> cca_rsa_pub_enc(<span class='keyword'>int</span> flen, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *from,</td></tr>
+<tr><td class="num" id="LN563">563</td><td class="line">			<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *to, RSA *rsa,<span class='keyword'>int</span> padding)</td></tr>
+<tr><td class="num" id="LN564">564</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN565">565</td><td class="line">	<span class='keyword'>long</span> returnCode;</td></tr>
+<tr><td class="num" id="LN566">566</td><td class="line">	<span class='keyword'>long</span> reasonCode;</td></tr>
+<tr><td class="num" id="LN567">567</td><td class="line">	<span class='keyword'>long</span> lflen = flen;</td></tr>
+<tr><td class="num" id="LN568">568</td><td class="line">	<span class='keyword'>long</span> exitDataLength = 0;</td></tr>
+<tr><td class="num" id="LN569">569</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> exitData[8];</td></tr>
+<tr><td class="num" id="LN570">570</td><td class="line">	<span class='keyword'>long</span> ruleArrayLength = 1;</td></tr>
+<tr><td class="num" id="LN571">571</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> ruleArray[8] = <span class='string_literal'>"PKCS-1.2"</span>;</td></tr>
+<tr><td class="num" id="LN572">572</td><td class="line">	<span class='keyword'>long</span> dataStructureLength = 0;</td></tr>
+<tr><td class="num" id="LN573">573</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> dataStructure[8];</td></tr>
+<tr><td class="num" id="LN574">574</td><td class="line">	<span class='keyword'>long</span> outputLength = RSA_size(rsa);</td></tr>
+<tr><td class="num" id="LN575">575</td><td class="line">	<span class='keyword'>long</span> keyTokenLength;</td></tr>
+<tr><td class="num" id="LN576">576</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span>* keyToken = (<span class='keyword'>unsigned</span> <span class='keyword'>char</span>*)RSA_get_ex_data(rsa, hndidx);</td></tr>
+<tr><td class="num" id="LN577">577</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN578">578</td><td class="line">	keyTokenLength = *(<span class='keyword'>long</span>*)keyToken;</td></tr>
+<tr><td class="num" id="LN579">579</td><td class="line">	keyToken+=<span class='keyword'>sizeof</span>(<span class='keyword'>long</span>);</td></tr>
+<tr><td class="num" id="LN580">580</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN581">581</td><td class="line">	pkaEncrypt(&amp;returnCode, &amp;reasonCode, &amp;exitDataLength, exitData,</td></tr>
+<tr><td class="num" id="LN582">582</td><td class="line">		&amp;ruleArrayLength, ruleArray, &amp;lflen, (<span class='keyword'>unsigned</span> <span class='keyword'>char</span>*)from,</td></tr>
+<tr><td class="num" id="LN583">583</td><td class="line">		&amp;dataStructureLength, dataStructure, &amp;keyTokenLength,</td></tr>
+<tr><td class="num" id="LN584">584</td><td class="line">		keyToken, &amp;outputLength, to);</td></tr>
+<tr><td class="num" id="LN585">585</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN586">586</td><td class="line">	<span class='keyword'>if</span> (returnCode || reasonCode)</td></tr>
+<tr><td class="num" id="LN587">587</td><td class="line">		<span class='keyword'>return</span> -(returnCode &lt;&lt; 16 | reasonCode);</td></tr>
+<tr><td class="num" id="LN588">588</td><td class="line">	<span class='keyword'>return</span> outputLength;</td></tr>
+<tr><td class="num" id="LN589">589</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN590">590</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN591">591</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> cca_rsa_priv_dec(<span class='keyword'>int</span> flen, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *from,</td></tr>
+<tr><td class="num" id="LN592">592</td><td class="line">			<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *to, RSA *rsa,<span class='keyword'>int</span> padding)</td></tr>
+<tr><td class="num" id="LN593">593</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN594">594</td><td class="line">	<span class='keyword'>long</span> returnCode;</td></tr>
+<tr><td class="num" id="LN595">595</td><td class="line">	<span class='keyword'>long</span> reasonCode;</td></tr>
+<tr><td class="num" id="LN596">596</td><td class="line">	<span class='keyword'>long</span> lflen = flen;</td></tr>
+<tr><td class="num" id="LN597">597</td><td class="line">	<span class='keyword'>long</span> exitDataLength = 0;</td></tr>
+<tr><td class="num" id="LN598">598</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> exitData[8];</td></tr>
+<tr><td class="num" id="LN599">599</td><td class="line">	<span class='keyword'>long</span> ruleArrayLength = 1;</td></tr>
+<tr><td class="num" id="LN600">600</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> ruleArray[8] = <span class='string_literal'>"PKCS-1.2"</span>;</td></tr>
+<tr><td class="num" id="LN601">601</td><td class="line">	<span class='keyword'>long</span> dataStructureLength = 0;</td></tr>
+<tr><td class="num" id="LN602">602</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> dataStructure[8];</td></tr>
+<tr><td class="num" id="LN603">603</td><td class="line">	<span class='keyword'>long</span> outputLength = RSA_size(rsa);</td></tr>
+<tr><td class="num" id="LN604">604</td><td class="line">	<span class='keyword'>long</span> keyTokenLength;</td></tr>
+<tr><td class="num" id="LN605">605</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span>* keyToken = (<span class='keyword'>unsigned</span> <span class='keyword'>char</span>*)RSA_get_ex_data(rsa, hndidx);</td></tr>
+<tr><td class="num" id="LN606">606</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN607">607</td><td class="line">	keyTokenLength = *(<span class='keyword'>long</span>*)keyToken;</td></tr>
+<tr><td class="num" id="LN608">608</td><td class="line">	keyToken+=<span class='keyword'>sizeof</span>(<span class='keyword'>long</span>);</td></tr>
+<tr><td class="num" id="LN609">609</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN610">610</td><td class="line">	pkaDecrypt(&amp;returnCode, &amp;reasonCode, &amp;exitDataLength, exitData,</td></tr>
+<tr><td class="num" id="LN611">611</td><td class="line">		&amp;ruleArrayLength, ruleArray, &amp;lflen, (<span class='keyword'>unsigned</span> <span class='keyword'>char</span>*)from,</td></tr>
+<tr><td class="num" id="LN612">612</td><td class="line">		&amp;dataStructureLength, dataStructure, &amp;keyTokenLength,</td></tr>
+<tr><td class="num" id="LN613">613</td><td class="line">		keyToken, &amp;outputLength, to);</td></tr>
+<tr><td class="num" id="LN614">614</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN615">615</td><td class="line">	<span class='keyword'>return</span> (returnCode | reasonCode) ? 0 : 1;</td></tr>
+<tr><td class="num" id="LN616">616</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN617">617</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN618">618</td><td class="line"><span class='directive'>#define <span class='macro'>SSL_SIG_LEN<span class='expansion'>36</span></span> 36</span></td></tr>
+<tr><td class="num" id="LN619">619</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN620">620</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> cca_rsa_verify(<span class='keyword'>int</span> type, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *m, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> m_len,</td></tr>
+<tr><td class="num" id="LN621">621</td><td class="line">	<span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *sigbuf, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> siglen, <span class='keyword'>const</span> RSA *rsa)</td></tr>
+<tr><td class="num" id="LN622">622</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN623">623</td><td class="line">	<span class='keyword'>long</span> returnCode;</td></tr>
+<tr><td class="num" id="LN624">624</td><td class="line">	<span class='keyword'>long</span> reasonCode;</td></tr>
+<tr><td class="num" id="LN625">625</td><td class="line">	<span class='keyword'>long</span> lsiglen = siglen;</td></tr>
+<tr><td class="num" id="LN626">626</td><td class="line">	<span class='keyword'>long</span> exitDataLength = 0;</td></tr>
+<tr><td class="num" id="LN627">627</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> exitData[8];</td></tr>
+<tr><td class="num" id="LN628">628</td><td class="line">	<span class='keyword'>long</span> ruleArrayLength = 1;</td></tr>
+<tr><td class="num" id="LN629">629</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> ruleArray[8] = <span class='string_literal'>"PKCS-1.1"</span>;</td></tr>
+<tr><td class="num" id="LN630">630</td><td class="line">	<span class='keyword'>long</span> keyTokenLength;</td></tr>
+<tr><td class="num" id="LN631">631</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span>* keyToken = (<span class='keyword'>unsigned</span> <span class='keyword'>char</span>*)RSA_get_ex_data(rsa, hndidx);</td></tr>
+<tr><td class="num" id="LN632">632</td><td class="line">	<span class='keyword'>long</span> length = <span class='macro'>SSL_SIG_LEN<span class='expansion'>36</span></span>;</td></tr>
+<tr><td class="num" id="LN633">633</td><td class="line">	<span class='keyword'>long</span> keyLength ;</td></tr>
+<tr><td class="num" id="LN634">634</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *hashBuffer = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN635">635</td><td class="line">	X509_SIG sig;</td></tr>
+<tr><td class="num" id="LN636">636</td><td class="line">	ASN1_TYPE parameter;</td></tr>
+<tr><td class="num" id="LN637">637</td><td class="line">	X509_ALGOR algorithm;</td></tr>
+<tr><td class="num" id="LN638">638</td><td class="line">	ASN1_OCTET_STRING digest;</td></tr>
+<tr><td class="num" id="LN639">639</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN640">640</td><td class="line">	keyTokenLength = *(<span class='keyword'>long</span>*)keyToken;</td></tr>
+<tr><td class="num" id="LN641">641</td><td class="line">	keyToken+=<span class='keyword'>sizeof</span>(<span class='keyword'>long</span>);</td></tr>
+<tr><td class="num" id="LN642">642</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN643">643</td><td class="line">	<span class='keyword'>if</span> (type == <span class='macro'>NID_md5<span class='expansion'>4</span></span> || type == <span class='macro'>NID_sha1<span class='expansion'>64</span></span>)</td></tr>
+<tr><td class="num" id="LN644">644</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN645">645</td><td class="line">		sig.algor = &amp;algorithm;</td></tr>
+<tr><td class="num" id="LN646">646</td><td class="line">		algorithm.algorithm = OBJ_nid2obj(type);</td></tr>
+<tr><td class="num" id="LN647">647</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN648">648</td><td class="line">		<span class='keyword'>if</span> (!algorithm.algorithm)</td></tr>
+<tr><td class="num" id="LN649">649</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN650">650</td><td class="line">			<span class='macro'>CCA4758err(CCA4758_F_CCA_RSA_VERIFY,<span class='expansion'>ERR_CCA4758_error((106),(109),"e_4758cca.c",651)</span></span></td></tr>
+<tr><td class="num" id="LN651">651</td><td class="line">				<span class='macro'>CCA4758_R_UNKNOWN_ALGORITHM_TYPE)<span class='expansion'>ERR_CCA4758_error((106),(109),"e_4758cca.c",651)</span></span>;</td></tr>
+<tr><td class="num" id="LN652">652</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN653">653</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN654">654</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN655">655</td><td class="line">		<span class='keyword'>if</span> (!algorithm.algorithm-&gt;length)</td></tr>
+<tr><td class="num" id="LN656">656</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN657">657</td><td class="line">			<span class='macro'>CCA4758err(CCA4758_F_CCA_RSA_VERIFY,<span class='expansion'>ERR_CCA4758_error((106),(101),"e_4758cca.c",658)</span></span></td></tr>
+<tr><td class="num" id="LN658">658</td><td class="line">				<span class='macro'>CCA4758_R_ASN1_OID_UNKNOWN_FOR_MD)<span class='expansion'>ERR_CCA4758_error((106),(101),"e_4758cca.c",658)</span></span>;</td></tr>
+<tr><td class="num" id="LN659">659</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN660">660</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN661">661</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN662">662</td><td class="line">		parameter.type = <span class='macro'>V_ASN1_NULL<span class='expansion'>5</span></span>;</td></tr>
+<tr><td class="num" id="LN663">663</td><td class="line">		parameter.value.ptr = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN664">664</td><td class="line">		algorithm.parameter = &amp;parameter;</td></tr>
+<tr><td class="num" id="LN665">665</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN666">666</td><td class="line">		sig.digest = &amp;digest;</td></tr>
+<tr><td class="num" id="LN667">667</td><td class="line">		sig.digest-&gt;data = (<span class='keyword'>unsigned</span> <span class='keyword'>char</span>*)m;</td></tr>
+<tr><td class="num" id="LN668">668</td><td class="line">		sig.digest-&gt;length = m_len;</td></tr>
+<tr><td class="num" id="LN669">669</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN670">670</td><td class="line">		length = i2d_X509_SIG(&amp;sig, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>);</td></tr>
+<tr><td class="num" id="LN671">671</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN672">672</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN673">673</td><td class="line">	keyLength = RSA_size(rsa);</td></tr>
+<tr><td class="num" id="LN674">674</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN675">675</td><td class="line">	<span class='keyword'>if</span> (length - <span class='macro'>RSA_PKCS1_PADDING<span class='expansion'>1</span></span> &gt; keyLength)</td></tr>
+<tr><td class="num" id="LN676">676</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN677">677</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_CCA_RSA_VERIFY,<span class='expansion'>ERR_CCA4758_error((106),(107),"e_4758cca.c",678)</span></span></td></tr>
+<tr><td class="num" id="LN678">678</td><td class="line">			<span class='macro'>CCA4758_R_SIZE_TOO_LARGE_OR_TOO_SMALL)<span class='expansion'>ERR_CCA4758_error((106),(107),"e_4758cca.c",678)</span></span>;</td></tr>
+<tr><td class="num" id="LN679">679</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN680">680</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN681">681</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN682">682</td><td class="line">	<span class='keyword'>switch</span> (type)</td></tr>
+<tr><td class="num" id="LN683">683</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN684">684</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>NID_md5_sha1<span class='expansion'>114</span></span> :</td></tr>
+<tr><td class="num" id="LN685">685</td><td class="line">			<span class='keyword'>if</span> (m_len != <span class='macro'>SSL_SIG_LEN<span class='expansion'>36</span></span>)</td></tr>
+<tr><td class="num" id="LN686">686</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN687">687</td><td class="line">				<span class='macro'>CCA4758err(CCA4758_F_CCA_RSA_VERIFY,<span class='expansion'>ERR_CCA4758_error((106),(107),"e_4758cca.c",688)</span></span></td></tr>
+<tr><td class="num" id="LN688">688</td><td class="line">				<span class='macro'>CCA4758_R_SIZE_TOO_LARGE_OR_TOO_SMALL)<span class='expansion'>ERR_CCA4758_error((106),(107),"e_4758cca.c",688)</span></span>;</td></tr>
+<tr><td class="num" id="LN689">689</td><td class="line">				<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN690">690</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN691">691</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN692">692</td><td class="line">			hashBuffer = (<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *)m;</td></tr>
+<tr><td class="num" id="LN693">693</td><td class="line">			length = m_len;</td></tr>
+<tr><td class="num" id="LN694">694</td><td class="line">			<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN695">695</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>NID_md5<span class='expansion'>4</span></span> :</td></tr>
+<tr><td class="num" id="LN696">696</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN697">697</td><td class="line">			<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *ptr;</td></tr>
+<tr><td class="num" id="LN698">698</td><td class="line">			ptr = hashBuffer = <span class='macro'>OPENSSL_malloc(<span class='expansion'>CRYPTO_malloc((int)(unsigned int)keyLength+1,"e_4758cca.c",699<br>)</span></span></td></tr>
+<tr><td class="num" id="LN699">699</td><td class="line">					<span class='macro'>(<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)keyLength+1)<span class='expansion'>CRYPTO_malloc((int)(unsigned int)keyLength+1,"e_4758cca.c",699<br>)</span></span>;</td></tr>
+<tr><td class="num" id="LN700">700</td><td class="line">			<span class='keyword'>if</span> (!hashBuffer)</td></tr>
+<tr><td class="num" id="LN701">701</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN702">702</td><td class="line">				<span class='macro'>CCA4758err(CCA4758_F_CCA_RSA_VERIFY,<span class='expansion'>ERR_CCA4758_error((106),((1|64)),"e_4758cca.c",703)</span></span></td></tr>
+<tr><td class="num" id="LN703">703</td><td class="line">						<span class='macro'>ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_CCA4758_error((106),((1|64)),"e_4758cca.c",703)</span></span>;</td></tr>
+<tr><td class="num" id="LN704">704</td><td class="line">				<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN705">705</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN706">706</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN707">707</td><td class="line">			i2d_X509_SIG(&amp;sig, &amp;ptr);</td></tr>
+<tr><td class="num" id="LN708">708</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN709">709</td><td class="line">			<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN710">710</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>NID_sha1<span class='expansion'>64</span></span> :</td></tr>
+<tr><td class="num" id="LN711">711</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN712">712</td><td class="line">			<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *ptr;</td></tr>
+<tr><td class="num" id="LN713">713</td><td class="line">			ptr = hashBuffer = <span class='macro'>OPENSSL_malloc(<span class='expansion'>CRYPTO_malloc((int)(unsigned int)keyLength+1,"e_4758cca.c",714<br>)</span></span></td></tr>
+<tr><td class="num" id="LN714">714</td><td class="line">					<span class='macro'>(<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)keyLength+1)<span class='expansion'>CRYPTO_malloc((int)(unsigned int)keyLength+1,"e_4758cca.c",714<br>)</span></span>;</td></tr>
+<tr><td class="num" id="LN715">715</td><td class="line">			<span class='keyword'>if</span> (!hashBuffer)</td></tr>
+<tr><td class="num" id="LN716">716</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN717">717</td><td class="line">				<span class='macro'>CCA4758err(CCA4758_F_CCA_RSA_VERIFY,<span class='expansion'>ERR_CCA4758_error((106),((1|64)),"e_4758cca.c",718)</span></span></td></tr>
+<tr><td class="num" id="LN718">718</td><td class="line">						<span class='macro'>ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_CCA4758_error((106),((1|64)),"e_4758cca.c",718)</span></span>;</td></tr>
+<tr><td class="num" id="LN719">719</td><td class="line">				<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN720">720</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN721">721</td><td class="line">			i2d_X509_SIG(&amp;sig, &amp;ptr);</td></tr>
+<tr><td class="num" id="LN722">722</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN723">723</td><td class="line">			<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN724">724</td><td class="line">		<span class='keyword'>default</span>:</td></tr>
+<tr><td class="num" id="LN725">725</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN726">726</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN727">727</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN728">728</td><td class="line">	digitalSignatureVerify(&amp;returnCode, &amp;reasonCode, &amp;exitDataLength,</td></tr>
+<tr><td class="num" id="LN729">729</td><td class="line">		exitData, &amp;ruleArrayLength, ruleArray, &amp;keyTokenLength,</td></tr>
+<tr><td class="num" id="LN730">730</td><td class="line">		keyToken, &amp;length, hashBuffer, &amp;lsiglen,</td></tr>
+<tr><td class="num" id="LN731">731</td><td class="line">						(<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *)sigbuf);</td></tr>
+<tr><td class="num" id="LN732">732</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN733">733</td><td class="line">	<span class='keyword'>if</span> (type == <span class='macro'>NID_sha1<span class='expansion'>64</span></span> || type == <span class='macro'>NID_md5<span class='expansion'>4</span></span>)</td></tr>
+<tr><td class="num" id="LN734">734</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN735">735</td><td class="line">		OPENSSL_cleanse(hashBuffer, keyLength+1);</td></tr>
+<tr><td class="num" id="LN736">736</td><td class="line">		<span class='macro'>OPENSSL_free(hashBuffer)<span class='expansion'>CRYPTO_free(hashBuffer)</span></span>;</td></tr>
+<tr><td class="num" id="LN737">737</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN738">738</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN739">739</td><td class="line">	<span class='keyword'>return</span> ((returnCode || reasonCode) ? 0 : 1);</td></tr>
+<tr><td class="num" id="LN740">740</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN741">741</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN742">742</td><td class="line"><span class='directive'>#define <span class='macro'>SSL_SIG_LEN<span class='expansion'>36</span></span> 36</span></td></tr>
+<tr><td class="num" id="LN743">743</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN744">744</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> cca_rsa_sign(<span class='keyword'>int</span> type, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *m, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> m_len,</td></tr>
+<tr><td class="num" id="LN745">745</td><td class="line">		<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *sigret, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> *siglen, <span class='keyword'>const</span> RSA *rsa)</td></tr>
+<tr><td class="num" id="LN746">746</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN747">747</td><td class="line">	<span class='keyword'>long</span> returnCode;</td></tr>
+<tr><td class="num" id="LN748">748</td><td class="line">	<span class='keyword'>long</span> reasonCode;</td></tr>
+<tr><td class="num" id="LN749">749</td><td class="line">	<span class='keyword'>long</span> exitDataLength = 0;</td></tr>
+<tr><td class="num" id="LN750">750</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> exitData[8];</td></tr>
+<tr><td class="num" id="LN751">751</td><td class="line">	<span class='keyword'>long</span> ruleArrayLength = 1;</td></tr>
+<tr><td class="num" id="LN752">752</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> ruleArray[8] = <span class='string_literal'>"PKCS-1.1"</span>;</td></tr>
+<tr><td class="num" id="LN753">753</td><td class="line">	<span class='keyword'>long</span> outputLength=256;</td></tr>
+<tr><td class="num" id="LN754">754</td><td class="line">	<span class='keyword'>long</span> outputBitLength;</td></tr>
+<tr><td class="num" id="LN755">755</td><td class="line">	<span class='keyword'>long</span> keyTokenLength;</td></tr>
+<tr><td class="num" id="LN756">756</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *hashBuffer = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN757">757</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span>* keyToken = (<span class='keyword'>unsigned</span> <span class='keyword'>char</span>*)RSA_get_ex_data(rsa, hndidx);</td></tr>
+<tr><td class="num" id="LN758">758</td><td class="line">	<span class='keyword'>long</span> length = <span class='macro'>SSL_SIG_LEN<span class='expansion'>36</span></span>;</td></tr>
+<tr><td class="num" id="LN759">759</td><td class="line">	<span class='keyword'>long</span> keyLength ;</td></tr>
+<tr><td class="num" id="LN760">760</td><td class="line">	X509_SIG sig;</td></tr>
+<tr><td class="num" id="LN761">761</td><td class="line">	ASN1_TYPE parameter;</td></tr>
+<tr><td class="num" id="LN762">762</td><td class="line">	X509_ALGOR algorithm;</td></tr>
+<tr><td class="num" id="LN763">763</td><td class="line">	ASN1_OCTET_STRING digest;</td></tr>
+<tr><td class="num" id="LN764">764</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN765">765</td><td class="line">	keyTokenLength = *(<span class='keyword'>long</span>*)keyToken;</td></tr>
+<tr><td class="num" id="LN766">766</td><td class="line">	keyToken+=<span class='keyword'>sizeof</span>(<span class='keyword'>long</span>);</td></tr>
+<tr><td class="num" id="LN767">767</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN768">768</td><td class="line">	<span class='keyword'>if</span> (type == <span class='macro'>NID_md5<span class='expansion'>4</span></span> || type == <span class='macro'>NID_sha1<span class='expansion'>64</span></span>)</td></tr>
+<tr><td class="num" id="LN769">769</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN770">770</td><td class="line">		sig.algor = &amp;algorithm;</td></tr>
+<tr><td class="num" id="LN771">771</td><td class="line">		algorithm.algorithm = OBJ_nid2obj(type);</td></tr>
+<tr><td class="num" id="LN772">772</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN773">773</td><td class="line">		<span class='keyword'>if</span> (!algorithm.algorithm)</td></tr>
+<tr><td class="num" id="LN774">774</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN775">775</td><td class="line">			<span class='macro'>CCA4758err(CCA4758_F_CCA_RSA_SIGN,<span class='expansion'>ERR_CCA4758_error((105),(109),"e_4758cca.c",776)</span></span></td></tr>
+<tr><td class="num" id="LN776">776</td><td class="line">				<span class='macro'>CCA4758_R_UNKNOWN_ALGORITHM_TYPE)<span class='expansion'>ERR_CCA4758_error((105),(109),"e_4758cca.c",776)</span></span>;</td></tr>
+<tr><td class="num" id="LN777">777</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN778">778</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN779">779</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN780">780</td><td class="line">		<span class='keyword'>if</span> (!algorithm.algorithm-&gt;length)</td></tr>
+<tr><td class="num" id="LN781">781</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN782">782</td><td class="line">			<span class='macro'>CCA4758err(CCA4758_F_CCA_RSA_SIGN,<span class='expansion'>ERR_CCA4758_error((105),(101),"e_4758cca.c",783)</span></span></td></tr>
+<tr><td class="num" id="LN783">783</td><td class="line">				<span class='macro'>CCA4758_R_ASN1_OID_UNKNOWN_FOR_MD)<span class='expansion'>ERR_CCA4758_error((105),(101),"e_4758cca.c",783)</span></span>;</td></tr>
+<tr><td class="num" id="LN784">784</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN785">785</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN786">786</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN787">787</td><td class="line">		parameter.type = <span class='macro'>V_ASN1_NULL<span class='expansion'>5</span></span>;</td></tr>
+<tr><td class="num" id="LN788">788</td><td class="line">		parameter.value.ptr = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN789">789</td><td class="line">		algorithm.parameter = &amp;parameter;</td></tr>
+<tr><td class="num" id="LN790">790</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN791">791</td><td class="line">		sig.digest = &amp;digest;</td></tr>
+<tr><td class="num" id="LN792">792</td><td class="line">		sig.digest-&gt;data = (<span class='keyword'>unsigned</span> <span class='keyword'>char</span>*)m;</td></tr>
+<tr><td class="num" id="LN793">793</td><td class="line">		sig.digest-&gt;length = m_len;</td></tr>
+<tr><td class="num" id="LN794">794</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN795">795</td><td class="line">		length = i2d_X509_SIG(&amp;sig, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>);</td></tr>
+<tr><td class="num" id="LN796">796</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN797">797</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN798">798</td><td class="line">	keyLength = RSA_size(rsa);</td></tr>
+<tr><td class="num" id="LN799">799</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN800">800</td><td class="line">	<span class='keyword'>if</span> (length - <span class='macro'>RSA_PKCS1_PADDING<span class='expansion'>1</span></span> &gt; keyLength)</td></tr>
+<tr><td class="num" id="LN801">801</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN802">802</td><td class="line">		<span class='macro'>CCA4758err(CCA4758_F_CCA_RSA_SIGN,<span class='expansion'>ERR_CCA4758_error((105),(107),"e_4758cca.c",803)</span></span></td></tr>
+<tr><td class="num" id="LN803">803</td><td class="line">			<span class='macro'>CCA4758_R_SIZE_TOO_LARGE_OR_TOO_SMALL)<span class='expansion'>ERR_CCA4758_error((105),(107),"e_4758cca.c",803)</span></span>;</td></tr>
+<tr><td class="num" id="LN804">804</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN805">805</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN806">806</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN807">807</td><td class="line">	<span class='keyword'>switch</span> (type)</td></tr>
+<tr><td class="num" id="LN808">808</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN809">809</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>NID_md5_sha1<span class='expansion'>114</span></span> :</td></tr>
+<tr><td class="num" id="LN810">810</td><td class="line">			<span class='keyword'>if</span> (m_len != <span class='macro'>SSL_SIG_LEN<span class='expansion'>36</span></span>)</td></tr>
+<tr><td class="num" id="LN811">811</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN812">812</td><td class="line">				<span class='macro'>CCA4758err(CCA4758_F_CCA_RSA_SIGN,<span class='expansion'>ERR_CCA4758_error((105),(107),"e_4758cca.c",813)</span></span></td></tr>
+<tr><td class="num" id="LN813">813</td><td class="line">				<span class='macro'>CCA4758_R_SIZE_TOO_LARGE_OR_TOO_SMALL)<span class='expansion'>ERR_CCA4758_error((105),(107),"e_4758cca.c",813)</span></span>;</td></tr>
+<tr><td class="num" id="LN814">814</td><td class="line">				<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN815">815</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN816">816</td><td class="line">			hashBuffer = (<span class='keyword'>unsigned</span> <span class='keyword'>char</span>*)m;</td></tr>
+<tr><td class="num" id="LN817">817</td><td class="line">			length = m_len;</td></tr>
+<tr><td class="num" id="LN818">818</td><td class="line">			<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN819">819</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>NID_md5<span class='expansion'>4</span></span> :</td></tr>
+<tr><td class="num" id="LN820">820</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN821">821</td><td class="line">			<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *ptr;</td></tr>
+<tr><td class="num" id="LN822">822</td><td class="line">			ptr = hashBuffer = <span class='macro'>OPENSSL_malloc(<span class='expansion'>CRYPTO_malloc((int)(unsigned int)keyLength+1,"e_4758cca.c",823<br>)</span></span></td></tr>
+<tr><td class="num" id="LN823">823</td><td class="line">					<span class='macro'>(<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)keyLength+1)<span class='expansion'>CRYPTO_malloc((int)(unsigned int)keyLength+1,"e_4758cca.c",823<br>)</span></span>;</td></tr>
+<tr><td class="num" id="LN824">824</td><td class="line">			<span class='keyword'>if</span> (!hashBuffer)</td></tr>
+<tr><td class="num" id="LN825">825</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN826">826</td><td class="line">				<span class='macro'>CCA4758err(CCA4758_F_CCA_RSA_SIGN,<span class='expansion'>ERR_CCA4758_error((105),((1|64)),"e_4758cca.c",827)</span></span></td></tr>
+<tr><td class="num" id="LN827">827</td><td class="line">						<span class='macro'>ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_CCA4758_error((105),((1|64)),"e_4758cca.c",827)</span></span>;</td></tr>
+<tr><td class="num" id="LN828">828</td><td class="line">				<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN829">829</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN830">830</td><td class="line">			i2d_X509_SIG(&amp;sig, &amp;ptr);</td></tr>
+<tr><td class="num" id="LN831">831</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN832">832</td><td class="line">			<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN833">833</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>NID_sha1<span class='expansion'>64</span></span> :</td></tr>
+<tr><td class="num" id="LN834">834</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN835">835</td><td class="line">			<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *ptr;</td></tr>
+<tr><td class="num" id="LN836">836</td><td class="line">			ptr = hashBuffer = <span class='macro'>OPENSSL_malloc(<span class='expansion'>CRYPTO_malloc((int)(unsigned int)keyLength+1,"e_4758cca.c",837<br>)</span></span></td></tr>
+<tr><td class="num" id="LN837">837</td><td class="line">					<span class='macro'>(<span class='keyword'>unsigned</span> <span class='keyword'>int</span>)keyLength+1)<span class='expansion'>CRYPTO_malloc((int)(unsigned int)keyLength+1,"e_4758cca.c",837<br>)</span></span>;</td></tr>
+<tr><td class="num" id="LN838">838</td><td class="line">			<span class='keyword'>if</span> (!hashBuffer)</td></tr>
+<tr><td class="num" id="LN839">839</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN840">840</td><td class="line">				<span class='macro'>CCA4758err(CCA4758_F_CCA_RSA_SIGN,<span class='expansion'>ERR_CCA4758_error((105),((1|64)),"e_4758cca.c",841)</span></span></td></tr>
+<tr><td class="num" id="LN841">841</td><td class="line">						<span class='macro'>ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_CCA4758_error((105),((1|64)),"e_4758cca.c",841)</span></span>;</td></tr>
+<tr><td class="num" id="LN842">842</td><td class="line">				<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN843">843</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN844">844</td><td class="line">			i2d_X509_SIG(&amp;sig, &amp;ptr);</td></tr>
+<tr><td class="num" id="LN845">845</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN846">846</td><td class="line">			<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN847">847</td><td class="line">		<span class='keyword'>default</span>:</td></tr>
+<tr><td class="num" id="LN848">848</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN849">849</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN850">850</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN851">851</td><td class="line">	digitalSignatureGenerate(&amp;returnCode, &amp;reasonCode, &amp;exitDataLength,</td></tr>
+<tr><td class="num" id="LN852">852</td><td class="line">		exitData, &amp;ruleArrayLength, ruleArray, &amp;keyTokenLength,</td></tr>
+<tr><td class="num" id="LN853">853</td><td class="line">		keyToken, &amp;length, hashBuffer, &amp;outputLength, &amp;outputBitLength,</td></tr>
+<tr><td class="num" id="LN854">854</td><td class="line">		sigret);</td></tr>
+<tr><td class="num" id="LN855">855</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN856">856</td><td class="line">	<span class='keyword'>if</span> (type == <span class='macro'>NID_sha1<span class='expansion'>64</span></span> || type == <span class='macro'>NID_md5<span class='expansion'>4</span></span>)</td></tr>
+<tr><td class="num" id="LN857">857</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN858">858</td><td class="line">		OPENSSL_cleanse(hashBuffer, keyLength+1);</td></tr>
+<tr><td class="num" id="LN859">859</td><td class="line">		<span class='macro'>OPENSSL_free(hashBuffer)<span class='expansion'>CRYPTO_free(hashBuffer)</span></span>;</td></tr>
+<tr><td class="num" id="LN860">860</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN861">861</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN862">862</td><td class="line">	*siglen = outputLength;</td></tr>
+<tr><td class="num" id="LN863">863</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN864">864</td><td class="line">	<span class='keyword'>return</span> ((returnCode || reasonCode) ? 0 : 1);</td></tr>
+<tr><td class="num" id="LN865">865</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN866">866</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN867">867</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> getModulusAndExponent(<span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span>*token, <span class='keyword'>long</span> *exponentLength,</td></tr>
+<tr><td class="num" id="LN868">868</td><td class="line">		<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *exponent, <span class='keyword'>long</span> *modulusLength, <span class='keyword'>long</span> *modulusFieldLength,</td></tr>
+<tr><td class="num" id="LN869">869</td><td class="line">		<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *modulus)</td></tr>
+<tr><td class="num" id="LN870">870</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN871">871</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>long</span> len;</td></tr>
+<tr><td class="num" id="LN872">872</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN873">873</td><td class="line">	<span class='keyword'>if</span> (*token++ != (<span class='keyword'>char</span>)0x1E) <span class='comment'>/* internal PKA token? */</span></td></tr>
+<tr><td class="num" id="LN874">874</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN875">875</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN876">876</td><td class="line">	<span class='keyword'>if</span> (*token++) <span class='comment'>/* token version must be zero */</span></td></tr>
+<tr><td class="num" id="LN877">877</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN878">878</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN879">879</td><td class="line">	len = *token++;</td></tr>
+<tr><td class="num" id="LN880">880</td><td class="line">	len = len &lt;&lt; 8;</td></tr>
+<tr><td class="num" id="LN881">881</td><td class="line">	len |= (<span class='keyword'>unsigned</span> <span class='keyword'>char</span>)*token++;</td></tr>
+<tr><td class="num" id="LN882">882</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN883">883</td><td class="line">	token += 4; <span class='comment'>/* skip reserved bytes */</span></td></tr>
+<tr><td class="num" id="LN884">884</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN885">885</td><td class="line">	<span class='keyword'>if</span> (*token++ == (<span class='keyword'>char</span>)0x04)</td></tr>
+<tr><td class="num" id="LN886">886</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN887">887</td><td class="line">		<span class='keyword'>if</span> (*token++) <span class='comment'>/* token version must be zero */</span></td></tr>
+<tr><td class="num" id="LN888">888</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN889">889</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN890">890</td><td class="line">		len = *token++;</td></tr>
+<tr><td class="num" id="LN891">891</td><td class="line">		len = len &lt;&lt; 8;</td></tr>
+<tr><td class="num" id="LN892">892</td><td class="line">		len |= <span class="mrange">(<span class='keyword'>unsigned</span> <span class='keyword'>char</span>)*token++</span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgEvent" style="margin-left:17ex">Value stored to 'len' is never read</div></td></tr>
+<tr><td class="num" id="LN893">893</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN894">894</td><td class="line">		token+=2; <span class='comment'>/* skip reserved section */</span></td></tr>
+<tr><td class="num" id="LN895">895</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN896">896</td><td class="line">		len = *token++;</td></tr>
+<tr><td class="num" id="LN897">897</td><td class="line">		len = len &lt;&lt; 8;</td></tr>
+<tr><td class="num" id="LN898">898</td><td class="line">		len |= (<span class='keyword'>unsigned</span> <span class='keyword'>char</span>)*token++;</td></tr>
+<tr><td class="num" id="LN899">899</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN900">900</td><td class="line">		*exponentLength = len;</td></tr>
+<tr><td class="num" id="LN901">901</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN902">902</td><td class="line">		len = *token++;</td></tr>
+<tr><td class="num" id="LN903">903</td><td class="line">		len = len &lt;&lt; 8;</td></tr>
+<tr><td class="num" id="LN904">904</td><td class="line">		len |= (<span class='keyword'>unsigned</span> <span class='keyword'>char</span>)*token++;</td></tr>
+<tr><td class="num" id="LN905">905</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN906">906</td><td class="line">		*modulusLength = len;</td></tr>
+<tr><td class="num" id="LN907">907</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN908">908</td><td class="line">		len = *token++;</td></tr>
+<tr><td class="num" id="LN909">909</td><td class="line">		len = len &lt;&lt; 8;</td></tr>
+<tr><td class="num" id="LN910">910</td><td class="line">		len |= (<span class='keyword'>unsigned</span> <span class='keyword'>char</span>)*token++;</td></tr>
+<tr><td class="num" id="LN911">911</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN912">912</td><td class="line">		*modulusFieldLength = len;</td></tr>
+<tr><td class="num" id="LN913">913</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN914">914</td><td class="line">		<span class='macro'>memcpy(exponent, token, *exponentLength)<span class='expansion'>__builtin___memcpy_chk (exponent, token, *exponentLength, __builtin_object_size<br> (exponent, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN915">915</td><td class="line">		token+= *exponentLength;</td></tr>
+<tr><td class="num" id="LN916">916</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN917">917</td><td class="line">		<span class='macro'>memcpy(modulus, token, *modulusFieldLength)<span class='expansion'>__builtin___memcpy_chk (modulus, token, *modulusFieldLength, __builtin_object_size<br> (modulus, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN918">918</td><td class="line">		<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN919">919</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN920">920</td><td class="line">	<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN921">921</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN922">922</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN923">923</td><td class="line"><span class='directive'>#endif /* OPENSSL_NO_RSA */</span></td></tr>
+<tr><td class="num" id="LN924">924</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN925">925</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> cca_random_status(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN926">926</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN927">927</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN928">928</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN929">929</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN930">930</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> cca_get_random_bytes(<span class='keyword'>unsigned</span> <span class='keyword'>char</span>* buf, <span class='keyword'>int</span> num)</td></tr>
+<tr><td class="num" id="LN931">931</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN932">932</td><td class="line">	<span class='keyword'>long</span> ret_code;</td></tr>
+<tr><td class="num" id="LN933">933</td><td class="line">	<span class='keyword'>long</span> reason_code;</td></tr>
+<tr><td class="num" id="LN934">934</td><td class="line">	<span class='keyword'>long</span> exit_data_length;</td></tr>
+<tr><td class="num" id="LN935">935</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> exit_data[4];</td></tr>
+<tr><td class="num" id="LN936">936</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> form[] = <span class='string_literal'>"RANDOM  "</span>;</td></tr>
+<tr><td class="num" id="LN937">937</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> rand_buf[8];</td></tr>
+<tr><td class="num" id="LN938">938</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN939">939</td><td class="line">	<span class='keyword'>while</span>(num &gt;= (<span class='keyword'>int</span>)<span class='keyword'>sizeof</span>(rand_buf))</td></tr>
+<tr><td class="num" id="LN940">940</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN941">941</td><td class="line">		randomNumberGenerate(&amp;ret_code, &amp;reason_code, &amp;exit_data_length,</td></tr>
+<tr><td class="num" id="LN942">942</td><td class="line">			exit_data, form, rand_buf);</td></tr>
+<tr><td class="num" id="LN943">943</td><td class="line">		<span class='keyword'>if</span> (ret_code)</td></tr>
+<tr><td class="num" id="LN944">944</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN945">945</td><td class="line">		num -= <span class='keyword'>sizeof</span>(rand_buf);</td></tr>
+<tr><td class="num" id="LN946">946</td><td class="line">		<span class='macro'>memcpy(buf, rand_buf, <span class='keyword'>sizeof</span>(rand_buf))<span class='expansion'>__builtin___memcpy_chk (buf, rand_buf, sizeof(rand_buf), __builtin_object_size<br> (buf, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN947">947</td><td class="line">		buf += <span class='keyword'>sizeof</span>(rand_buf);</td></tr>
+<tr><td class="num" id="LN948">948</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN949">949</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN950">950</td><td class="line">	<span class='keyword'>if</span> (num)</td></tr>
+<tr><td class="num" id="LN951">951</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN952">952</td><td class="line">		randomNumberGenerate(&amp;ret_code, &amp;reason_code, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,</td></tr>
+<tr><td class="num" id="LN953">953</td><td class="line">			form, rand_buf);</td></tr>
+<tr><td class="num" id="LN954">954</td><td class="line">		<span class='keyword'>if</span> (ret_code)</td></tr>
+<tr><td class="num" id="LN955">955</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN956">956</td><td class="line">		<span class='macro'>memcpy(buf, rand_buf, num)<span class='expansion'>__builtin___memcpy_chk (buf, rand_buf, num, __builtin_object_size<br> (buf, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN957">957</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN958">958</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN959">959</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN960">960</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN961">961</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN962">962</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN963">963</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>void</span> cca_ex_free(<span class='keyword'>void</span> *obj, <span class='keyword'>void</span> *item, CRYPTO_EX_DATA *ad, <span class='keyword'>int</span> idx,</td></tr>
+<tr><td class="num" id="LN964">964</td><td class="line">		<span class='keyword'>long</span> argl, <span class='keyword'>void</span> *argp)</td></tr>
+<tr><td class="num" id="LN965">965</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN966">966</td><td class="line">	<span class='keyword'>if</span> (item)</td></tr>
+<tr><td class="num" id="LN967">967</td><td class="line">		<span class='macro'>OPENSSL_free(item)<span class='expansion'>CRYPTO_free(item)</span></span>;</td></tr>
+<tr><td class="num" id="LN968">968</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN969">969</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN970">970</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN971">971</td><td class="line"><span class='comment'>/* Goo to handle building as a dynamic engine */</span></td></tr>
+<tr><td class="num" id="LN972">972</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_DYNAMIC_ENGINE</span> </td></tr>
+<tr><td class="num" id="LN973">973</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> bind_fn(ENGINE *e, <span class='keyword'>const</span> <span class='keyword'>char</span> *id)</td></tr>
+<tr><td class="num" id="LN974">974</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN975">975</td><td class="line">	<span class='keyword'>if</span>(id &amp;&amp; (strcmp(id, engine_4758_cca_id) != 0) &amp;&amp;</td></tr>
+<tr><td class="num" id="LN976">976</td><td class="line">			(strcmp(id, engine_4758_cca_id_alt) != 0))</td></tr>
+<tr><td class="num" id="LN977">977</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN978">978</td><td class="line">	<span class='keyword'>if</span>(!bind_helper(e))</td></tr>
+<tr><td class="num" id="LN979">979</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN980">980</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN981">981</td><td class="line">	}       </td></tr>
+<tr><td class="num" id="LN982">982</td><td class="line"><span class='macro'>IMPLEMENT_DYNAMIC_CHECK_FN()<span class='expansion'>extern unsigned long v_check(unsigned long v); extern unsigned<br> long v_check(unsigned long v) { if(v &gt;= (unsigned long)0x00020000<br>) return (unsigned long)0x00020000; return 0; }</span></span></td></tr>
+<tr><td class="num" id="LN983">983</td><td class="line"><span class='macro'>IMPLEMENT_DYNAMIC_BIND_FN(bind_fn)<span class='expansion'>extern int bind_engine(ENGINE *e, const char *id, const dynamic_fns<br> *fns); extern int bind_engine(ENGINE *e, const char *id, const<br> dynamic_fns *fns) { if(ENGINE_get_static_state() == fns-&gt;<br>static_state) goto skip_cbs; if(!CRYPTO_set_mem_functions(fns<br>-&gt;mem_fns.malloc_cb, fns-&gt;mem_fns.realloc_cb, fns-&gt;mem_fns<br>.free_cb)) return 0; CRYPTO_set_locking_callback(fns-&gt;lock_fns<br>.lock_locking_cb); CRYPTO_set_add_lock_callback(fns-&gt;lock_fns<br>.lock_add_lock_cb); CRYPTO_set_dynlock_create_callback(fns-&gt;<br>lock_fns.dynlock_create_cb); CRYPTO_set_dynlock_lock_callback<br>(fns-&gt;lock_fns.dynlock_lock_cb); CRYPTO_set_dynlock_destroy_callback<br>(fns-&gt;lock_fns.dynlock_destroy_cb); if(!CRYPTO_set_ex_data_implementation<br>(fns-&gt;ex_data_fns)) return 0; if(!ERR_set_implementation(fns<br>-&gt;err_fns)) return 0; skip_cbs: if(!bind_fn(e,id)) return 0<br>; return 1; }</span></span></td></tr>
+<tr><td class="num" id="LN984">984</td><td class="line"><span class='directive'>#endif /* OPENSSL_NO_DYNAMIC_ENGINE */</span></td></tr>
+<tr><td class="num" id="LN985">985</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN986">986</td><td class="line"><span class='directive'>#endif /* !OPENSSL_NO_HW_4758_CCA */</span></td></tr>
+<tr><td class="num" id="LN987">987</td><td class="line"><span class='directive'>#endif /* !OPENSSL_NO_HW */</span></td></tr>
+</table></body></html>

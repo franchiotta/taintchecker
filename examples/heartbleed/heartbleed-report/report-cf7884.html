@@ -1,0 +1,209 @@
+<!doctype html>
+<html>
+<head>
+<title>i_cfb64.c</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC Value stored to 'v0' is never read -->
+
+<!-- BUGTYPE Dead assignment -->
+
+<!-- BUGCATEGORY Dead store -->
+
+<!-- BUGFILE /Users/fran/Desktop/openssl-1.0.1f/crypto/idea/i_cfb64.c -->
+
+<!-- FILENAME i_cfb64.c -->
+
+<!-- FUNCTIONNAME idea_cfb64_encrypt -->
+
+<!-- BUGLINE 119 -->
+
+<!-- BUGCOLUMN 2 -->
+
+<!-- BUGPATHLENGTH 1 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>crypto/idea/i_cfb64.c</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 119, column 2</a></td></tr>
+<tr><td class="rowname">Description:</td><td>Value stored to 'v0' is never read</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/* crypto/idea/i_cfb64.c */</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>/* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"> <span class='comment'>* All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"> <span class='comment'>* This package is an SSL implementation written</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"> <span class='comment'>* by Eric Young (eay@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"> <span class='comment'>* The implementation was written so as to conform with Netscapes SSL.</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"> <span class='comment'>* This library is free for commercial and non-commercial use as long as</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"> <span class='comment'>* the following conditions are aheared to.  The following conditions</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"> <span class='comment'>* apply to all code found in this distribution, be it the RC4, RSA,</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"> <span class='comment'>* lhash, DES, etc., code; not just the SSL code.  The SSL documentation</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"> <span class='comment'>* included with this distribution is covered by the same copyright terms</span></td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"> <span class='comment'>* except that the holder is Tim Hudson (tjh@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"> <span class='comment'>* Copyright remains Eric Young's, and as such any Copyright notices in</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"> <span class='comment'>* the code are not to be removed.</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"> <span class='comment'>* If this package is used in a product, Eric Young should be given attribution</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"> <span class='comment'>* as the author of the parts of the library used.</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"> <span class='comment'>* This can be in the form of a textual message at program startup or</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"> <span class='comment'>* in documentation (online or textual) provided with the package.</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"> <span class='comment'>* Redistribution and use in source and binary forms, with or without</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"> <span class='comment'>* modification, are permitted provided that the following conditions</span></td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"> <span class='comment'>* are met:</span></td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"> <span class='comment'>* 1. Redistributions of source code must retain the copyright</span></td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer.</span></td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"> <span class='comment'>* 2. Redistributions in binary form must reproduce the above copyright</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer in the</span></td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"> <span class='comment'>*    documentation and/or other materials provided with the distribution.</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"> <span class='comment'>* 3. All advertising materials mentioning features or use of this software</span></td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> <span class='comment'>*    must display the following acknowledgement:</span></td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"> <span class='comment'>*    "This product includes cryptographic software written by</span></td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"> <span class='comment'>*     Eric Young (eay@cryptsoft.com)"</span></td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"> <span class='comment'>*    The word 'cryptographic' can be left out if the rouines from the library</span></td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line"> <span class='comment'>*    being used are not cryptographic related :-).</span></td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line"> <span class='comment'>* 4. If you include any Windows specific code (or a derivative thereof) from</span> </td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line"> <span class='comment'>*    the apps directory (application code) you must include an acknowledgement:</span></td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line"> <span class='comment'>*    "This product includes software written by Tim Hudson (tjh@cryptsoft.com)"</span></td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line"> <span class='comment'>* THIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND</span></td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line"> <span class='comment'>* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span></td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line"> <span class='comment'>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span></td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line"> <span class='comment'>* ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE</span></td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line"> <span class='comment'>* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span></td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line"> <span class='comment'>* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span></td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line"> <span class='comment'>* OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span></td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line"> <span class='comment'>* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span></td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line"> <span class='comment'>* LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY</span></td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line"> <span class='comment'>* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF</span></td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line"> <span class='comment'>* SUCH DAMAGE.</span></td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line"> <span class='comment'>* The licence and distribution terms for any publically available version or</span></td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line"> <span class='comment'>* derivative of this code cannot be changed.  i.e. this code cannot simply be</span></td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line"> <span class='comment'>* copied and put under another distribution licence</span></td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line"> <span class='comment'>* [including the GNU Public Licence.]</span></td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line"><span class='directive'>#include &lt;openssl/idea.h&gt;</span></td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line"><span class='directive'>#include "idea_lcl.h"</span></td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line"><span class='comment'>/* The input and output encrypted as though 64bit cfb mode is being</span></td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line"> <span class='comment'>* used.  The extra state information to record how much of the</span></td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line"> <span class='comment'>* 64bit block we have used is contained in *num;</span></td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line"><span class='keyword'>void</span> idea_cfb64_encrypt(<span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *in, <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *out,</td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line">			<span class='keyword'>long</span> length, IDEA_KEY_SCHEDULE *schedule,</td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line">			<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *ivec, <span class='keyword'>int</span> *num, <span class='keyword'>int</span> encrypt)</td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line">	<span class='keyword'>register</span> <span class='keyword'>unsigned</span> <span class='keyword'>long</span> v0,v1,t;</td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line">	<span class='keyword'>register</span> <span class='keyword'>int</span> n= *num;</td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line">	<span class='keyword'>register</span> <span class='keyword'>long</span> l=length;</td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>long</span> ti[2];</td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *iv,c,cc;</td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line">	iv=(<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *)ivec;</td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line">	<span class='keyword'>if</span> (encrypt)</td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line">		<span class='keyword'>while</span> (l--)</td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line">			<span class='keyword'>if</span> (n == 0)</td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line">				<span class='macro'>n2l(iv,v0)<span class='expansion'>(v0 =((unsigned long)(*((iv)++)))&lt;&lt;24L, v0|=((unsigned long<br>)(*((iv)++)))&lt;&lt;16L, v0|=((unsigned long)(*((iv)++)))&lt;&lt;<br> 8L, v0|=((unsigned long)(*((iv)++))))</span></span>; ti[0]=v0;</td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line">				<span class='macro'>n2l(iv,v1)<span class='expansion'>(v1 =((unsigned long)(*((iv)++)))&lt;&lt;24L, v1|=((unsigned long<br>)(*((iv)++)))&lt;&lt;16L, v1|=((unsigned long)(*((iv)++)))&lt;&lt;<br> 8L, v1|=((unsigned long)(*((iv)++))))</span></span>; ti[1]=v1;</td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line">				idea_encrypt((<span class='keyword'>unsigned</span> <span class='keyword'>long</span> *)ti,schedule);</td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line">				iv=(<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *)ivec;</td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line">				t=ti[0]; <span class='macro'>l2n(t,iv)<span class='expansion'>(*((iv)++)=(unsigned char)(((t)&gt;&gt;24L)&amp;0xff), *((iv)<br>++)=(unsigned char)(((t)&gt;&gt;16L)&amp;0xff), *((iv)++)=(unsigned<br> char)(((t)&gt;&gt; 8L)&amp;0xff), *((iv)++)=(unsigned char)(<br>((t) )&amp;0xff))</span></span>;</td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line">				t=ti[1]; <span class='macro'>l2n(t,iv)<span class='expansion'>(*((iv)++)=(unsigned char)(((t)&gt;&gt;24L)&amp;0xff), *((iv)<br>++)=(unsigned char)(((t)&gt;&gt;16L)&amp;0xff), *((iv)++)=(unsigned<br> char)(((t)&gt;&gt; 8L)&amp;0xff), *((iv)++)=(unsigned char)(<br>((t) )&amp;0xff))</span></span>;</td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line">				iv=(<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *)ivec;</td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line">			c= *(in++)^iv[n];</td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">			*(out++)=c;</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line">			iv[n]=c;</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line">			n=(n+1)&amp;0x07;</td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line">		<span class='keyword'>while</span> (l--)</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line">			<span class='keyword'>if</span> (n == 0)</td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line">				<span class='macro'>n2l(iv,v0)<span class='expansion'>(v0 =((unsigned long)(*((iv)++)))&lt;&lt;24L, v0|=((unsigned long<br>)(*((iv)++)))&lt;&lt;16L, v0|=((unsigned long)(*((iv)++)))&lt;&lt;<br> 8L, v0|=((unsigned long)(*((iv)++))))</span></span>; ti[0]=v0;</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line">				<span class='macro'>n2l(iv,v1)<span class='expansion'>(v1 =((unsigned long)(*((iv)++)))&lt;&lt;24L, v1|=((unsigned long<br>)(*((iv)++)))&lt;&lt;16L, v1|=((unsigned long)(*((iv)++)))&lt;&lt;<br> 8L, v1|=((unsigned long)(*((iv)++))))</span></span>; ti[1]=v1;</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line">				idea_encrypt((<span class='keyword'>unsigned</span> <span class='keyword'>long</span> *)ti,schedule);</td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line">				iv=(<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *)ivec;</td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line">				t=ti[0]; <span class='macro'>l2n(t,iv)<span class='expansion'>(*((iv)++)=(unsigned char)(((t)&gt;&gt;24L)&amp;0xff), *((iv)<br>++)=(unsigned char)(((t)&gt;&gt;16L)&amp;0xff), *((iv)++)=(unsigned<br> char)(((t)&gt;&gt; 8L)&amp;0xff), *((iv)++)=(unsigned char)(<br>((t) )&amp;0xff))</span></span>;</td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">				t=ti[1]; <span class='macro'>l2n(t,iv)<span class='expansion'>(*((iv)++)=(unsigned char)(((t)&gt;&gt;24L)&amp;0xff), *((iv)<br>++)=(unsigned char)(((t)&gt;&gt;16L)&amp;0xff), *((iv)++)=(unsigned<br> char)(((t)&gt;&gt; 8L)&amp;0xff), *((iv)++)=(unsigned char)(<br>((t) )&amp;0xff))</span></span>;</td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line">				iv=(<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *)ivec;</td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line">			cc= *(in++);</td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line">			c=iv[n];</td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">			iv[n]=cc;</td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line">			*(out++)=c^cc;</td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line">			n=(n+1)&amp;0x07;</td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line">	v0=<span class="mrange">v1=ti[0]=ti[1]=t=c=cc=0</span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgEvent" style="margin-left:9ex">Value stored to 'v0' is never read</div></td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line">	*num=n;</td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line"> </td></tr>
+</table></body></html>

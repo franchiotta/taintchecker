@@ -1,0 +1,465 @@
+<!doctype html>
+<html>
+<head>
+<title>bn_print.c</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC Value stored to 'i' is never read -->
+
+<!-- BUGTYPE Dead assignment -->
+
+<!-- BUGCATEGORY Dead store -->
+
+<!-- BUGFILE /Users/fran/Desktop/openssl-1.0.1f/crypto/bn/bn_print.c -->
+
+<!-- FILENAME bn_print.c -->
+
+<!-- FUNCTIONNAME BN_bn2dec -->
+
+<!-- BUGLINE 140 -->
+
+<!-- BUGCOLUMN 3 -->
+
+<!-- BUGPATHLENGTH 1 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>crypto/bn/bn_print.c</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 140, column 3</a></td></tr>
+<tr><td class="rowname">Description:</td><td>Value stored to 'i' is never read</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/* crypto/bn/bn_print.c */</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>/* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"> <span class='comment'>* All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"> <span class='comment'>* This package is an SSL implementation written</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"> <span class='comment'>* by Eric Young (eay@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"> <span class='comment'>* The implementation was written so as to conform with Netscapes SSL.</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"> <span class='comment'>* This library is free for commercial and non-commercial use as long as</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"> <span class='comment'>* the following conditions are aheared to.  The following conditions</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"> <span class='comment'>* apply to all code found in this distribution, be it the RC4, RSA,</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"> <span class='comment'>* lhash, DES, etc., code; not just the SSL code.  The SSL documentation</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"> <span class='comment'>* included with this distribution is covered by the same copyright terms</span></td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"> <span class='comment'>* except that the holder is Tim Hudson (tjh@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"> <span class='comment'>* Copyright remains Eric Young's, and as such any Copyright notices in</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"> <span class='comment'>* the code are not to be removed.</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"> <span class='comment'>* If this package is used in a product, Eric Young should be given attribution</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"> <span class='comment'>* as the author of the parts of the library used.</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"> <span class='comment'>* This can be in the form of a textual message at program startup or</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"> <span class='comment'>* in documentation (online or textual) provided with the package.</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"> <span class='comment'>* Redistribution and use in source and binary forms, with or without</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"> <span class='comment'>* modification, are permitted provided that the following conditions</span></td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"> <span class='comment'>* are met:</span></td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"> <span class='comment'>* 1. Redistributions of source code must retain the copyright</span></td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer.</span></td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"> <span class='comment'>* 2. Redistributions in binary form must reproduce the above copyright</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer in the</span></td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"> <span class='comment'>*    documentation and/or other materials provided with the distribution.</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"> <span class='comment'>* 3. All advertising materials mentioning features or use of this software</span></td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> <span class='comment'>*    must display the following acknowledgement:</span></td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"> <span class='comment'>*    "This product includes cryptographic software written by</span></td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"> <span class='comment'>*     Eric Young (eay@cryptsoft.com)"</span></td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"> <span class='comment'>*    The word 'cryptographic' can be left out if the rouines from the library</span></td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line"> <span class='comment'>*    being used are not cryptographic related :-).</span></td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line"> <span class='comment'>* 4. If you include any Windows specific code (or a derivative thereof) from</span> </td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line"> <span class='comment'>*    the apps directory (application code) you must include an acknowledgement:</span></td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line"> <span class='comment'>*    "This product includes software written by Tim Hudson (tjh@cryptsoft.com)"</span></td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line"> <span class='comment'>* THIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND</span></td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line"> <span class='comment'>* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span></td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line"> <span class='comment'>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span></td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line"> <span class='comment'>* ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE</span></td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line"> <span class='comment'>* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span></td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line"> <span class='comment'>* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span></td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line"> <span class='comment'>* OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span></td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line"> <span class='comment'>* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span></td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line"> <span class='comment'>* LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY</span></td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line"> <span class='comment'>* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF</span></td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line"> <span class='comment'>* SUCH DAMAGE.</span></td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line"> <span class='comment'>* The licence and distribution terms for any publically available version or</span></td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line"> <span class='comment'>* derivative of this code cannot be changed.  i.e. this code cannot simply be</span></td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line"> <span class='comment'>* copied and put under another distribution licence</span></td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line"> <span class='comment'>* [including the GNU Public Licence.]</span></td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line"><span class='directive'>#include &lt;stdio.h&gt;</span></td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line"><span class='directive'>#include &lt;ctype.h&gt;</span></td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line"><span class='directive'>#include "cryptlib.h"</span></td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line"><span class='directive'>#include &lt;openssl/buffer.h&gt;</span></td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line"><span class='directive'>#include "bn_lcl.h"</span></td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span> Hex[]=<span class='string_literal'>"0123456789ABCDEF"</span>;</td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line"><span class='comment'>/* Must 'OPENSSL_free' the returned data */</span></td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line"><span class='keyword'>char</span> *BN_bn2hex(<span class='keyword'>const</span> BIGNUM *a)</td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line">	<span class='keyword'>int</span> i,j,v,z=0;</td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line">	<span class='keyword'>char</span> *buf;</td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line">	<span class='keyword'>char</span> *p;</td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line">	buf=(<span class='keyword'>char</span> *)<span class='macro'>OPENSSL_malloc(a-&gt;top*BN_BYTES*2+2)<span class='expansion'>CRYPTO_malloc((int)a-&gt;top*8*2+2,"bn_print.c",74)</span></span>;</td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line">	<span class='keyword'>if</span> (buf == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line">		<span class='macro'>BNerr(BN_F_BN_BN2HEX,ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_put_error(3,(105),((1|64)),"bn_print.c",77)</span></span>;</td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line">	p=buf;</td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line">	<span class='keyword'>if</span> (a-&gt;neg) *(p++)='-';</td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>BN_is_zero(a)<span class='expansion'>((a)-&gt;top == 0)</span></span>) *(p++)='0';</td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line">	<span class='keyword'>for</span> (i=a-&gt;top-1; i &gt;=0; i--)</td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line">		<span class='keyword'>for</span> (j=<span class='macro'>BN_BITS2<span class='expansion'>64</span></span>-8; j &gt;= 0; j-=8)</td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line">			<span class='comment'>/* strip leading zeros */</span></td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line">			v=((<span class='keyword'>int</span>)(a-&gt;d[i]&gt;&gt;(<span class='keyword'>long</span>)j))&amp;0xff;</td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line">			<span class='keyword'>if</span> (z || (v != 0))</td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">				*(p++)=Hex[v&gt;&gt;4];</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line">				*(p++)=Hex[v&amp;0x0f];</td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">				z=1;</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">	*p='\0';</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line">	<span class='keyword'>return</span>(buf);</td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line"><span class='comment'>/* Must 'OPENSSL_free' the returned data */</span></td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line"><span class='keyword'>char</span> *BN_bn2dec(<span class='keyword'>const</span> BIGNUM *a)</td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line">	<span class='keyword'>int</span> i=0,num, ok = 0;</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line">	<span class='keyword'>char</span> *buf=<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line">	<span class='keyword'>char</span> *p;</td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line">	BIGNUM *t=<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">	<span class='macro'>BN_ULONG<span class='expansion'>unsigned long</span></span> *bn_data=<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,*lp;</td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line">	<span class='comment'>/* get an upper bound for the length of the decimal integer</span></td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line">	 <span class='comment'>* num &lt;= (BN_num_bits(a) + 1) * log(2)</span></td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line">	 <span class='comment'>*     &lt;= 3 * BN_num_bits(a) * 0.1001 + log(2) + 1     (rounding error)</span></td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">	 <span class='comment'>*     &lt;= BN_num_bits(a)/10 + BN_num_bits/1000 + 1 + 1</span> </td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line">	 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line">	i=BN_num_bits(a)*3;</td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line">	num=(i/10+i/1000+1)+1;</td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line">	bn_data=(<span class='macro'>BN_ULONG<span class='expansion'>unsigned long</span></span> *)<span class='macro'>OPENSSL_malloc((num/BN_DEC_NUM+1)*<span class='keyword'>sizeof</span>(BN_ULONG))<span class='expansion'>CRYPTO_malloc((int)(num/19 +1)*sizeof(unsigned long),"bn_print.c"<br>,118)</span></span>;</td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line">	buf=(<span class='keyword'>char</span> *)<span class='macro'>OPENSSL_malloc(num+3)<span class='expansion'>CRYPTO_malloc((int)num+3,"bn_print.c",119)</span></span>;</td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line">	<span class='keyword'>if</span> ((buf == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) || (bn_data == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>))</td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line">		<span class='macro'>BNerr(BN_F_BN_BN2DEC,ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_put_error(3,(104),((1|64)),"bn_print.c",122)</span></span>;</td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line">	<span class='keyword'>if</span> ((t=BN_dup(a)) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line"><span class='directive'>#define <span class='macro'>BUF_REMAIN<span class='expansion'>(num+3 - (size_t)(p - buf))</span></span> (num+3 - (size_t)(p - buf))</span></td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line">	p=buf;</td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line">	lp=bn_data;</td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>BN_is_zero(t)<span class='expansion'>((t)-&gt;top == 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line">		*(p++)='0';</td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line">		*(p++)='\0';</td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line">		<span class='keyword'>if</span> (<span class='macro'>BN_is_negative(t)<span class='expansion'>((t)-&gt;neg != 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line">			*p++ = '-';</td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line">		i=<span class="mrange">0</span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgEvent" style="margin-left:17ex">Value stored to 'i' is never read</div></td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line">		<span class='keyword'>while</span> (!<span class='macro'>BN_is_zero(t)<span class='expansion'>((t)-&gt;top == 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">			*lp=BN_div_word(t,<span class='macro'>BN_DEC_CONV<span class='expansion'>(10000000000000000000UL)</span></span>);</td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line">			lp++;</td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line">		lp--;</td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line">		<span class='comment'>/* We now have a series of blocks, BN_DEC_NUM chars</span></td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line">		 <span class='comment'>* in length, where the last one needs truncation.</span></td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line">		 <span class='comment'>* The blocks need to be reversed in order. */</span></td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line">		BIO_snprintf(p,<span class='macro'>BUF_REMAIN<span class='expansion'>(num+3 - (size_t)(p - buf))</span></span>,<span class='macro'>BN_DEC_FMT1<span class='expansion'>"%lu"</span></span>,*lp);</td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line">		<span class='keyword'>while</span> (*p) p++;</td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line">		<span class='keyword'>while</span> (lp != bn_data)</td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line">			lp--;</td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line">			BIO_snprintf(p,<span class='macro'>BUF_REMAIN<span class='expansion'>(num+3 - (size_t)(p - buf))</span></span>,<span class='macro'>BN_DEC_FMT2<span class='expansion'>"%019lu"</span></span>,*lp);</td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line">			<span class='keyword'>while</span> (*p) p++;</td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line">	ok = 1;</td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line">	<span class='keyword'>if</span> (bn_data != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) <span class='macro'>OPENSSL_free(bn_data)<span class='expansion'>CRYPTO_free(bn_data)</span></span>;</td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line">	<span class='keyword'>if</span> (t != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) BN_free(t);</td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line">	<span class='keyword'>if</span> (!ok &amp;&amp; buf)</td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line">		<span class='macro'>OPENSSL_free(buf)<span class='expansion'>CRYPTO_free(buf)</span></span>;</td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line">		buf = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line">	<span class='keyword'>return</span>(buf);</td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line"><span class='keyword'>int</span> BN_hex2bn(BIGNUM **bn, <span class='keyword'>const</span> <span class='keyword'>char</span> *a)</td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line">	BIGNUM *ret=<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line">	<span class='macro'>BN_ULONG<span class='expansion'>unsigned long</span></span> l=0;</td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line">	<span class='keyword'>int</span> neg=0,h,m,i,j,k,c;</td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line">	<span class='keyword'>int</span> num;</td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line">	<span class='keyword'>if</span> ((a == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) || (*a == '\0')) <span class='keyword'>return</span>(0);</td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">	<span class='keyword'>if</span> (*a == '-') { neg=1; a++; }</td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line">	<span class='keyword'>for</span> (i=0; isxdigit((<span class='keyword'>unsigned</span> <span class='keyword'>char</span>) a[i]); i++)</td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line">		;</td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line">	num=i+neg;</td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line">	<span class='keyword'>if</span> (bn == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) <span class='keyword'>return</span>(num);</td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line">	<span class='comment'>/* a is the start of the hex digits, and it is 'i' long */</span></td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">	<span class='keyword'>if</span> (*bn == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line">		<span class='keyword'>if</span> ((ret=BN_new()) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) <span class='keyword'>return</span>(0);</td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line">		ret= *bn;</td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line">		<span class='macro'>BN_zero(ret)<span class='expansion'>(BN_set_word((ret),0))</span></span>;</td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line">	<span class='comment'>/* i is the number of hex digests; */</span></td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>bn_expand(ret,i*4)<span class='expansion'>((((((i*4 +64 -1))/64)) &lt;= (ret)-&gt;dmax)? (ret):bn_expand2<br>((ret),(i*4 +64 -1)/64))</span></span> == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line">	j=i; <span class='comment'>/* least significant 'hex' */</span></td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line">	m=0;</td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line">	h=0;</td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line">	<span class='keyword'>while</span> (j &gt; 0)</td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line">		m=((<span class='macro'>BN_BYTES<span class='expansion'>8</span></span>*2) &lt;= j)?(<span class='macro'>BN_BYTES<span class='expansion'>8</span></span>*2):j;</td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line">		l=0;</td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line">		<span class='keyword'>for</span> (;;)</td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line">			c=a[j-m];</td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line">			<span class='keyword'>if</span> ((c &gt;= '0') &amp;&amp; (c &lt;= '9')) k=c-'0';</td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line">			<span class='keyword'>else</span> <span class='keyword'>if</span> ((c &gt;= 'a') &amp;&amp; (c &lt;= 'f')) k=c-'a'+10;</td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line">			<span class='keyword'>else</span> <span class='keyword'>if</span> ((c &gt;= 'A') &amp;&amp; (c &lt;= 'F')) k=c-'A'+10;</td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line">			<span class='keyword'>else</span> k=0; <span class='comment'>/* paranoia */</span></td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line">			l=(l&lt;&lt;4)|k;</td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line">			<span class='keyword'>if</span> (--m &lt;= 0)</td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line">				ret-&gt;d[h++]=l;</td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line">				<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line">		j-=(<span class='macro'>BN_BYTES<span class='expansion'>8</span></span>*2);</td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line">	ret-&gt;top=h;</td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line">	<span class='macro'>bn_correct_top(ret)<span class='expansion'>{ unsigned long *ftl; int tmp_top = (ret)-&gt;top; if (tmp_top<br> &gt; 0) { for (ftl= &amp;((ret)-&gt;d[tmp_top-1]); tmp_top &gt;<br> 0; tmp_top--) if (*(ftl--)) break; (ret)-&gt;top = tmp_top; }<br> ; }</span></span>;</td></tr>
+<tr><td class="num" id="LN229">229</td><td class="line">	ret-&gt;neg=neg;</td></tr>
+<tr><td class="num" id="LN230">230</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN231">231</td><td class="line">	*bn=ret;</td></tr>
+<tr><td class="num" id="LN232">232</td><td class="line">	bn_check_top(ret);</td></tr>
+<tr><td class="num" id="LN233">233</td><td class="line">	<span class='keyword'>return</span>(num);</td></tr>
+<tr><td class="num" id="LN234">234</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN235">235</td><td class="line">	<span class='keyword'>if</span> (*bn == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) BN_free(ret);</td></tr>
+<tr><td class="num" id="LN236">236</td><td class="line">	<span class='keyword'>return</span>(0);</td></tr>
+<tr><td class="num" id="LN237">237</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN238">238</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN239">239</td><td class="line"><span class='keyword'>int</span> BN_dec2bn(BIGNUM **bn, <span class='keyword'>const</span> <span class='keyword'>char</span> *a)</td></tr>
+<tr><td class="num" id="LN240">240</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN241">241</td><td class="line">	BIGNUM *ret=<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN242">242</td><td class="line">	<span class='macro'>BN_ULONG<span class='expansion'>unsigned long</span></span> l=0;</td></tr>
+<tr><td class="num" id="LN243">243</td><td class="line">	<span class='keyword'>int</span> neg=0,i,j;</td></tr>
+<tr><td class="num" id="LN244">244</td><td class="line">	<span class='keyword'>int</span> num;</td></tr>
+<tr><td class="num" id="LN245">245</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN246">246</td><td class="line">	<span class='keyword'>if</span> ((a == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) || (*a == '\0')) <span class='keyword'>return</span>(0);</td></tr>
+<tr><td class="num" id="LN247">247</td><td class="line">	<span class='keyword'>if</span> (*a == '-') { neg=1; a++; }</td></tr>
+<tr><td class="num" id="LN248">248</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN249">249</td><td class="line">	<span class='keyword'>for</span> (i=0; isdigit((<span class='keyword'>unsigned</span> <span class='keyword'>char</span>) a[i]); i++)</td></tr>
+<tr><td class="num" id="LN250">250</td><td class="line">		;</td></tr>
+<tr><td class="num" id="LN251">251</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN252">252</td><td class="line">	num=i+neg;</td></tr>
+<tr><td class="num" id="LN253">253</td><td class="line">	<span class='keyword'>if</span> (bn == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) <span class='keyword'>return</span>(num);</td></tr>
+<tr><td class="num" id="LN254">254</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN255">255</td><td class="line">	<span class='comment'>/* a is the start of the digits, and it is 'i' long.</span></td></tr>
+<tr><td class="num" id="LN256">256</td><td class="line">	 <span class='comment'>* We chop it into BN_DEC_NUM digits at a time */</span></td></tr>
+<tr><td class="num" id="LN257">257</td><td class="line">	<span class='keyword'>if</span> (*bn == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN258">258</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN259">259</td><td class="line">		<span class='keyword'>if</span> ((ret=BN_new()) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) <span class='keyword'>return</span>(0);</td></tr>
+<tr><td class="num" id="LN260">260</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN261">261</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN262">262</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN263">263</td><td class="line">		ret= *bn;</td></tr>
+<tr><td class="num" id="LN264">264</td><td class="line">		<span class='macro'>BN_zero(ret)<span class='expansion'>(BN_set_word((ret),0))</span></span>;</td></tr>
+<tr><td class="num" id="LN265">265</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN266">266</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN267">267</td><td class="line">	<span class='comment'>/* i is the number of digests, a bit of an over expand; */</span></td></tr>
+<tr><td class="num" id="LN268">268</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>bn_expand(ret,i*4)<span class='expansion'>((((((i*4 +64 -1))/64)) &lt;= (ret)-&gt;dmax)? (ret):bn_expand2<br>((ret),(i*4 +64 -1)/64))</span></span> == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN269">269</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN270">270</td><td class="line">	j=<span class='macro'>BN_DEC_NUM<span class='expansion'>19</span></span>-(i%<span class='macro'>BN_DEC_NUM<span class='expansion'>19</span></span>);</td></tr>
+<tr><td class="num" id="LN271">271</td><td class="line">	<span class='keyword'>if</span> (j == <span class='macro'>BN_DEC_NUM<span class='expansion'>19</span></span>) j=0;</td></tr>
+<tr><td class="num" id="LN272">272</td><td class="line">	l=0;</td></tr>
+<tr><td class="num" id="LN273">273</td><td class="line">	<span class='keyword'>while</span> (*a)</td></tr>
+<tr><td class="num" id="LN274">274</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN275">275</td><td class="line">		l*=10;</td></tr>
+<tr><td class="num" id="LN276">276</td><td class="line">		l+= *a-'0';</td></tr>
+<tr><td class="num" id="LN277">277</td><td class="line">		a++;</td></tr>
+<tr><td class="num" id="LN278">278</td><td class="line">		<span class='keyword'>if</span> (++j == <span class='macro'>BN_DEC_NUM<span class='expansion'>19</span></span>)</td></tr>
+<tr><td class="num" id="LN279">279</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN280">280</td><td class="line">			BN_mul_word(ret,<span class='macro'>BN_DEC_CONV<span class='expansion'>(10000000000000000000UL)</span></span>);</td></tr>
+<tr><td class="num" id="LN281">281</td><td class="line">			BN_add_word(ret,l);</td></tr>
+<tr><td class="num" id="LN282">282</td><td class="line">			l=0;</td></tr>
+<tr><td class="num" id="LN283">283</td><td class="line">			j=0;</td></tr>
+<tr><td class="num" id="LN284">284</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN285">285</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN286">286</td><td class="line">	ret-&gt;neg=neg;</td></tr>
+<tr><td class="num" id="LN287">287</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN288">288</td><td class="line">	<span class='macro'>bn_correct_top(ret)<span class='expansion'>{ unsigned long *ftl; int tmp_top = (ret)-&gt;top; if (tmp_top<br> &gt; 0) { for (ftl= &amp;((ret)-&gt;d[tmp_top-1]); tmp_top &gt;<br> 0; tmp_top--) if (*(ftl--)) break; (ret)-&gt;top = tmp_top; }<br> ; }</span></span>;</td></tr>
+<tr><td class="num" id="LN289">289</td><td class="line">	*bn=ret;</td></tr>
+<tr><td class="num" id="LN290">290</td><td class="line">	bn_check_top(ret);</td></tr>
+<tr><td class="num" id="LN291">291</td><td class="line">	<span class='keyword'>return</span>(num);</td></tr>
+<tr><td class="num" id="LN292">292</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN293">293</td><td class="line">	<span class='keyword'>if</span> (*bn == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) BN_free(ret);</td></tr>
+<tr><td class="num" id="LN294">294</td><td class="line">	<span class='keyword'>return</span>(0);</td></tr>
+<tr><td class="num" id="LN295">295</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN296">296</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN297">297</td><td class="line"><span class='keyword'>int</span> BN_asc2bn(BIGNUM **bn, <span class='keyword'>const</span> <span class='keyword'>char</span> *a)</td></tr>
+<tr><td class="num" id="LN298">298</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN299">299</td><td class="line">	<span class='keyword'>const</span> <span class='keyword'>char</span> *p = a;</td></tr>
+<tr><td class="num" id="LN300">300</td><td class="line">	<span class='keyword'>if</span> (*p == '-')</td></tr>
+<tr><td class="num" id="LN301">301</td><td class="line">		p++;</td></tr>
+<tr><td class="num" id="LN302">302</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN303">303</td><td class="line">	<span class='keyword'>if</span> (p[0] == '0' &amp;&amp; (p[1] == 'X' || p[1] == 'x'))</td></tr>
+<tr><td class="num" id="LN304">304</td><td class="line">		{		</td></tr>
+<tr><td class="num" id="LN305">305</td><td class="line">		<span class='keyword'>if</span> (!BN_hex2bn(bn, p + 2))</td></tr>
+<tr><td class="num" id="LN306">306</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN307">307</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN308">308</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN309">309</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN310">310</td><td class="line">		<span class='keyword'>if</span> (!BN_dec2bn(bn, p))</td></tr>
+<tr><td class="num" id="LN311">311</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN312">312</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN313">313</td><td class="line">	<span class='keyword'>if</span> (*a == '-')</td></tr>
+<tr><td class="num" id="LN314">314</td><td class="line">		(*bn)-&gt;neg = 1;</td></tr>
+<tr><td class="num" id="LN315">315</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN316">316</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN317">317</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN318">318</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_BIO</span></td></tr>
+<tr><td class="num" id="LN319">319</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_FP_API</span></td></tr>
+<tr><td class="num" id="LN320">320</td><td class="line"><span class='keyword'>int</span> BN_print_fp(FILE *fp, <span class='keyword'>const</span> BIGNUM *a)</td></tr>
+<tr><td class="num" id="LN321">321</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN322">322</td><td class="line">	BIO *b;</td></tr>
+<tr><td class="num" id="LN323">323</td><td class="line">	<span class='keyword'>int</span> ret;</td></tr>
+<tr><td class="num" id="LN324">324</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN325">325</td><td class="line">	<span class='keyword'>if</span> ((b=BIO_new(BIO_s_file())) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN326">326</td><td class="line">		<span class='keyword'>return</span>(0);</td></tr>
+<tr><td class="num" id="LN327">327</td><td class="line">	<span class='macro'>BIO_set_fp(b,fp,BIO_NOCLOSE)<span class='expansion'>BIO_ctrl(b,106,0x00,(char *)fp)</span></span>;</td></tr>
+<tr><td class="num" id="LN328">328</td><td class="line">	ret=BN_print(b,a);</td></tr>
+<tr><td class="num" id="LN329">329</td><td class="line">	BIO_free(b);</td></tr>
+<tr><td class="num" id="LN330">330</td><td class="line">	<span class='keyword'>return</span>(ret);</td></tr>
+<tr><td class="num" id="LN331">331</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN332">332</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN333">333</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN334">334</td><td class="line"><span class='keyword'>int</span> BN_print(BIO *bp, <span class='keyword'>const</span> BIGNUM *a)</td></tr>
+<tr><td class="num" id="LN335">335</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN336">336</td><td class="line">	<span class='keyword'>int</span> i,j,v,z=0;</td></tr>
+<tr><td class="num" id="LN337">337</td><td class="line">	<span class='keyword'>int</span> ret=0;</td></tr>
+<tr><td class="num" id="LN338">338</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN339">339</td><td class="line">	<span class='keyword'>if</span> ((a-&gt;neg) &amp;&amp; (BIO_write(bp,<span class='string_literal'>"-"</span>,1) != 1)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN340">340</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>BN_is_zero(a)<span class='expansion'>((a)-&gt;top == 0)</span></span> &amp;&amp; (BIO_write(bp,<span class='string_literal'>"0"</span>,1) != 1)) <span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN341">341</td><td class="line">	<span class='keyword'>for</span> (i=a-&gt;top-1; i &gt;=0; i--)</td></tr>
+<tr><td class="num" id="LN342">342</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN343">343</td><td class="line">		<span class='keyword'>for</span> (j=<span class='macro'>BN_BITS2<span class='expansion'>64</span></span>-4; j &gt;= 0; j-=4)</td></tr>
+<tr><td class="num" id="LN344">344</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN345">345</td><td class="line">			<span class='comment'>/* strip leading zeros */</span></td></tr>
+<tr><td class="num" id="LN346">346</td><td class="line">			v=((<span class='keyword'>int</span>)(a-&gt;d[i]&gt;&gt;(<span class='keyword'>long</span>)j))&amp;0x0f;</td></tr>
+<tr><td class="num" id="LN347">347</td><td class="line">			<span class='keyword'>if</span> (z || (v != 0))</td></tr>
+<tr><td class="num" id="LN348">348</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN349">349</td><td class="line">				<span class='keyword'>if</span> (BIO_write(bp,&amp;(Hex[v]),1) != 1)</td></tr>
+<tr><td class="num" id="LN350">350</td><td class="line">					<span class='keyword'>goto</span> end;</td></tr>
+<tr><td class="num" id="LN351">351</td><td class="line">				z=1;</td></tr>
+<tr><td class="num" id="LN352">352</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN353">353</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN354">354</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN355">355</td><td class="line">	ret=1;</td></tr>
+<tr><td class="num" id="LN356">356</td><td class="line">end:</td></tr>
+<tr><td class="num" id="LN357">357</td><td class="line">	<span class='keyword'>return</span>(ret);</td></tr>
+<tr><td class="num" id="LN358">358</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN359">359</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN360">360</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN361">361</td><td class="line"><span class='keyword'>char</span> *BN_options(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN362">362</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN363">363</td><td class="line">	<span class='keyword'>static</span> <span class='keyword'>int</span> init=0;</td></tr>
+<tr><td class="num" id="LN364">364</td><td class="line">	<span class='keyword'>static</span> <span class='keyword'>char</span> data[16];</td></tr>
+<tr><td class="num" id="LN365">365</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN366">366</td><td class="line">	<span class='keyword'>if</span> (!init)</td></tr>
+<tr><td class="num" id="LN367">367</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN368">368</td><td class="line">		init++;</td></tr>
+<tr><td class="num" id="LN369">369</td><td class="line"><span class='directive'>#ifdef BN_LLONG</span></td></tr>
+<tr><td class="num" id="LN370">370</td><td class="line">		BIO_snprintf(data,<span class='keyword'>sizeof</span> data,<span class='string_literal'>"bn(%d,%d)"</span>,</td></tr>
+<tr><td class="num" id="LN371">371</td><td class="line">			     (<span class='keyword'>int</span>)<span class='keyword'>sizeof</span>(<span class='macro'>BN_ULLONG<span class='expansion'>unsigned long long</span></span>)*8,(<span class='keyword'>int</span>)<span class='keyword'>sizeof</span>(<span class='macro'>BN_ULONG<span class='expansion'>unsigned long</span></span>)*8);</td></tr>
+<tr><td class="num" id="LN372">372</td><td class="line"><span class='directive'>#else</span></td></tr>
+<tr><td class="num" id="LN373">373</td><td class="line">		BIO_snprintf(data,<span class='keyword'>sizeof</span> data,<span class='string_literal'>"bn(%d,%d)"</span>,</td></tr>
+<tr><td class="num" id="LN374">374</td><td class="line">			     (<span class='keyword'>int</span>)<span class='keyword'>sizeof</span>(<span class='macro'>BN_ULONG<span class='expansion'>unsigned long</span></span>)*8,(<span class='keyword'>int</span>)<span class='keyword'>sizeof</span>(<span class='macro'>BN_ULONG<span class='expansion'>unsigned long</span></span>)*8);</td></tr>
+<tr><td class="num" id="LN375">375</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN376">376</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN377">377</td><td class="line">	<span class='keyword'>return</span>(data);</td></tr>
+<tr><td class="num" id="LN378">378</td><td class="line">	}</td></tr>
+</table></body></html>

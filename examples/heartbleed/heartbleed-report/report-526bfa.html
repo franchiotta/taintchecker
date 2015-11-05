@@ -1,0 +1,764 @@
+<!doctype html>
+<html>
+<head>
+<title>eng_rsax.c</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC The left operand of '&' is a garbage value -->
+
+<!-- BUGTYPE Result of operation is garbage or undefined -->
+
+<!-- BUGCATEGORY Logic error -->
+
+<!-- BUGFILE /Users/fran/Desktop/openssl-1.0.1f/crypto/engine/eng_rsax.c -->
+
+<!-- FILENAME eng_rsax.c -->
+
+<!-- FUNCTIONNAME e_rsax_rsa_mod_exp -->
+
+<!-- BUGLINE 553 -->
+
+<!-- BUGCOLUMN 3 -->
+
+<!-- BUGPATHLENGTH 8 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>crypto/engine/eng_rsax.c</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 553, column 3</a></td></tr>
+<tr><td class="rowname">Description:</td><td>The left operand of '&' is a garbage value</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/* crypto/engine/eng_rsax.c */</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>/* Copyright (c) 2010-2010 Intel Corp.</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"> <span class='comment'>*   Author: Vinodh.Gopal@intel.com</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"> <span class='comment'>*           Jim Guilford</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"> <span class='comment'>*           Erdinc.Ozturk@intel.com</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"> <span class='comment'>*           Maxim.Perminov@intel.com</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"> <span class='comment'>*           Ying.Huang@intel.com</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"> <span class='comment'>* More information about algorithm used can be found at:</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"> <span class='comment'>*   http://www.cse.buffalo.edu/srds2009/escs2009_submission_Gopal.pdf</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"><span class='comment'>/* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"> <span class='comment'>* Copyright (c) 1999-2001 The OpenSSL Project.  All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> <span class='comment'>* Redistribution and use in source and binary forms, with or without</span></td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"> <span class='comment'>* modification, are permitted provided that the following conditions</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"> <span class='comment'>* are met:</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"> <span class='comment'>* 1. Redistributions of source code must retain the above copyright</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer.</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"> <span class='comment'>* 2. Redistributions in binary form must reproduce the above copyright</span></td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer in</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"> <span class='comment'>*    the documentation and/or other materials provided with the</span></td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"> <span class='comment'>*    distribution.</span></td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"> <span class='comment'>* 3. All advertising materials mentioning features or use of this</span></td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"> <span class='comment'>*    software must display the following acknowledgment:</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"> <span class='comment'>*    "This product includes software developed by the OpenSSL Project</span></td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"> <span class='comment'>*    for use in the OpenSSL Toolkit. (http://www.OpenSSL.org/)"</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> <span class='comment'>* 4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to</span></td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"> <span class='comment'>*    endorse or promote products derived from this software without</span></td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"> <span class='comment'>*    prior written permission. For written permission, please contact</span></td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"> <span class='comment'>*    licensing@OpenSSL.org.</span></td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line"> <span class='comment'>* 5. Products derived from this software may not be called "OpenSSL"</span></td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line"> <span class='comment'>*    nor may "OpenSSL" appear in their names without prior written</span></td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line"> <span class='comment'>*    permission of the OpenSSL Project.</span></td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line"> <span class='comment'>* 6. Redistributions of any form whatsoever must retain the following</span></td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line"> <span class='comment'>*    acknowledgment:</span></td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line"> <span class='comment'>*    "This product includes software developed by the OpenSSL Project</span></td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line"> <span class='comment'>*    for use in the OpenSSL Toolkit (http://www.OpenSSL.org/)"</span></td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line"> <span class='comment'>* THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY</span></td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line"> <span class='comment'>* EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span></td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line"> <span class='comment'>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR</span></td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line"> <span class='comment'>* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR</span></td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line"> <span class='comment'>* ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span></td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line"> <span class='comment'>* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT</span></td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line"> <span class='comment'>* NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span></td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line"> <span class='comment'>* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span></td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line"> <span class='comment'>* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span></td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line"> <span class='comment'>* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)</span></td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line"> <span class='comment'>* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED</span></td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line"> <span class='comment'>* OF THE POSSIBILITY OF SUCH DAMAGE.</span></td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line"> <span class='comment'>* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line"> <span class='comment'>* This product includes cryptographic software written by Eric Young</span></td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line"> <span class='comment'>* (eay@cryptsoft.com).  This product includes software written by Tim</span></td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line"> <span class='comment'>* Hudson (tjh@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line"><span class='directive'>#include &lt;openssl/opensslconf.h&gt;</span></td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line"><span class='directive'>#include &lt;stdio.h&gt;</span></td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line"><span class='directive'>#include &lt;string.h&gt;</span></td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line"><span class='directive'>#include &lt;openssl/crypto.h&gt;</span></td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line"><span class='directive'>#include &lt;openssl/buffer.h&gt;</span></td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line"><span class='directive'>#include &lt;openssl/engine.h&gt;</span></td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line"><span class='directive'>#include &lt;openssl/rsa.h&gt;</span></td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line"><span class='directive'>#include &lt;openssl/bn.h&gt;</span></td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line"><span class='directive'>#include &lt;openssl/err.h&gt;</span></td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line"><span class='comment'>/* RSAX is available **ONLY* on x86_64 CPUs */</span></td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line"><span class='directive'>#undef COMPILE_RSAX</span></td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line"><span class='directive'>#if (defined(<span class='macro'>__x86_64<span class='expansion'>1</span></span>) || defined(<span class='macro'>__x86_64__<span class='expansion'>1</span></span>) || \</span></td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line">     <span class='directive'>defined(_M_AMD64) || defined (_M_X64)) &amp;&amp; !defined(OPENSSL_NO_ASM)</span></td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line"><span class='directive'>#define COMPILE_RSAX</span></td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line"><span class='keyword'>static</span> ENGINE *ENGINE_rsax (<span class='keyword'>void</span>);</td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line"><span class='keyword'>void</span> ENGINE_load_rsax (<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line"><span class='comment'>/* On non-x86 CPUs it just returns. */</span></td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line"><span class='directive'>#ifdef COMPILE_RSAX</span></td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">	ENGINE *toadd = ENGINE_rsax();</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line">	<span class='keyword'>if</span>(!toadd) <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">	ENGINE_add(toadd);</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line">	ENGINE_free(toadd);</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line">	ERR_clear_error();</td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line"><span class='directive'>#ifdef COMPILE_RSAX</span></td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line"><span class='directive'>#define <span class='macro'>E_RSAX_LIB_NAME<span class='expansion'>"rsax engine"</span></span> "rsax engine"</span></td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> e_rsax_destroy(ENGINE *e);</td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> e_rsax_init(ENGINE *e);</td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> e_rsax_finish(ENGINE *e);</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> e_rsax_ctrl(ENGINE *e, <span class='keyword'>int</span> cmd, <span class='keyword'>long</span> i, <span class='keyword'>void</span> *p, <span class='keyword'>void</span> (*f)(<span class='keyword'>void</span>));</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line"><span class='comment'>/* RSA stuff */</span></td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> e_rsax_rsa_mod_exp(BIGNUM *r, <span class='keyword'>const</span> BIGNUM *I, RSA *rsa, BN_CTX *ctx);</td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> e_rsax_rsa_finish(RSA *r);</td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> ENGINE_CMD_DEFN e_rsax_cmd_defns[] = {</td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">	{0, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, 0}</td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line">	};</td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line"><span class='comment'>/* Our internal RSA_METHOD that we provide pointers to */</span></td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line"><span class='keyword'>static</span> RSA_METHOD e_rsax_rsa =</td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line">	<span class='string_literal'>"Intel RSA-X method"</span>,</td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,</td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,</td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,</td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,</td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line">	e_rsax_rsa_mod_exp,</td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,</td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,</td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line">	e_rsax_rsa_finish,</td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line">	<span class='macro'>RSA_FLAG_CACHE_PUBLIC<span class='expansion'>0x0002</span></span>|<span class='macro'>RSA_FLAG_CACHE_PRIVATE<span class='expansion'>0x0004</span></span>,</td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,</td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,</td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line">	<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span></td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line">	};</td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line"><span class='comment'>/* Constants used when creating the ENGINE */</span></td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span> *engine_e_rsax_id = <span class='string_literal'>"rsax"</span>;</td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span> *engine_e_rsax_name = <span class='string_literal'>"RSAX engine support"</span>;</td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line"><span class='comment'>/* This internal function is used by ENGINE_rsax() */</span></td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> bind_helper(ENGINE *e)</td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line">	<span class='keyword'>const</span> RSA_METHOD *meth1;</td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line">	<span class='keyword'>if</span>(!ENGINE_set_id(e, engine_e_rsax_id) ||</td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line">			!ENGINE_set_name(e, engine_e_rsax_name) ||</td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line">			!ENGINE_set_RSA(e, &amp;e_rsax_rsa) ||</td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line">			!ENGINE_set_destroy_function(e, e_rsax_destroy) ||</td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line">			!ENGINE_set_init_function(e, e_rsax_init) ||</td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line">			!ENGINE_set_finish_function(e, e_rsax_finish) ||</td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line">			!ENGINE_set_ctrl_function(e, e_rsax_ctrl) ||</td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line">			!ENGINE_set_cmd_defns(e, e_rsax_cmd_defns))</td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line">	meth1 = RSA_PKCS1_SSLeay();</td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line">	e_rsax_rsa.rsa_pub_enc = meth1-&gt;rsa_pub_enc;</td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line">	e_rsax_rsa.rsa_pub_dec = meth1-&gt;rsa_pub_dec;</td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line">	e_rsax_rsa.rsa_priv_enc = meth1-&gt;rsa_priv_enc;</td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line">	e_rsax_rsa.rsa_priv_dec = meth1-&gt;rsa_priv_dec;</td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line">	e_rsax_rsa.bn_mod_exp = meth1-&gt;bn_mod_exp;</td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line"><span class='keyword'>static</span> ENGINE *ENGINE_rsax(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line">	ENGINE *ret = ENGINE_new();</td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line">	<span class='keyword'>if</span>(!ret)</td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line">		<span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line">	<span class='keyword'>if</span>(!bind_helper(ret))</td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line">		ENGINE_free(ret);</td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line">		<span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line"><span class='comment'>/* Used to attach our own key-data to an RSA structure */</span></td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> rsax_ex_data_idx = -1;</td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> e_rsax_destroy(ENGINE *e)</td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line"><span class='comment'>/* (de)initialisation functions. */</span></td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> e_rsax_init(ENGINE *e)</td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line">	<span class='keyword'>if</span> (rsax_ex_data_idx == -1)</td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line">		rsax_ex_data_idx = RSA_get_ex_new_index(0,</td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line">			<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,</td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line">			<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>);</td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line">	<span class='keyword'>if</span> (rsax_ex_data_idx  == -1)</td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> e_rsax_finish(ENGINE *e)</td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> e_rsax_ctrl(ENGINE *e, <span class='keyword'>int</span> cmd, <span class='keyword'>long</span> i, <span class='keyword'>void</span> *p, <span class='keyword'>void</span> (*f)(<span class='keyword'>void</span>))</td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line">	<span class='keyword'>int</span> to_return = 1;</td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line">	<span class='keyword'>switch</span>(cmd)</td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line">	<span class='comment'>/* The command isn't understood by this engine */</span></td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line">	<span class='keyword'>default</span>:</td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line">		to_return = 0;</td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line">	<span class='keyword'>return</span> to_return;</td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_RSA</span></td></tr>
+<tr><td class="num" id="LN229">229</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN230">230</td><td class="line"><span class='directive'>#ifdef _WIN32</span></td></tr>
+<tr><td class="num" id="LN231">231</td><td class="line"><span class='keyword'>typedef</span> <span class='keyword'>unsigned</span> __int64 UINT64;</td></tr>
+<tr><td class="num" id="LN232">232</td><td class="line"><span class='directive'>#else</span></td></tr>
+<tr><td class="num" id="LN233">233</td><td class="line"><span class='keyword'>typedef</span> <span class='keyword'>unsigned</span> <span class='keyword'>long</span> <span class='keyword'>long</span> UINT64;</td></tr>
+<tr><td class="num" id="LN234">234</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN235">235</td><td class="line"><span class='keyword'>typedef</span> <span class='keyword'>unsigned</span> <span class='keyword'>short</span> UINT16;</td></tr>
+<tr><td class="num" id="LN236">236</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN237">237</td><td class="line"><span class='comment'>/* Table t is interleaved in the following manner:</span></td></tr>
+<tr><td class="num" id="LN238">238</td><td class="line"> <span class='comment'>* The order in memory is t[0][0], t[0][1], ..., t[0][7], t[1][0], ...</span></td></tr>
+<tr><td class="num" id="LN239">239</td><td class="line"> <span class='comment'>* A particular 512-bit value is stored in t[][index] rather than the more</span></td></tr>
+<tr><td class="num" id="LN240">240</td><td class="line"> <span class='comment'>* normal t[index][]; i.e. the qwords of a particular entry in t are not</span></td></tr>
+<tr><td class="num" id="LN241">241</td><td class="line"> <span class='comment'>* adjacent in memory</span></td></tr>
+<tr><td class="num" id="LN242">242</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN243">243</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN244">244</td><td class="line"><span class='comment'>/* Init BIGNUM b from the interleaved UINT64 array */</span></td></tr>
+<tr><td class="num" id="LN245">245</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> interleaved_array_to_bn_512(BIGNUM* b, UINT64 *array);</td></tr>
+<tr><td class="num" id="LN246">246</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN247">247</td><td class="line"><span class='comment'>/* Extract array elements from BIGNUM b</span></td></tr>
+<tr><td class="num" id="LN248">248</td><td class="line"> <span class='comment'>* To set the whole array from b, call with n=8</span></td></tr>
+<tr><td class="num" id="LN249">249</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN250">250</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> bn_extract_to_array_512(<span class='keyword'>const</span> BIGNUM* b, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> n, UINT64 *array);</td></tr>
+<tr><td class="num" id="LN251">251</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN252">252</td><td class="line"><span class='keyword'>struct</span> mod_ctx_512 {</td></tr>
+<tr><td class="num" id="LN253">253</td><td class="line">    UINT64 t[8][8];</td></tr>
+<tr><td class="num" id="LN254">254</td><td class="line">    UINT64 m[8];</td></tr>
+<tr><td class="num" id="LN255">255</td><td class="line">    UINT64 m1[8]; <span class='comment'>/* 2^278 % m */</span></td></tr>
+<tr><td class="num" id="LN256">256</td><td class="line">    UINT64 m2[8]; <span class='comment'>/* 2^640 % m */</span></td></tr>
+<tr><td class="num" id="LN257">257</td><td class="line">    UINT64 k1[2]; <span class='comment'>/* (- 1/m) % 2^128 */</span></td></tr>
+<tr><td class="num" id="LN258">258</td><td class="line">};</td></tr>
+<tr><td class="num" id="LN259">259</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN260">260</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> mod_exp_pre_compute_data_512(UINT64 *m, <span class='keyword'>struct</span> mod_ctx_512 *data);</td></tr>
+<tr><td class="num" id="LN261">261</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN262">262</td><td class="line"><span class='keyword'>void</span> mod_exp_512(UINT64 *result, <span class='comment'>/* 512 bits, 8 qwords */</span></td></tr>
+<tr><td class="num" id="LN263">263</td><td class="line">		 UINT64 *g,      <span class='comment'>/* 512 bits, 8 qwords */</span></td></tr>
+<tr><td class="num" id="LN264">264</td><td class="line">		 UINT64 *exp,    <span class='comment'>/* 512 bits, 8 qwords */</span></td></tr>
+<tr><td class="num" id="LN265">265</td><td class="line">		 <span class='keyword'>struct</span> mod_ctx_512 *data);</td></tr>
+<tr><td class="num" id="LN266">266</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN267">267</td><td class="line"><span class='keyword'>typedef</span> <span class='keyword'>struct</span> st_e_rsax_mod_ctx</td></tr>
+<tr><td class="num" id="LN268">268</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN269">269</td><td class="line">  UINT64 type;</td></tr>
+<tr><td class="num" id="LN270">270</td><td class="line">  <span class='keyword'>union</span> {</td></tr>
+<tr><td class="num" id="LN271">271</td><td class="line">    <span class='keyword'>struct</span> mod_ctx_512 b512;</td></tr>
+<tr><td class="num" id="LN272">272</td><td class="line">  } ctx;</td></tr>
+<tr><td class="num" id="LN273">273</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN274">274</td><td class="line">} E_RSAX_MOD_CTX;</td></tr>
+<tr><td class="num" id="LN275">275</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN276">276</td><td class="line"><span class='keyword'>static</span> E_RSAX_MOD_CTX *e_rsax_get_ctx(RSA *rsa, <span class='keyword'>int</span> idx, BIGNUM* m)</td></tr>
+<tr><td class="num" id="LN277">277</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN278">278</td><td class="line">	E_RSAX_MOD_CTX *hptr;</td></tr>
+<tr><td class="num" id="LN279">279</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN280">280</td><td class="line">        <span class='keyword'>if</span> (idx &lt; 0 || idx &gt; 2)</td></tr>
+<tr><td class="num" id="LN281">281</td><td class="line">           <span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN282">282</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN283">283</td><td class="line">	hptr = RSA_get_ex_data(rsa, rsax_ex_data_idx);</td></tr>
+<tr><td class="num" id="LN284">284</td><td class="line">	<span class='keyword'>if</span> (!hptr) {</td></tr>
+<tr><td class="num" id="LN285">285</td><td class="line">	    hptr = <span class='macro'>OPENSSL_malloc(3*<span class='keyword'>sizeof</span>(E_RSAX_MOD_CTX))<span class='expansion'>CRYPTO_malloc((int)3*sizeof(E_RSAX_MOD_CTX),"eng_rsax.c",285)</span></span>;</td></tr>
+<tr><td class="num" id="LN286">286</td><td class="line">	    <span class='keyword'>if</span> (!hptr) <span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN287">287</td><td class="line">            hptr[2].type = hptr[1].type= hptr[0].type = 0;</td></tr>
+<tr><td class="num" id="LN288">288</td><td class="line">	    RSA_set_ex_data(rsa, rsax_ex_data_idx, hptr);</td></tr>
+<tr><td class="num" id="LN289">289</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN290">290</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN291">291</td><td class="line">        <span class='keyword'>if</span> (hptr[idx].type == (UINT64)BN_num_bits(m))</td></tr>
+<tr><td class="num" id="LN292">292</td><td class="line">            <span class='keyword'>return</span> hptr+idx;</td></tr>
+<tr><td class="num" id="LN293">293</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN294">294</td><td class="line">        <span class='keyword'>if</span> (BN_num_bits(m) == 512) {</td></tr>
+<tr><td class="num" id="LN295">295</td><td class="line">  	    UINT64 _m[8];</td></tr>
+<tr><td class="num" id="LN296">296</td><td class="line">	    bn_extract_to_array_512(m, 8, _m);</td></tr>
+<tr><td class="num" id="LN297">297</td><td class="line">	    <span class='macro'>memset( &amp;hptr[idx].ctx.b512, 0, <span class='keyword'>sizeof</span>(<span class='keyword'>struct</span> mod_ctx_512))<span class='expansion'>__builtin___memset_chk (&amp;hptr[idx].ctx.b512, 0, sizeof(struct<br> mod_ctx_512), __builtin_object_size (&amp;hptr[idx].ctx.b512<br>, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN298">298</td><td class="line">	    mod_exp_pre_compute_data_512(_m, &amp;hptr[idx].ctx.b512);</td></tr>
+<tr><td class="num" id="LN299">299</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN300">300</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN301">301</td><td class="line">        hptr[idx].type = BN_num_bits(m);</td></tr>
+<tr><td class="num" id="LN302">302</td><td class="line">	<span class='keyword'>return</span> hptr+idx;</td></tr>
+<tr><td class="num" id="LN303">303</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN304">304</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN305">305</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> e_rsax_rsa_finish(RSA *rsa)</td></tr>
+<tr><td class="num" id="LN306">306</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN307">307</td><td class="line">	E_RSAX_MOD_CTX *hptr = RSA_get_ex_data(rsa, rsax_ex_data_idx);</td></tr>
+<tr><td class="num" id="LN308">308</td><td class="line">	<span class='keyword'>if</span>(hptr)</td></tr>
+<tr><td class="num" id="LN309">309</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN310">310</td><td class="line">		<span class='macro'>OPENSSL_free(hptr)<span class='expansion'>CRYPTO_free(hptr)</span></span>;</td></tr>
+<tr><td class="num" id="LN311">311</td><td class="line">		RSA_set_ex_data(rsa, rsax_ex_data_idx, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>);</td></tr>
+<tr><td class="num" id="LN312">312</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN313">313</td><td class="line">	<span class='keyword'>if</span> (rsa-&gt;_method_mod_n)</td></tr>
+<tr><td class="num" id="LN314">314</td><td class="line">		BN_MONT_CTX_free(rsa-&gt;_method_mod_n);</td></tr>
+<tr><td class="num" id="LN315">315</td><td class="line">	<span class='keyword'>if</span> (rsa-&gt;_method_mod_p)</td></tr>
+<tr><td class="num" id="LN316">316</td><td class="line">		BN_MONT_CTX_free(rsa-&gt;_method_mod_p);</td></tr>
+<tr><td class="num" id="LN317">317</td><td class="line">	<span class='keyword'>if</span> (rsa-&gt;_method_mod_q)</td></tr>
+<tr><td class="num" id="LN318">318</td><td class="line">		BN_MONT_CTX_free(rsa-&gt;_method_mod_q);</td></tr>
+<tr><td class="num" id="LN319">319</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN320">320</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN321">321</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN322">322</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN323">323</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> e_rsax_bn_mod_exp(BIGNUM *r, <span class='keyword'>const</span> BIGNUM *g, <span class='keyword'>const</span> BIGNUM *e,</td></tr>
+<tr><td class="num" id="LN324">324</td><td class="line">                    <span class='keyword'>const</span> BIGNUM *m, BN_CTX *ctx, BN_MONT_CTX *in_mont, E_RSAX_MOD_CTX* rsax_mod_ctx )</td></tr>
+<tr><td class="num" id="LN325">325</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN326">326</td><td class="line">	<span class='keyword'>if</span> (rsax_mod_ctx &amp;&amp; <span class='macro'>BN_get_flags(e, BN_FLG_CONSTTIME)<span class='expansion'>((e)-&gt;flags&amp;(0x04))</span></span> != 0) {</td></tr>
+<tr><td class="num" id="LN327">327</td><td class="line">	   <span class='keyword'>if</span> (BN_num_bits(m) == 512) {</td></tr>
+<tr><td class="num" id="LN328">328</td><td class="line">  		UINT64 _r[8];</td></tr>
+<tr><td class="num" id="LN329">329</td><td class="line">   	  	UINT64 _g[8];</td></tr>
+<tr><td class="num" id="LN330">330</td><td class="line">		UINT64 _e[8];</td></tr>
+<tr><td class="num" id="LN331">331</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN332">332</td><td class="line">		<span class='comment'>/* Init the arrays from the BIGNUMs */</span></td></tr>
+<tr><td class="num" id="LN333">333</td><td class="line">		bn_extract_to_array_512(g, 8, _g);</td></tr>
+<tr><td class="num" id="LN334">334</td><td class="line">		bn_extract_to_array_512(e, 8, _e);</td></tr>
+<tr><td class="num" id="LN335">335</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN336">336</td><td class="line">		mod_exp_512(_r, _g, _e, &amp;rsax_mod_ctx-&gt;ctx.b512);</td></tr>
+<tr><td class="num" id="LN337">337</td><td class="line">		<span class='comment'>/* Return the result in the BIGNUM */</span></td></tr>
+<tr><td class="num" id="LN338">338</td><td class="line">		interleaved_array_to_bn_512(r, _r);</td></tr>
+<tr><td class="num" id="LN339">339</td><td class="line">                <span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN340">340</td><td class="line">           }</td></tr>
+<tr><td class="num" id="LN341">341</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN342">342</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN343">343</td><td class="line">	<span class='keyword'>return</span> BN_mod_exp_mont(r, g, e, m, ctx, in_mont);</td></tr>
+<tr><td class="num" id="LN344">344</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN345">345</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN346">346</td><td class="line"><span class='comment'>/* Declares for the Intel CIAP 512-bit / CRT / 1024 bit RSA modular</span></td></tr>
+<tr><td class="num" id="LN347">347</td><td class="line"> <span class='comment'>* exponentiation routine precalculations and a structure to hold the</span></td></tr>
+<tr><td class="num" id="LN348">348</td><td class="line"> <span class='comment'>* necessary values.  These files are meant to live in crypto/rsa/ in</span></td></tr>
+<tr><td class="num" id="LN349">349</td><td class="line"> <span class='comment'>* the target openssl.</span></td></tr>
+<tr><td class="num" id="LN350">350</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN351">351</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN352">352</td><td class="line"><span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN353">353</td><td class="line"> <span class='comment'>* Local method: extracts a piece from a BIGNUM, to fit it into</span></td></tr>
+<tr><td class="num" id="LN354">354</td><td class="line"> <span class='comment'>* an array. Call with n=8 to extract an entire 512-bit BIGNUM</span></td></tr>
+<tr><td class="num" id="LN355">355</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN356">356</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> bn_extract_to_array_512(<span class='keyword'>const</span> BIGNUM* b, <span class='keyword'>unsigned</span> <span class='keyword'>int</span> n, UINT64 *array)</td></tr>
+<tr><td class="num" id="LN357">357</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN358">358</td><td class="line">	<span class='keyword'>int</span> i;</td></tr>
+<tr><td class="num" id="LN359">359</td><td class="line">	UINT64 tmp;</td></tr>
+<tr><td class="num" id="LN360">360</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> bn_buff[64];</td></tr>
+<tr><td class="num" id="LN361">361</td><td class="line">	<span class='macro'>memset(bn_buff, 0, 64)<span class='expansion'>__builtin___memset_chk (bn_buff, 0, 64, __builtin_object_size<br> (bn_buff, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN362">362</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>BN_num_bytes(b)<span class='expansion'>((BN_num_bits(b)+7)/8)</span></span> &gt; 64) {</td></tr>
+<tr><td class="num" id="LN363">363</td><td class="line">		printf (<span class='string_literal'>"Can't support this byte size\n"</span>);</td></tr>
+<tr><td class="num" id="LN364">364</td><td class="line">		<span class='keyword'>return</span> 0; }</td></tr>
+<tr><td class="num" id="LN365">365</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>BN_num_bytes(b)<span class='expansion'>((BN_num_bits(b)+7)/8)</span></span>!=0) {</td></tr>
+<tr><td class="num" id="LN366">366</td><td class="line">		<span class='keyword'>if</span> (!BN_bn2bin(b, bn_buff+(64-<span class='macro'>BN_num_bytes(b)<span class='expansion'>((BN_num_bits(b)+7)/8)</span></span>))) {</td></tr>
+<tr><td class="num" id="LN367">367</td><td class="line">			printf (<span class='string_literal'>"Error's in bn2bin\n"</span>);</td></tr>
+<tr><td class="num" id="LN368">368</td><td class="line">			<span class='comment'>/* We have to error, here */</span></td></tr>
+<tr><td class="num" id="LN369">369</td><td class="line">			<span class='keyword'>return</span> 0; } }</td></tr>
+<tr><td class="num" id="LN370">370</td><td class="line">	<span class='keyword'>while</span> (n-- &gt; 0) {</td></tr>
+<tr><td class="num" id="LN371">371</td><td class="line">		array[n] = 0;</td></tr>
+<tr><td class="num" id="LN372">372</td><td class="line">		<span class='keyword'>for</span> (i=7; i&gt;=0; i--) {</td></tr>
+<tr><td class="num" id="LN373">373</td><td class="line">			tmp = bn_buff[63-(n*8+i)];</td></tr>
+<tr><td class="num" id="LN374">374</td><td class="line">			array[n] |= tmp &lt;&lt; (8*i); } }</td></tr>
+<tr><td class="num" id="LN375">375</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN376">376</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN377">377</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN378">378</td><td class="line"><span class='comment'>/* Init a 512-bit BIGNUM from the UINT64*_ (8 * 64) interleaved array */</span></td></tr>
+<tr><td class="num" id="LN379">379</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> interleaved_array_to_bn_512(BIGNUM* b, UINT64 *array)</td></tr>
+<tr><td class="num" id="LN380">380</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN381">381</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> tmp[64];</td></tr>
+<tr><td class="num" id="LN382">382</td><td class="line">	<span class='keyword'>int</span> n=8;</td></tr>
+<tr><td class="num" id="LN383">383</td><td class="line">	<span class='keyword'>int</span> i;</td></tr>
+<tr><td class="num" id="LN384">384</td><td class="line">	<span class='keyword'>while</span> (n-- &gt; 0) {</td></tr>
+<tr><td class="num" id="LN385">385</td><td class="line">		<span class='keyword'>for</span> (i = 7; i&gt;=0; i--) {</td></tr>
+<tr><td class="num" id="LN386">386</td><td class="line">			tmp[63-(n*8+i)] = (<span class='keyword'>unsigned</span> <span class='keyword'>char</span>)(array[n]&gt;&gt;(8*i)); } }</td></tr>
+<tr><td class="num" id="LN387">387</td><td class="line">	BN_bin2bn(tmp, 64, b);</td></tr>
+<tr><td class="num" id="LN388">388</td><td class="line">        <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN389">389</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN390">390</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN391">391</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN392">392</td><td class="line"><span class='comment'>/* The main 512bit precompute call */</span></td></tr>
+<tr><td class="num" id="LN393">393</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> mod_exp_pre_compute_data_512(UINT64 *m, <span class='keyword'>struct</span> mod_ctx_512 *data)</td></tr>
+<tr><td class="num" id="LN394">394</td><td class="line"> {</td></tr>
+<tr><td class="num" id="LN395">395</td><td class="line">    BIGNUM two_768, two_640, two_128, two_512, tmp, _m, tmp2;</td></tr>
+<tr><td class="num" id="LN396">396</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN397">397</td><td class="line">    <span class='comment'>/* We need a BN_CTX for the modulo functions */</span></td></tr>
+<tr><td class="num" id="LN398">398</td><td class="line">    BN_CTX* ctx;</td></tr>
+<tr><td class="num" id="LN399">399</td><td class="line">    <span class='comment'>/* Some tmps */</span></td></tr>
+<tr><td class="num" id="LN400">400</td><td class="line">    UINT64 _t[8];</td></tr>
+<tr><td class="num" id="LN401">401</td><td class="line">    <span class='keyword'>int</span> i, j, ret = 0;</td></tr>
+<tr><td class="num" id="LN402">402</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN403">403</td><td class="line">    <span class='comment'>/* Init _m with m */</span></td></tr>
+<tr><td class="num" id="LN404">404</td><td class="line">    BN_init(&amp;_m);</td></tr>
+<tr><td class="num" id="LN405">405</td><td class="line">    interleaved_array_to_bn_512(&amp;_m, m);</td></tr>
+<tr><td class="num" id="LN406">406</td><td class="line">    <span class='macro'>memset(_t, 0, 64)<span class='expansion'>__builtin___memset_chk (_t, 0, 64, __builtin_object_size (_t,<br> 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN407">407</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN408">408</td><td class="line">    <span class='comment'>/* Inits */</span></td></tr>
+<tr><td class="num" id="LN409">409</td><td class="line">    BN_init(&amp;two_768);</td></tr>
+<tr><td class="num" id="LN410">410</td><td class="line">    BN_init(&amp;two_640);</td></tr>
+<tr><td class="num" id="LN411">411</td><td class="line">    BN_init(&amp;two_128);</td></tr>
+<tr><td class="num" id="LN412">412</td><td class="line">    BN_init(&amp;two_512);</td></tr>
+<tr><td class="num" id="LN413">413</td><td class="line">    BN_init(&amp;tmp);</td></tr>
+<tr><td class="num" id="LN414">414</td><td class="line">    BN_init(&amp;tmp2);</td></tr>
+<tr><td class="num" id="LN415">415</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN416">416</td><td class="line">    <span class='comment'>/* Create our context */</span></td></tr>
+<tr><td class="num" id="LN417">417</td><td class="line">    <span class='keyword'>if</span> ((ctx=BN_CTX_new()) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) { <span class='keyword'>goto</span> err; }</td></tr>
+<tr><td class="num" id="LN418">418</td><td class="line">	BN_CTX_start(ctx);</td></tr>
+<tr><td class="num" id="LN419">419</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN420">420</td><td class="line">    <span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN421">421</td><td class="line">     <span class='comment'>* For production, if you care, these only need to be set once,</span></td></tr>
+<tr><td class="num" id="LN422">422</td><td class="line">     <span class='comment'>* and may be made constants.</span></td></tr>
+<tr><td class="num" id="LN423">423</td><td class="line">     <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN424">424</td><td class="line">    BN_lshift(&amp;two_768, BN_value_one(), 768);</td></tr>
+<tr><td class="num" id="LN425">425</td><td class="line">    BN_lshift(&amp;two_640, BN_value_one(), 640);</td></tr>
+<tr><td class="num" id="LN426">426</td><td class="line">    BN_lshift(&amp;two_128, BN_value_one(), 128);</td></tr>
+<tr><td class="num" id="LN427">427</td><td class="line">    BN_lshift(&amp;two_512, BN_value_one(), 512);</td></tr>
+<tr><td class="num" id="LN428">428</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN429">429</td><td class="line">    <span class='keyword'>if</span> (0 == (m[7] &amp; 0x8000000000000000)) {</td></tr>
+<tr><td class="num" id="LN430">430</td><td class="line">        exit(1);</td></tr>
+<tr><td class="num" id="LN431">431</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN432">432</td><td class="line">    <span class='keyword'>if</span> (0 == (m[0] &amp; 0x1)) { <span class='comment'>/* Odd modulus required for Mont */</span></td></tr>
+<tr><td class="num" id="LN433">433</td><td class="line">        exit(1);</td></tr>
+<tr><td class="num" id="LN434">434</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN435">435</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN436">436</td><td class="line">    <span class='comment'>/* Precompute m1 */</span></td></tr>
+<tr><td class="num" id="LN437">437</td><td class="line">    <span class='macro'>BN_mod(&amp;tmp, &amp;two_768, &amp;_m, ctx)<span class='expansion'>BN_div(((void*)0),(&amp;tmp),(&amp;two_768),(&amp;_m),(ctx))</span></span>;</td></tr>
+<tr><td class="num" id="LN438">438</td><td class="line">    <span class='keyword'>if</span> (!bn_extract_to_array_512(&amp;tmp, 8, &amp;data-&gt;m1[0])) {</td></tr>
+<tr><td class="num" id="LN439">439</td><td class="line">	    <span class='keyword'>goto</span> err; }</td></tr>
+<tr><td class="num" id="LN440">440</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN441">441</td><td class="line">    <span class='comment'>/* Precompute m2 */</span></td></tr>
+<tr><td class="num" id="LN442">442</td><td class="line">    <span class='macro'>BN_mod(&amp;tmp, &amp;two_640, &amp;_m, ctx)<span class='expansion'>BN_div(((void*)0),(&amp;tmp),(&amp;two_640),(&amp;_m),(ctx))</span></span>;</td></tr>
+<tr><td class="num" id="LN443">443</td><td class="line">    <span class='keyword'>if</span> (!bn_extract_to_array_512(&amp;tmp, 8, &amp;data-&gt;m2[0])) {</td></tr>
+<tr><td class="num" id="LN444">444</td><td class="line">	    <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN445">445</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN446">446</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN447">447</td><td class="line">    <span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN448">448</td><td class="line">     <span class='comment'>* Precompute k1, a 128b number = ((-1)* m-1 ) mod 2128; k1 should</span></td></tr>
+<tr><td class="num" id="LN449">449</td><td class="line">     <span class='comment'>* be non-negative.</span></td></tr>
+<tr><td class="num" id="LN450">450</td><td class="line">     <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN451">451</td><td class="line">    BN_mod_inverse(&amp;tmp, &amp;_m, &amp;two_128, ctx);</td></tr>
+<tr><td class="num" id="LN452">452</td><td class="line">    <span class='keyword'>if</span> (!<span class='macro'>BN_is_zero(&amp;tmp)<span class='expansion'>((&amp;tmp)-&gt;top == 0)</span></span>) { BN_sub(&amp;tmp, &amp;two_128, &amp;tmp); }</td></tr>
+<tr><td class="num" id="LN453">453</td><td class="line">    <span class='keyword'>if</span> (!bn_extract_to_array_512(&amp;tmp, 2, &amp;data-&gt;k1[0])) {</td></tr>
+<tr><td class="num" id="LN454">454</td><td class="line">	    <span class='keyword'>goto</span> err; }</td></tr>
+<tr><td class="num" id="LN455">455</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN456">456</td><td class="line">    <span class='comment'>/* Precompute t */</span></td></tr>
+<tr><td class="num" id="LN457">457</td><td class="line">    <span class='keyword'>for</span> (i=0; i&lt;8; i++) {</td></tr>
+<tr><td class="num" id="LN458">458</td><td class="line">        <span class='macro'>BN_zero(&amp;tmp)<span class='expansion'>(BN_set_word((&amp;tmp),0))</span></span>;</td></tr>
+<tr><td class="num" id="LN459">459</td><td class="line">        <span class='keyword'>if</span> (i &amp; 1) { BN_add(&amp;tmp, &amp;two_512, &amp;tmp); }</td></tr>
+<tr><td class="num" id="LN460">460</td><td class="line">        <span class='keyword'>if</span> (i &amp; 2) { BN_add(&amp;tmp, &amp;two_512, &amp;tmp); }</td></tr>
+<tr><td class="num" id="LN461">461</td><td class="line">        <span class='keyword'>if</span> (i &amp; 4) { BN_add(&amp;tmp, &amp;two_640, &amp;tmp); }</td></tr>
+<tr><td class="num" id="LN462">462</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN463">463</td><td class="line">        BN_nnmod(&amp;tmp2, &amp;tmp, &amp;_m, ctx);</td></tr>
+<tr><td class="num" id="LN464">464</td><td class="line">        <span class='keyword'>if</span> (!bn_extract_to_array_512(&amp;tmp2, 8, _t)) {</td></tr>
+<tr><td class="num" id="LN465">465</td><td class="line">	        <span class='keyword'>goto</span> err; }</td></tr>
+<tr><td class="num" id="LN466">466</td><td class="line">        <span class='keyword'>for</span> (j=0; j&lt;8; j++) data-&gt;t[j][i] = _t[j]; }</td></tr>
+<tr><td class="num" id="LN467">467</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN468">468</td><td class="line">    <span class='comment'>/* Precompute m */</span></td></tr>
+<tr><td class="num" id="LN469">469</td><td class="line">    <span class='keyword'>for</span> (i=0; i&lt;8; i++) {</td></tr>
+<tr><td class="num" id="LN470">470</td><td class="line">        data-&gt;m[i] = m[i]; }</td></tr>
+<tr><td class="num" id="LN471">471</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN472">472</td><td class="line">    ret = 1;</td></tr>
+<tr><td class="num" id="LN473">473</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN474">474</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN475">475</td><td class="line">    <span class='comment'>/* Cleanup */</span></td></tr>
+<tr><td class="num" id="LN476">476</td><td class="line">	<span class='keyword'>if</span> (ctx != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) {</td></tr>
+<tr><td class="num" id="LN477">477</td><td class="line">		BN_CTX_end(ctx); BN_CTX_free(ctx); }</td></tr>
+<tr><td class="num" id="LN478">478</td><td class="line">    BN_free(&amp;two_768);</td></tr>
+<tr><td class="num" id="LN479">479</td><td class="line">    BN_free(&amp;two_640);</td></tr>
+<tr><td class="num" id="LN480">480</td><td class="line">    BN_free(&amp;two_128);</td></tr>
+<tr><td class="num" id="LN481">481</td><td class="line">    BN_free(&amp;two_512);</td></tr>
+<tr><td class="num" id="LN482">482</td><td class="line">    BN_free(&amp;tmp);</td></tr>
+<tr><td class="num" id="LN483">483</td><td class="line">    BN_free(&amp;tmp2);</td></tr>
+<tr><td class="num" id="LN484">484</td><td class="line">    BN_free(&amp;_m);</td></tr>
+<tr><td class="num" id="LN485">485</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN486">486</td><td class="line">    <span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN487">487</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN488">488</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN489">489</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN490">490</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> e_rsax_rsa_mod_exp(BIGNUM *r0, <span class='keyword'>const</span> BIGNUM *I, RSA *rsa, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN491">491</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN492">492</td><td class="line">	BIGNUM *r1,*m1,*vrfy;</td></tr>
+<tr><td class="num" id="LN493">493</td><td class="line">	BIGNUM local_dmp1,local_dmq1,local_c,local_r1;</td></tr>
+<tr><td class="num" id="LN494">494</td><td class="line">	BIGNUM *dmp1,*dmq1,*c,*pr1;</td></tr>
+<tr><td class="num" id="LN495">495</td><td class="line">	<span class='keyword'>int</span> ret=0;</td></tr>
+<tr><td class="num" id="LN496">496</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN497">497</td><td class="line">	BN_CTX_start(ctx);</td></tr>
+<tr><td class="num" id="LN498">498</td><td class="line">	r1 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN499">499</td><td class="line">	m1 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN500">500</td><td class="line">	vrfy = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN501">501</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN502">502</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN503">503</td><td class="line">		BIGNUM local_p, local_q;</td></tr>
+<tr><td class="num" id="LN504">504</td><td class="line">		BIGNUM *p = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, *q = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN505">505</td><td class="line">		<span class='keyword'>int</span> error = 0;</td></tr>
+<tr><td class="num" id="LN506">506</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN507">507</td><td class="line">		<span class='comment'>/* Make sure BN_mod_inverse in Montgomery</span></td></tr>
+<tr><td class="num" id="LN508">508</td><td class="line">		 <span class='comment'>* intialization uses the BN_FLG_CONSTTIME flag</span></td></tr>
+<tr><td class="num" id="LN509">509</td><td class="line">		 <span class='comment'>* (unless RSA_FLAG_NO_CONSTTIME is set)</span></td></tr>
+<tr><td class="num" id="LN510">510</td><td class="line">		 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN511">511</td><td class="line">		<span class='keyword'>if</span> (!(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NO_CONSTTIME<span class='expansion'>0x0100</span></span>))</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path1" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">1</div></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path2" title="Next event (2)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN512">512</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN513">513</td><td class="line">			BN_init(&amp;local_p);</td></tr>
+<tr><td class="num" id="LN514">514</td><td class="line">			p = &amp;local_p;</td></tr>
+<tr><td class="num" id="LN515">515</td><td class="line">			<span class='macro'>BN_with_flags(p, rsa-&gt;p, BN_FLG_CONSTTIME)<span class='expansion'>((p)-&gt;d=(rsa-&gt;p)-&gt;d, (p)-&gt;top=(rsa-&gt;p)-&gt;top<br>, (p)-&gt;dmax=(rsa-&gt;p)-&gt;dmax, (p)-&gt;neg=(rsa-&gt;p)-&gt;<br>neg, (p)-&gt;flags=(((p)-&gt;flags &amp; 0x01) | ((rsa-&gt;p)<br>-&gt;flags &amp; ~0x01) | 0x02 | (0x04)))</span></span>;</td></tr>
+<tr><td class="num" id="LN516">516</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN517">517</td><td class="line">			BN_init(&amp;local_q);</td></tr>
+<tr><td class="num" id="LN518">518</td><td class="line">			q = &amp;local_q;</td></tr>
+<tr><td class="num" id="LN519">519</td><td class="line">			<span class='macro'>BN_with_flags(q, rsa-&gt;q, BN_FLG_CONSTTIME)<span class='expansion'>((q)-&gt;d=(rsa-&gt;q)-&gt;d, (q)-&gt;top=(rsa-&gt;q)-&gt;top<br>, (q)-&gt;dmax=(rsa-&gt;q)-&gt;dmax, (q)-&gt;neg=(rsa-&gt;q)-&gt;<br>neg, (q)-&gt;flags=(((q)-&gt;flags &amp; 0x01) | ((rsa-&gt;q)<br>-&gt;flags &amp; ~0x01) | 0x02 | (0x04)))</span></span>;</td></tr>
+<tr><td class="num" id="LN520">520</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN521">521</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN522">522</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN523">523</td><td class="line">			p = rsa-&gt;p;</td></tr>
+<tr><td class="num" id="LN524">524</td><td class="line">			q = rsa-&gt;q;</td></tr>
+<tr><td class="num" id="LN525">525</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN526">526</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN527">527</td><td class="line">		<span class='keyword'>if</span> (rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_CACHE_PRIVATE<span class='expansion'>0x0004</span></span>)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path2" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">2</div></td><td><div class="PathNav"><a href="#Path1" title="Previous event (1)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path3" title="Next event (3)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN528">528</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN529">529</td><td class="line">			<span class='keyword'>if</span> (!BN_MONT_CTX_set_locked(&amp;rsa-&gt;_method_mod_p, <span class='macro'>CRYPTO_LOCK_RSA<span class='expansion'>9</span></span>, p, ctx))</td></tr>
+<tr><td class="num" id="LN530">530</td><td class="line">				error = 1;</td></tr>
+<tr><td class="num" id="LN531">531</td><td class="line">			<span class='keyword'>if</span> (!BN_MONT_CTX_set_locked(&amp;rsa-&gt;_method_mod_q, <span class='macro'>CRYPTO_LOCK_RSA<span class='expansion'>9</span></span>, q, ctx))</td></tr>
+<tr><td class="num" id="LN532">532</td><td class="line">				error = 1;</td></tr>
+<tr><td class="num" id="LN533">533</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN534">534</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN535">535</td><td class="line">		<span class='comment'>/* clean up */</span></td></tr>
+<tr><td class="num" id="LN536">536</td><td class="line">		<span class='keyword'>if</span> (!(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NO_CONSTTIME<span class='expansion'>0x0100</span></span>))</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path3" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">3</div></td><td><div class="PathNav"><a href="#Path2" title="Previous event (2)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path4" title="Next event (4)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN537">537</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN538">538</td><td class="line">			BN_free(&amp;local_p);</td></tr>
+<tr><td class="num" id="LN539">539</td><td class="line">			BN_free(&amp;local_q);</td></tr>
+<tr><td class="num" id="LN540">540</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN541">541</td><td class="line">		<span class='keyword'>if</span> ( error )</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path4" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">4</div></td><td><div class="PathNav"><a href="#Path3" title="Previous event (3)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path5" title="Next event (5)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN542">542</td><td class="line">			<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN543">543</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN544">544</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN545">545</td><td class="line">	<span class='keyword'>if</span> (rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_CACHE_PUBLIC<span class='expansion'>0x0002</span></span>)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path5" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">5</div></td><td><div class="PathNav"><a href="#Path4" title="Previous event (4)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path6" title="Next event (6)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN546">546</td><td class="line">		<span class='keyword'>if</span> (!BN_MONT_CTX_set_locked(&amp;rsa-&gt;_method_mod_n, <span class='macro'>CRYPTO_LOCK_RSA<span class='expansion'>9</span></span>, rsa-&gt;n, ctx))</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path6" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">6</div></td><td><div class="PathNav"><a href="#Path5" title="Previous event (5)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path7" title="Next event (7)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN547">547</td><td class="line">			<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN548">548</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN549">549</td><td class="line">	<span class='comment'>/* compute I mod q */</span></td></tr>
+<tr><td class="num" id="LN550">550</td><td class="line">	<span class='keyword'>if</span> (!(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NO_CONSTTIME<span class='expansion'>0x0100</span></span>))</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path7" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">7</div></td><td><div class="PathNav"><a href="#Path6" title="Previous event (6)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#EndPath" title="Next event (8)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN551">551</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN552">552</td><td class="line">		c = &amp;local_c;</td></tr>
+<tr><td class="num" id="LN553">553</td><td class="line">		<span class='macro'>BN_with_flags(c, I, BN_FLG_CONSTTIME)<span class='expansion'>((c)-&gt;d=(I)-&gt;d, (c)-&gt;top=(I)-&gt;top, (c)-&gt;dmax=(<br>I)-&gt;dmax, (c)-&gt;neg=(I)-&gt;neg, (c)-&gt;flags=(((c)-&gt;<br>flags &amp; 0x01) | ((I)-&gt;flags &amp; ~0x01) | 0x02 | (0x04<br>)))</span></span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgControl" style="margin-left:17ex; max-width:100em"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">8</div></td><td><div class="PathNav"><a href="#Path7" title="Previous event (7)">&#x2190;</a></div></td></td><td>Within the expansion of the macro 'BN_with_flags':
+</td></tr></table><div class="msg msgEvent" style="width:94%; margin-left:5px"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">a</div></td><td valign="top">The left operand of '&amp;' is a garbage value</td></tr></table></div>
+</div></td></tr>
+<tr><td class="num" id="LN554">554</td><td class="line">		<span class='keyword'>if</span> (!<span class='macro'>BN_mod(r1,c,rsa-&gt;q,ctx)<span class='expansion'>BN_div(((void*)0),(r1),(c),(rsa-&gt;q),(ctx))</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN555">555</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN556">556</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN557">557</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN558">558</td><td class="line">		<span class='keyword'>if</span> (!<span class='macro'>BN_mod(r1,I,rsa-&gt;q,ctx)<span class='expansion'>BN_div(((void*)0),(r1),(I),(rsa-&gt;q),(ctx))</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN559">559</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN560">560</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN561">561</td><td class="line">	<span class='comment'>/* compute r1^dmq1 mod q */</span></td></tr>
+<tr><td class="num" id="LN562">562</td><td class="line">	<span class='keyword'>if</span> (!(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NO_CONSTTIME<span class='expansion'>0x0100</span></span>))</td></tr>
+<tr><td class="num" id="LN563">563</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN564">564</td><td class="line">		dmq1 = &amp;local_dmq1;</td></tr>
+<tr><td class="num" id="LN565">565</td><td class="line">		<span class='macro'>BN_with_flags(dmq1, rsa-&gt;dmq1, BN_FLG_CONSTTIME)<span class='expansion'>((dmq1)-&gt;d=(rsa-&gt;dmq1)-&gt;d, (dmq1)-&gt;top=(rsa-&gt;dmq1<br>)-&gt;top, (dmq1)-&gt;dmax=(rsa-&gt;dmq1)-&gt;dmax, (dmq1)-&gt;<br>neg=(rsa-&gt;dmq1)-&gt;neg, (dmq1)-&gt;flags=(((dmq1)-&gt;flags<br> &amp; 0x01) | ((rsa-&gt;dmq1)-&gt;flags &amp; ~0x01) | 0x02 |<br> (0x04)))</span></span>;</td></tr>
+<tr><td class="num" id="LN566">566</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN567">567</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN568">568</td><td class="line">		dmq1 = rsa-&gt;dmq1;</td></tr>
+<tr><td class="num" id="LN569">569</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN570">570</td><td class="line">	<span class='keyword'>if</span> (!e_rsax_bn_mod_exp(m1,r1,dmq1,rsa-&gt;q,ctx,</td></tr>
+<tr><td class="num" id="LN571">571</td><td class="line">		rsa-&gt;_method_mod_q, e_rsax_get_ctx(rsa, 0, rsa-&gt;q) )) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN572">572</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN573">573</td><td class="line">	<span class='comment'>/* compute I mod p */</span></td></tr>
+<tr><td class="num" id="LN574">574</td><td class="line">	<span class='keyword'>if</span> (!(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NO_CONSTTIME<span class='expansion'>0x0100</span></span>))</td></tr>
+<tr><td class="num" id="LN575">575</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN576">576</td><td class="line">		c = &amp;local_c;</td></tr>
+<tr><td class="num" id="LN577">577</td><td class="line">		<span class='macro'>BN_with_flags(c, I, BN_FLG_CONSTTIME)<span class='expansion'>((c)-&gt;d=(I)-&gt;d, (c)-&gt;top=(I)-&gt;top, (c)-&gt;dmax=(<br>I)-&gt;dmax, (c)-&gt;neg=(I)-&gt;neg, (c)-&gt;flags=(((c)-&gt;<br>flags &amp; 0x01) | ((I)-&gt;flags &amp; ~0x01) | 0x02 | (0x04<br>)))</span></span>;</td></tr>
+<tr><td class="num" id="LN578">578</td><td class="line">		<span class='keyword'>if</span> (!<span class='macro'>BN_mod(r1,c,rsa-&gt;p,ctx)<span class='expansion'>BN_div(((void*)0),(r1),(c),(rsa-&gt;p),(ctx))</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN579">579</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN580">580</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN581">581</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN582">582</td><td class="line">		<span class='keyword'>if</span> (!<span class='macro'>BN_mod(r1,I,rsa-&gt;p,ctx)<span class='expansion'>BN_div(((void*)0),(r1),(I),(rsa-&gt;p),(ctx))</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN583">583</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN584">584</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN585">585</td><td class="line">	<span class='comment'>/* compute r1^dmp1 mod p */</span></td></tr>
+<tr><td class="num" id="LN586">586</td><td class="line">	<span class='keyword'>if</span> (!(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NO_CONSTTIME<span class='expansion'>0x0100</span></span>))</td></tr>
+<tr><td class="num" id="LN587">587</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN588">588</td><td class="line">		dmp1 = &amp;local_dmp1;</td></tr>
+<tr><td class="num" id="LN589">589</td><td class="line">		<span class='macro'>BN_with_flags(dmp1, rsa-&gt;dmp1, BN_FLG_CONSTTIME)<span class='expansion'>((dmp1)-&gt;d=(rsa-&gt;dmp1)-&gt;d, (dmp1)-&gt;top=(rsa-&gt;dmp1<br>)-&gt;top, (dmp1)-&gt;dmax=(rsa-&gt;dmp1)-&gt;dmax, (dmp1)-&gt;<br>neg=(rsa-&gt;dmp1)-&gt;neg, (dmp1)-&gt;flags=(((dmp1)-&gt;flags<br> &amp; 0x01) | ((rsa-&gt;dmp1)-&gt;flags &amp; ~0x01) | 0x02 |<br> (0x04)))</span></span>;</td></tr>
+<tr><td class="num" id="LN590">590</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN591">591</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN592">592</td><td class="line">		dmp1 = rsa-&gt;dmp1;</td></tr>
+<tr><td class="num" id="LN593">593</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN594">594</td><td class="line">	<span class='keyword'>if</span> (!e_rsax_bn_mod_exp(r0,r1,dmp1,rsa-&gt;p,ctx,</td></tr>
+<tr><td class="num" id="LN595">595</td><td class="line">		rsa-&gt;_method_mod_p, e_rsax_get_ctx(rsa, 1, rsa-&gt;p) )) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN596">596</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN597">597</td><td class="line">	<span class='keyword'>if</span> (!BN_sub(r0,r0,m1)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN598">598</td><td class="line">	<span class='comment'>/* This will help stop the size of r0 increasing, which does</span></td></tr>
+<tr><td class="num" id="LN599">599</td><td class="line">	 <span class='comment'>* affect the multiply if it optimised for a power of 2 size */</span></td></tr>
+<tr><td class="num" id="LN600">600</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>BN_is_negative(r0)<span class='expansion'>((r0)-&gt;neg != 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN601">601</td><td class="line">		<span class='keyword'>if</span> (!BN_add(r0,r0,rsa-&gt;p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN602">602</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN603">603</td><td class="line">	<span class='keyword'>if</span> (!BN_mul(r1,r0,rsa-&gt;iqmp,ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN604">604</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN605">605</td><td class="line">	<span class='comment'>/* Turn BN_FLG_CONSTTIME flag on before division operation */</span></td></tr>
+<tr><td class="num" id="LN606">606</td><td class="line">	<span class='keyword'>if</span> (!(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NO_CONSTTIME<span class='expansion'>0x0100</span></span>))</td></tr>
+<tr><td class="num" id="LN607">607</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN608">608</td><td class="line">		pr1 = &amp;local_r1;</td></tr>
+<tr><td class="num" id="LN609">609</td><td class="line">		<span class='macro'>BN_with_flags(pr1, r1, BN_FLG_CONSTTIME)<span class='expansion'>((pr1)-&gt;d=(r1)-&gt;d, (pr1)-&gt;top=(r1)-&gt;top, (pr1)-&gt;<br>dmax=(r1)-&gt;dmax, (pr1)-&gt;neg=(r1)-&gt;neg, (pr1)-&gt;flags<br>=(((pr1)-&gt;flags &amp; 0x01) | ((r1)-&gt;flags &amp; ~0x01)<br> | 0x02 | (0x04)))</span></span>;</td></tr>
+<tr><td class="num" id="LN610">610</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN611">611</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN612">612</td><td class="line">		pr1 = r1;</td></tr>
+<tr><td class="num" id="LN613">613</td><td class="line">	<span class='keyword'>if</span> (!<span class='macro'>BN_mod(r0,pr1,rsa-&gt;p,ctx)<span class='expansion'>BN_div(((void*)0),(r0),(pr1),(rsa-&gt;p),(ctx))</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN614">614</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN615">615</td><td class="line">	<span class='comment'>/* If p &lt; q it is occasionally possible for the correction of</span></td></tr>
+<tr><td class="num" id="LN616">616</td><td class="line">         <span class='comment'>* adding 'p' if r0 is negative above to leave the result still</span></td></tr>
+<tr><td class="num" id="LN617">617</td><td class="line">	 <span class='comment'>* negative. This can break the private key operations: the following</span></td></tr>
+<tr><td class="num" id="LN618">618</td><td class="line">	 <span class='comment'>* second correction should *always* correct this rare occurrence.</span></td></tr>
+<tr><td class="num" id="LN619">619</td><td class="line">	 <span class='comment'>* This will *never* happen with OpenSSL generated keys because</span></td></tr>
+<tr><td class="num" id="LN620">620</td><td class="line">         <span class='comment'>* they ensure p &gt; q [steve]</span></td></tr>
+<tr><td class="num" id="LN621">621</td><td class="line">         <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN622">622</td><td class="line">	<span class='keyword'>if</span> (<span class='macro'>BN_is_negative(r0)<span class='expansion'>((r0)-&gt;neg != 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN623">623</td><td class="line">		<span class='keyword'>if</span> (!BN_add(r0,r0,rsa-&gt;p)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN624">624</td><td class="line">	<span class='keyword'>if</span> (!BN_mul(r1,r0,rsa-&gt;q,ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN625">625</td><td class="line">	<span class='keyword'>if</span> (!BN_add(r0,r1,m1)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN626">626</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN627">627</td><td class="line">	<span class='keyword'>if</span> (rsa-&gt;e &amp;&amp; rsa-&gt;n)</td></tr>
+<tr><td class="num" id="LN628">628</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN629">629</td><td class="line">		<span class='keyword'>if</span> (!e_rsax_bn_mod_exp(vrfy,r0,rsa-&gt;e,rsa-&gt;n,ctx,rsa-&gt;_method_mod_n, e_rsax_get_ctx(rsa, 2, rsa-&gt;n) ))</td></tr>
+<tr><td class="num" id="LN630">630</td><td class="line">                    <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN631">631</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN632">632</td><td class="line">		<span class='comment'>/* If 'I' was greater than (or equal to) rsa-&gt;n, the operation</span></td></tr>
+<tr><td class="num" id="LN633">633</td><td class="line">		 <span class='comment'>* will be equivalent to using 'I mod n'. However, the result of</span></td></tr>
+<tr><td class="num" id="LN634">634</td><td class="line">		 <span class='comment'>* the verify will *always* be less than 'n' so we don't check</span></td></tr>
+<tr><td class="num" id="LN635">635</td><td class="line">		 <span class='comment'>* for absolute equality, just congruency. */</span></td></tr>
+<tr><td class="num" id="LN636">636</td><td class="line">		<span class='keyword'>if</span> (!BN_sub(vrfy, vrfy, I)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN637">637</td><td class="line">		<span class='keyword'>if</span> (!<span class='macro'>BN_mod(vrfy, vrfy, rsa-&gt;n, ctx)<span class='expansion'>BN_div(((void*)0),(vrfy),(vrfy),(rsa-&gt;n),(ctx))</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN638">638</td><td class="line">		<span class='keyword'>if</span> (<span class='macro'>BN_is_negative(vrfy)<span class='expansion'>((vrfy)-&gt;neg != 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN639">639</td><td class="line">			<span class='keyword'>if</span> (!BN_add(vrfy, vrfy, rsa-&gt;n)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN640">640</td><td class="line">		<span class='keyword'>if</span> (!<span class='macro'>BN_is_zero(vrfy)<span class='expansion'>((vrfy)-&gt;top == 0)</span></span>)</td></tr>
+<tr><td class="num" id="LN641">641</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN642">642</td><td class="line">			<span class='comment'>/* 'I' and 'vrfy' aren't congruent mod n. Don't leak</span></td></tr>
+<tr><td class="num" id="LN643">643</td><td class="line">			 <span class='comment'>* miscalculated CRT output, just do a raw (slower)</span></td></tr>
+<tr><td class="num" id="LN644">644</td><td class="line">			 <span class='comment'>* mod_exp and return that instead. */</span></td></tr>
+<tr><td class="num" id="LN645">645</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN646">646</td><td class="line">			BIGNUM local_d;</td></tr>
+<tr><td class="num" id="LN647">647</td><td class="line">			BIGNUM *d = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN648">648</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN649">649</td><td class="line">			<span class='keyword'>if</span> (!(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NO_CONSTTIME<span class='expansion'>0x0100</span></span>))</td></tr>
+<tr><td class="num" id="LN650">650</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN651">651</td><td class="line">				d = &amp;local_d;</td></tr>
+<tr><td class="num" id="LN652">652</td><td class="line">				<span class='macro'>BN_with_flags(d, rsa-&gt;d, BN_FLG_CONSTTIME)<span class='expansion'>((d)-&gt;d=(rsa-&gt;d)-&gt;d, (d)-&gt;top=(rsa-&gt;d)-&gt;top<br>, (d)-&gt;dmax=(rsa-&gt;d)-&gt;dmax, (d)-&gt;neg=(rsa-&gt;d)-&gt;<br>neg, (d)-&gt;flags=(((d)-&gt;flags &amp; 0x01) | ((rsa-&gt;d)<br>-&gt;flags &amp; ~0x01) | 0x02 | (0x04)))</span></span>;</td></tr>
+<tr><td class="num" id="LN653">653</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN654">654</td><td class="line">			<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN655">655</td><td class="line">				d = rsa-&gt;d;</td></tr>
+<tr><td class="num" id="LN656">656</td><td class="line">			<span class='keyword'>if</span> (!e_rsax_bn_mod_exp(r0,I,d,rsa-&gt;n,ctx,</td></tr>
+<tr><td class="num" id="LN657">657</td><td class="line">						   rsa-&gt;_method_mod_n, e_rsax_get_ctx(rsa, 2, rsa-&gt;n) )) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN658">658</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN659">659</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN660">660</td><td class="line">	ret=1;</td></tr>
+<tr><td class="num" id="LN661">661</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN662">662</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN663">663</td><td class="line">	BN_CTX_end(ctx);</td></tr>
+<tr><td class="num" id="LN664">664</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN665">665</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN666">666</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN667">667</td><td class="line"><span class='directive'>#endif /* !OPENSSL_NO_RSA */</span></td></tr>
+<tr><td class="num" id="LN668">668</td><td class="line"><span class='directive'>#endif /* !COMPILE_RSAX */</span></td></tr>
+</table></body></html>

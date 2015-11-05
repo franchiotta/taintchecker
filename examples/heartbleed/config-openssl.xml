@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TaintChecker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="TaintChecker.xsd">
+  <TaintSources>
+    <TaintSource>
+      <method>ntohl</method>
+      <params>
+        <value>100</value>
+      </params>
+    </TaintSource>
+    <TaintSource>
+      <method>ntohs</method>
+      <params>
+        <value>100</value>
+      </params>
+    </TaintSource>
+    <TaintSource>
+      <method>ntos</method>
+      <params>
+        <value>100</value>
+      </params>
+    </TaintSource>
+  </TaintSources>
+  <PropagationRules/>
+  <TaintDestinations>
+        <TaintDestination>
+          <method>memcpy</method>
+          <params>
+            <value>2</value>
+          </params>
+        </TaintDestination>
+  </TaintDestinations>
+  <TaintFilters/>	  
+</TaintChecker>

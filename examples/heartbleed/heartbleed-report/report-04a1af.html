@@ -1,0 +1,349 @@
+<!doctype html>
+<html>
+<head>
+<title>rsa_gen.c</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC The left operand of '&' is a garbage value -->
+
+<!-- BUGTYPE Result of operation is garbage or undefined -->
+
+<!-- BUGCATEGORY Logic error -->
+
+<!-- BUGFILE /Users/fran/Desktop/openssl-1.0.1f/crypto/rsa/rsa_gen.c -->
+
+<!-- FILENAME rsa_gen.c -->
+
+<!-- FUNCTIONNAME rsa_builtin_keygen -->
+
+<!-- BUGLINE 188 -->
+
+<!-- BUGCOLUMN 5 -->
+
+<!-- BUGPATHLENGTH 27 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>crypto/rsa/rsa_gen.c</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 188, column 5</a></td></tr>
+<tr><td class="rowname">Description:</td><td>The left operand of '&' is a garbage value</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/* crypto/rsa/rsa_gen.c */</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>/* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"> <span class='comment'>* All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"> <span class='comment'>* This package is an SSL implementation written</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"> <span class='comment'>* by Eric Young (eay@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"> <span class='comment'>* The implementation was written so as to conform with Netscapes SSL.</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"> <span class='comment'>* This library is free for commercial and non-commercial use as long as</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"> <span class='comment'>* the following conditions are aheared to.  The following conditions</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"> <span class='comment'>* apply to all code found in this distribution, be it the RC4, RSA,</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"> <span class='comment'>* lhash, DES, etc., code; not just the SSL code.  The SSL documentation</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"> <span class='comment'>* included with this distribution is covered by the same copyright terms</span></td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"> <span class='comment'>* except that the holder is Tim Hudson (tjh@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"> <span class='comment'>* Copyright remains Eric Young's, and as such any Copyright notices in</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"> <span class='comment'>* the code are not to be removed.</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"> <span class='comment'>* If this package is used in a product, Eric Young should be given attribution</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"> <span class='comment'>* as the author of the parts of the library used.</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"> <span class='comment'>* This can be in the form of a textual message at program startup or</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"> <span class='comment'>* in documentation (online or textual) provided with the package.</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"> <span class='comment'>* Redistribution and use in source and binary forms, with or without</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"> <span class='comment'>* modification, are permitted provided that the following conditions</span></td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"> <span class='comment'>* are met:</span></td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"> <span class='comment'>* 1. Redistributions of source code must retain the copyright</span></td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer.</span></td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"> <span class='comment'>* 2. Redistributions in binary form must reproduce the above copyright</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer in the</span></td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"> <span class='comment'>*    documentation and/or other materials provided with the distribution.</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"> <span class='comment'>* 3. All advertising materials mentioning features or use of this software</span></td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> <span class='comment'>*    must display the following acknowledgement:</span></td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"> <span class='comment'>*    "This product includes cryptographic software written by</span></td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"> <span class='comment'>*     Eric Young (eay@cryptsoft.com)"</span></td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"> <span class='comment'>*    The word 'cryptographic' can be left out if the rouines from the library</span></td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line"> <span class='comment'>*    being used are not cryptographic related :-).</span></td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line"> <span class='comment'>* 4. If you include any Windows specific code (or a derivative thereof) from</span> </td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line"> <span class='comment'>*    the apps directory (application code) you must include an acknowledgement:</span></td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line"> <span class='comment'>*    "This product includes software written by Tim Hudson (tjh@cryptsoft.com)"</span></td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line"> <span class='comment'>* THIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND</span></td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line"> <span class='comment'>* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span></td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line"> <span class='comment'>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span></td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line"> <span class='comment'>* ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE</span></td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line"> <span class='comment'>* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span></td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line"> <span class='comment'>* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span></td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line"> <span class='comment'>* OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span></td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line"> <span class='comment'>* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span></td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line"> <span class='comment'>* LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY</span></td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line"> <span class='comment'>* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF</span></td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line"> <span class='comment'>* SUCH DAMAGE.</span></td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line"> <span class='comment'>* The licence and distribution terms for any publically available version or</span></td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line"> <span class='comment'>* derivative of this code cannot be changed.  i.e. this code cannot simply be</span></td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line"> <span class='comment'>* copied and put under another distribution licence</span></td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line"> <span class='comment'>* [including the GNU Public Licence.]</span></td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line"><span class='comment'>/* NB: these functions have been "upgraded", the deprecated versions (which are</span></td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line"> <span class='comment'>* compatibility wrappers using these functions) are in rsa_depr.c.</span></td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line"> <span class='comment'>* - Geoff</span></td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line"><span class='directive'>#include &lt;stdio.h&gt;</span></td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line"><span class='directive'>#include &lt;time.h&gt;</span></td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line"><span class='directive'>#include "cryptlib.h"</span></td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line"><span class='directive'>#include &lt;openssl/bn.h&gt;</span></td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line"><span class='directive'>#include &lt;openssl/rsa.h&gt;</span></td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line"><span class='directive'>#ifdef OPENSSL_FIPS</span></td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line"><span class='directive'>#include &lt;openssl/fips.h&gt;</span></td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> rsa_builtin_keygen(RSA *rsa, <span class='keyword'>int</span> bits, BIGNUM *e_value, BN_GENCB *cb);</td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line"><span class='comment'>/* NB: this wrapper would normally be placed in rsa_lib.c and the static</span></td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line"> <span class='comment'>* implementation would probably be in rsa_eay.c. Nonetheless, is kept here so</span></td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line"> <span class='comment'>* that we don't introduce a new linker dependency. Eg. any application that</span></td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line"> <span class='comment'>* wasn't previously linking object code related to key-generation won't have to</span></td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line"> <span class='comment'>* now just because key-generation is part of RSA_METHOD. */</span></td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line"><span class='keyword'>int</span> RSA_generate_key_ex(RSA *rsa, <span class='keyword'>int</span> bits, BIGNUM *e_value, BN_GENCB *cb)</td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line"><span class='directive'>#ifdef OPENSSL_FIPS</span></td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line">	<span class='keyword'>if</span> (FIPS_mode() &amp;&amp; !(rsa-&gt;meth-&gt;flags &amp; <span class='macro'>RSA_FLAG_FIPS_METHOD<span class='expansion'>0x0400</span></span>)</td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line">			&amp;&amp; !(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NON_FIPS_ALLOW<span class='expansion'>0x0400</span></span>))</td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line">		<span class='macro'>RSAerr(RSA_F_RSA_GENERATE_KEY_EX, RSA_R_NON_FIPS_RSA_METHOD)<span class='expansion'>ERR_put_error(4,(155),(157),"rsa_gen.c",87)</span></span>;</td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">	<span class='keyword'>if</span>(rsa-&gt;meth-&gt;rsa_keygen)</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line">		<span class='keyword'>return</span> rsa-&gt;meth-&gt;rsa_keygen(rsa, bits, e_value, cb);</td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line"><span class='directive'>#ifdef OPENSSL_FIPS</span></td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line">	<span class='keyword'>if</span> (FIPS_mode())</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line">		<span class='keyword'>return</span> FIPS_rsa_generate_key_ex(rsa, bits, e_value, cb);</td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">	<span class='keyword'>return</span> rsa_builtin_keygen(rsa, bits, e_value, cb);</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> rsa_builtin_keygen(RSA *rsa, <span class='keyword'>int</span> bits, BIGNUM *e_value, BN_GENCB *cb)</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line">	BIGNUM *r0=<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,*r1=<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,*r2=<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,*r3=<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>,*tmp;</td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line">	BIGNUM local_r0,local_d,local_p;</td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line">	BIGNUM *pr0,*d,*p;</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line">	<span class='keyword'>int</span> bitsp,bitsq,ok= -1,n=0;</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line">	BN_CTX *ctx=<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line">	ctx=BN_CTX_new();</td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">	<span class='keyword'>if</span> (<span class="mrange">ctx == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path1" class="msg msgEvent" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">1</div></td><td>Assuming 'ctx' is not equal to null</td><td><div class="PathNav"><a href="#Path2" title="Next event (2)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path2" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">2</div></td><td><div class="PathNav"><a href="#Path1" title="Previous event (1)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path3" title="Next event (3)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line">	BN_CTX_start(ctx);</td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line">	r0 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line">	r1 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line">	r2 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">	r3 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line">	<span class='keyword'>if</span> (<span class="mrange">r3 == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path3" class="msg msgEvent" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">3</div></td><td><div class="PathNav"><a href="#Path2" title="Previous event (2)">&#x2190;</a></div></td></td><td>Assuming 'r3' is not equal to null</td><td><div class="PathNav"><a href="#Path4" title="Next event (4)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path4" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">4</div></td><td><div class="PathNav"><a href="#Path3" title="Previous event (3)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path5" title="Next event (5)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line">	bitsp=(bits+1)/2;</td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line">	bitsq=bits-bitsp;</td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line">	<span class='comment'>/* We need the RSA components non-NULL */</span></td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line">	<span class='keyword'>if</span>(!rsa-&gt;n &amp;&amp; ((rsa-&gt;n=BN_new()) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line">	<span class='keyword'>if</span>(!rsa-&gt;d &amp;&amp; ((rsa-&gt;d=BN_new()) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line">	<span class='keyword'>if</span>(!rsa-&gt;e &amp;&amp; ((rsa-&gt;e=BN_new()) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line">	<span class='keyword'>if</span>(!rsa-&gt;p &amp;&amp; ((rsa-&gt;p=BN_new()) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line">	<span class='keyword'>if</span>(!rsa-&gt;q &amp;&amp; ((rsa-&gt;q=BN_new()) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line">	<span class='keyword'>if</span>(!rsa-&gt;dmp1 &amp;&amp; ((rsa-&gt;dmp1=BN_new()) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line">	<span class='keyword'>if</span>(!rsa-&gt;dmq1 &amp;&amp; ((rsa-&gt;dmq1=BN_new()) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line">	<span class='keyword'>if</span>(!rsa-&gt;iqmp &amp;&amp; ((rsa-&gt;iqmp=BN_new()) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line">	BN_copy(rsa-&gt;e, e_value);</td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line">	<span class='comment'>/* generate p and q */</span></td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line">	<span class='keyword'>for</span> (;;)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path5" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">5</div></td><td><div class="PathNav"><a href="#Path4" title="Previous event (4)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path6" title="Next event (6)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line">		<span class='keyword'>if</span>(!BN_generate_prime_ex(rsa-&gt;p, bitsp, 0, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, cb))</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path6" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">6</div></td><td><div class="PathNav"><a href="#Path5" title="Previous event (5)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path7" title="Next event (7)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line">			<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line">		<span class='keyword'>if</span> (!BN_sub(r2,rsa-&gt;p,BN_value_one())) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path7" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">7</div></td><td><div class="PathNav"><a href="#Path6" title="Previous event (6)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path8" title="Next event (8)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line">		<span class='keyword'>if</span> (!BN_gcd(r1,r2,rsa-&gt;e,ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path8" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">8</div></td><td><div class="PathNav"><a href="#Path7" title="Previous event (7)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path9" title="Next event (9)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line">		<span class='keyword'>if</span> (<span class='macro'>BN_is_one(r1)<span class='expansion'>((((((r1))-&gt;top == 1) &amp;&amp; (((r1))-&gt;d[0] == (unsigned<br> long)(1))) || (((1) == 0) &amp;&amp; (((r1))-&gt;top == 0)))<br> &amp;&amp; !(r1)-&gt;neg)</span></span>) <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path9" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">9</div></td><td><div class="PathNav"><a href="#Path8" title="Previous event (8)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path10" title="Next event (10)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path10" class="msg msgControl" style="margin-left:36ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">10</div></td><td><div class="PathNav"><a href="#Path9" title="Previous event (9)">&#x2190;</a></div></td></td><td> Execution continues on line 143</td><td><div class="PathNav"><a href="#Path11" title="Next event (11)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line">		<span class='keyword'>if</span>(!BN_GENCB_call(cb, 2, n++))</td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line">			<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">	<span class='keyword'>if</span>(!BN_GENCB_call(cb, 3, 0))</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path11" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">11</div></td><td><div class="PathNav"><a href="#Path10" title="Previous event (10)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path12" title="Next event (12)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line">	<span class='keyword'>for</span> (;;)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path12" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">12</div></td><td><div class="PathNav"><a href="#Path11" title="Previous event (11)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path13" title="Next event (13)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line">		<span class='comment'>/* When generating ridiculously small keys, we can get stuck</span></td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line">		 <span class='comment'>* continually regenerating the same prime values. Check for</span></td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line">		 <span class='comment'>* this and bail if it happens 3 times. */</span></td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line">		<span class='keyword'>unsigned</span> <span class='keyword'>int</span> degenerate = 0;</td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line">		<span class='keyword'>do</span></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path14" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">14</div></td><td><div class="PathNav"><a href="#Path13" title="Previous event (13)">&#x2190;</a></div></td></td><td>Loop condition is false.  Exiting loop</td><td><div class="PathNav"><a href="#Path15" title="Next event (15)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line">			<span class='keyword'>if</span>(!BN_generate_prime_ex(rsa-&gt;q, bitsq, 0, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, cb))</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path13" class="msg msgControl" style="margin-left:25ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">13</div></td><td><div class="PathNav"><a href="#Path12" title="Previous event (12)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path14" title="Next event (14)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line">				<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line">			} <span class='keyword'>while</span>((BN_cmp(rsa-&gt;p, rsa-&gt;q) == 0) &amp;&amp; (++degenerate &lt; 3));</td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line">		<span class='keyword'>if</span>(degenerate == 3)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path15" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">15</div></td><td><div class="PathNav"><a href="#Path14" title="Previous event (14)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path16" title="Next event (16)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line">			ok = 0; <span class='comment'>/* we set our own err */</span></td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line">			<span class='macro'>RSAerr(RSA_F_RSA_BUILTIN_KEYGEN,RSA_R_KEY_SIZE_TOO_SMALL)<span class='expansion'>ERR_put_error(4,(129),(120),"rsa_gen.c",159)</span></span>;</td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line">			<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line">		<span class='keyword'>if</span> (!BN_sub(r2,rsa-&gt;q,BN_value_one())) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path16" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">16</div></td><td><div class="PathNav"><a href="#Path15" title="Previous event (15)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path17" title="Next event (17)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line">		<span class='keyword'>if</span> (!BN_gcd(r1,r2,rsa-&gt;e,ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path17" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">17</div></td><td><div class="PathNav"><a href="#Path16" title="Previous event (16)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path18" title="Next event (18)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line">		<span class='keyword'>if</span> (<span class='macro'>BN_is_one(r1)<span class='expansion'>((((((r1))-&gt;top == 1) &amp;&amp; (((r1))-&gt;d[0] == (unsigned<br> long)(1))) || (((1) == 0) &amp;&amp; (((r1))-&gt;top == 0)))<br> &amp;&amp; !(r1)-&gt;neg)</span></span>)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path18" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">18</div></td><td><div class="PathNav"><a href="#Path17" title="Previous event (17)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path19" title="Next event (19)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line">			<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path19" class="msg msgControl" style="margin-left:25ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">19</div></td><td><div class="PathNav"><a href="#Path18" title="Previous event (18)">&#x2190;</a></div></td></td><td> Execution continues on line 169</td><td><div class="PathNav"><a href="#Path20" title="Next event (20)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line">		<span class='keyword'>if</span>(!BN_GENCB_call(cb, 2, n++))</td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line">			<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line">	<span class='keyword'>if</span>(!BN_GENCB_call(cb, 3, 1))</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path20" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">20</div></td><td><div class="PathNav"><a href="#Path19" title="Previous event (19)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path21" title="Next event (21)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line">	<span class='keyword'>if</span> (BN_cmp(rsa-&gt;p,rsa-&gt;q) &lt; 0)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path21" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">21</div></td><td><div class="PathNav"><a href="#Path20" title="Previous event (20)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path22" title="Next event (22)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line">		tmp=rsa-&gt;p;</td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line">		rsa-&gt;p=rsa-&gt;q;</td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line">		rsa-&gt;q=tmp;</td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line">	<span class='comment'>/* calculate n */</span></td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line">	<span class='keyword'>if</span> (!BN_mul(rsa-&gt;n,rsa-&gt;p,rsa-&gt;q,ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path22" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">22</div></td><td><div class="PathNav"><a href="#Path21" title="Previous event (21)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path23" title="Next event (23)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">	<span class='comment'>/* calculate d */</span></td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line">	<span class='keyword'>if</span> (!BN_sub(r1,rsa-&gt;p,BN_value_one())) <span class='keyword'>goto</span> err;	<span class='comment'>/* p-1 */</span></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path23" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">23</div></td><td><div class="PathNav"><a href="#Path22" title="Previous event (22)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path24" title="Next event (24)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line">	<span class='keyword'>if</span> (!BN_sub(r2,rsa-&gt;q,BN_value_one())) <span class='keyword'>goto</span> err;	<span class='comment'>/* q-1 */</span></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path24" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">24</div></td><td><div class="PathNav"><a href="#Path23" title="Previous event (23)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path25" title="Next event (25)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line">	<span class='keyword'>if</span> (!BN_mul(r0,r1,r2,ctx)) <span class='keyword'>goto</span> err;	<span class='comment'>/* (p-1)(q-1) */</span></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path25" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">25</div></td><td><div class="PathNav"><a href="#Path24" title="Previous event (24)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path26" title="Next event (26)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line">	<span class='keyword'>if</span> (!(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NO_CONSTTIME<span class='expansion'>0x0100</span></span>))</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path26" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">26</div></td><td><div class="PathNav"><a href="#Path25" title="Previous event (25)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#EndPath" title="Next event (27)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line">		  pr0 = &amp;local_r0;</td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line">		  <span class='macro'>BN_with_flags(pr0, r0, BN_FLG_CONSTTIME)<span class='expansion'>((pr0)-&gt;d=(r0)-&gt;d, (pr0)-&gt;top=(r0)-&gt;top, (pr0)-&gt;<br>dmax=(r0)-&gt;dmax, (pr0)-&gt;neg=(r0)-&gt;neg, (pr0)-&gt;flags<br>=(((pr0)-&gt;flags &amp; 0x01) | ((r0)-&gt;flags &amp; ~0x01)<br> | 0x02 | (0x04)))</span></span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgControl" style="margin-left:19ex; max-width:100em"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">27</div></td><td><div class="PathNav"><a href="#Path26" title="Previous event (26)">&#x2190;</a></div></td></td><td>Within the expansion of the macro 'BN_with_flags':
+</td></tr></table><div class="msg msgEvent" style="width:94%; margin-left:5px"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">a</div></td><td valign="top">The left operand of '&amp;' is a garbage value</td></tr></table></div>
+</div></td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line">	  pr0 = r0;</td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_inverse(rsa-&gt;d,rsa-&gt;e,pr0,ctx)) <span class='keyword'>goto</span> err;	<span class='comment'>/* d */</span></td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line">	<span class='comment'>/* set up d for correct BN_FLG_CONSTTIME flag */</span></td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line">	<span class='keyword'>if</span> (!(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NO_CONSTTIME<span class='expansion'>0x0100</span></span>))</td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line">		d = &amp;local_d;</td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line">		<span class='macro'>BN_with_flags(d, rsa-&gt;d, BN_FLG_CONSTTIME)<span class='expansion'>((d)-&gt;d=(rsa-&gt;d)-&gt;d, (d)-&gt;top=(rsa-&gt;d)-&gt;top<br>, (d)-&gt;dmax=(rsa-&gt;d)-&gt;dmax, (d)-&gt;neg=(rsa-&gt;d)-&gt;<br>neg, (d)-&gt;flags=(((d)-&gt;flags &amp; 0x01) | ((rsa-&gt;d)<br>-&gt;flags &amp; ~0x01) | 0x02 | (0x04)))</span></span>;</td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line">		d = rsa-&gt;d;</td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line">	<span class='comment'>/* calculate d mod (p-1) */</span></td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line">	<span class='keyword'>if</span> (!<span class='macro'>BN_mod(rsa-&gt;dmp1,d,r1,ctx)<span class='expansion'>BN_div(((void*)0),(rsa-&gt;dmp1),(d),(r1),(ctx))</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line">	<span class='comment'>/* calculate d mod (q-1) */</span></td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line">	<span class='keyword'>if</span> (!<span class='macro'>BN_mod(rsa-&gt;dmq1,d,r2,ctx)<span class='expansion'>BN_div(((void*)0),(rsa-&gt;dmq1),(d),(r2),(ctx))</span></span>) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line">	<span class='comment'>/* calculate inverse of q mod p */</span></td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line">	<span class='keyword'>if</span> (!(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NO_CONSTTIME<span class='expansion'>0x0100</span></span>))</td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line">		p = &amp;local_p;</td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line">		<span class='macro'>BN_with_flags(p, rsa-&gt;p, BN_FLG_CONSTTIME)<span class='expansion'>((p)-&gt;d=(rsa-&gt;p)-&gt;d, (p)-&gt;top=(rsa-&gt;p)-&gt;top<br>, (p)-&gt;dmax=(rsa-&gt;p)-&gt;dmax, (p)-&gt;neg=(rsa-&gt;p)-&gt;<br>neg, (p)-&gt;flags=(((p)-&gt;flags &amp; 0x01) | ((rsa-&gt;p)<br>-&gt;flags &amp; ~0x01) | 0x02 | (0x04)))</span></span>;</td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line">		p = rsa-&gt;p;</td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line">	<span class='keyword'>if</span> (!BN_mod_inverse(rsa-&gt;iqmp,rsa-&gt;q,p,ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line">	ok=1;</td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line">	<span class='keyword'>if</span> (ok == -1)</td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line">		<span class='macro'>RSAerr(RSA_F_RSA_BUILTIN_KEYGEN,ERR_LIB_BN)<span class='expansion'>ERR_put_error(4,(129),(3),"rsa_gen.c",223)</span></span>;</td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line">		ok=0;</td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line">	<span class='keyword'>if</span> (ctx != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line">		BN_CTX_end(ctx);</td></tr>
+<tr><td class="num" id="LN229">229</td><td class="line">		BN_CTX_free(ctx);</td></tr>
+<tr><td class="num" id="LN230">230</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN231">231</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN232">232</td><td class="line">	<span class='keyword'>return</span> ok;</td></tr>
+<tr><td class="num" id="LN233">233</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN234">234</td><td class="line"> </td></tr>
+</table></body></html>

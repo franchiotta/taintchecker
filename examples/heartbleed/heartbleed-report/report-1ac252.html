@@ -1,0 +1,947 @@
+<!doctype html>
+<html>
+<head>
+<title>asn1_gen.c</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC Null pointer argument in call to string comparison function -->
+
+<!-- BUGTYPE Unix API -->
+
+<!-- BUGCATEGORY Logic error -->
+
+<!-- BUGFILE /Users/fran/Desktop/openssl-1.0.1f/crypto/asn1/asn1_gen.c -->
+
+<!-- FILENAME asn1_gen.c -->
+
+<!-- FUNCTIONNAME asn1_cb -->
+
+<!-- BUGLINE 365 -->
+
+<!-- BUGCOLUMN 8 -->
+
+<!-- BUGPATHLENGTH 7 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>crypto/asn1/asn1_gen.c</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 365, column 8</a></td></tr>
+<tr><td class="rowname">Description:</td><td>Null pointer argument in call to string comparison function</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/* asn1_gen.c */</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>/* Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"> <span class='comment'>* project 2002.</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"><span class='comment'>/* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"> <span class='comment'>* Copyright (c) 2002 The OpenSSL Project.  All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"> <span class='comment'>* Redistribution and use in source and binary forms, with or without</span></td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"> <span class='comment'>* modification, are permitted provided that the following conditions</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"> <span class='comment'>* are met:</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"> <span class='comment'>* 1. Redistributions of source code must retain the above copyright</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer.</span> </td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> <span class='comment'>* 2. Redistributions in binary form must reproduce the above copyright</span></td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer in</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"> <span class='comment'>*    the documentation and/or other materials provided with the</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"> <span class='comment'>*    distribution.</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"> <span class='comment'>* 3. All advertising materials mentioning features or use of this</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"> <span class='comment'>*    software must display the following acknowledgment:</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"> <span class='comment'>*    "This product includes software developed by the OpenSSL Project</span></td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"> <span class='comment'>*    for use in the OpenSSL Toolkit. (http://www.OpenSSL.org/)"</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"> <span class='comment'>* 4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to</span></td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"> <span class='comment'>*    endorse or promote products derived from this software without</span></td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"> <span class='comment'>*    prior written permission. For written permission, please contact</span></td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"> <span class='comment'>*    licensing@OpenSSL.org.</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"> <span class='comment'>* 5. Products derived from this software may not be called "OpenSSL"</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"> <span class='comment'>*    nor may "OpenSSL" appear in their names without prior written</span></td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> <span class='comment'>*    permission of the OpenSSL Project.</span></td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"> <span class='comment'>* 6. Redistributions of any form whatsoever must retain the following</span></td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"> <span class='comment'>*    acknowledgment:</span></td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line"> <span class='comment'>*    "This product includes software developed by the OpenSSL Project</span></td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line"> <span class='comment'>*    for use in the OpenSSL Toolkit (http://www.OpenSSL.org/)"</span></td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line"> <span class='comment'>* THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY</span></td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line"> <span class='comment'>* EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span></td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line"> <span class='comment'>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR</span></td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line"> <span class='comment'>* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR</span></td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line"> <span class='comment'>* ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span></td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line"> <span class='comment'>* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT</span></td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line"> <span class='comment'>* NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span></td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line"> <span class='comment'>* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span></td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line"> <span class='comment'>* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,</span></td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line"> <span class='comment'>* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)</span></td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line"> <span class='comment'>* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED</span></td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line"> <span class='comment'>* OF THE POSSIBILITY OF SUCH DAMAGE.</span></td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line"> <span class='comment'>* ====================================================================</span></td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line"> <span class='comment'>* This product includes cryptographic software written by Eric Young</span></td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line"> <span class='comment'>* (eay@cryptsoft.com).  This product includes software written by Tim</span></td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line"> <span class='comment'>* Hudson (tjh@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line"><span class='directive'>#include "cryptlib.h"</span></td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line"><span class='directive'>#include &lt;openssl/asn1.h&gt;</span></td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line"><span class='directive'>#include &lt;openssl/x509v3.h&gt;</span></td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_GEN_FLAG<span class='expansion'>0x10000</span></span>		0x10000</span></td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_GEN_FLAG_IMP<span class='expansion'>(0x10000|1)</span></span>	(<span class='macro'>ASN1_GEN_FLAG<span class='expansion'>0x10000</span></span>|1)</span></td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_GEN_FLAG_EXP<span class='expansion'>(0x10000|2)</span></span>	(<span class='macro'>ASN1_GEN_FLAG<span class='expansion'>0x10000</span></span>|2)</span></td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_GEN_FLAG_TAG<span class='expansion'>(0x10000|3)</span></span>	(<span class='macro'>ASN1_GEN_FLAG<span class='expansion'>0x10000</span></span>|3)</span></td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_GEN_FLAG_BITWRAP<span class='expansion'>(0x10000|4)</span></span>	(<span class='macro'>ASN1_GEN_FLAG<span class='expansion'>0x10000</span></span>|4)</span></td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_GEN_FLAG_OCTWRAP<span class='expansion'>(0x10000|5)</span></span>	(<span class='macro'>ASN1_GEN_FLAG<span class='expansion'>0x10000</span></span>|5)</span></td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_GEN_FLAG_SEQWRAP<span class='expansion'>(0x10000|6)</span></span>	(<span class='macro'>ASN1_GEN_FLAG<span class='expansion'>0x10000</span></span>|6)</span></td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_GEN_FLAG_SETWRAP<span class='expansion'>(0x10000|7)</span></span>	(<span class='macro'>ASN1_GEN_FLAG<span class='expansion'>0x10000</span></span>|7)</span></td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_GEN_FLAG_FORMAT<span class='expansion'>(0x10000|8)</span></span>	(<span class='macro'>ASN1_GEN_FLAG<span class='expansion'>0x10000</span></span>|8)</span></td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_GEN_STR(str,val)<span class='expansion'>{str, sizeof(str) - 1, val}</span></span>	{str, sizeof(str) - 1, val}</span></td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_FLAG_EXP_MAX<span class='expansion'>20</span></span>	20</span></td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line"><span class='comment'>/* Input formats */</span></td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line"><span class='comment'>/* ASCII: default */</span></td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_GEN_FORMAT_ASCII<span class='expansion'>1</span></span>	1</span></td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line"><span class='comment'>/* UTF8 */</span></td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_GEN_FORMAT_UTF8<span class='expansion'>2</span></span>	2</span></td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line"><span class='comment'>/* Hex */</span></td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_GEN_FORMAT_HEX<span class='expansion'>3</span></span>	3</span></td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line"><span class='comment'>/* List of bits */</span></td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line"><span class='directive'>#define <span class='macro'>ASN1_GEN_FORMAT_BITLIST<span class='expansion'>4</span></span>	4</span></td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line"><span class='keyword'>struct</span> tag_name_st</td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">	<span class='keyword'>const</span> <span class='keyword'>char</span> *strnam;</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line">	<span class='keyword'>int</span> len;</td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">	<span class='keyword'>int</span> tag;</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line">	};</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line"><span class='keyword'>typedef</span> <span class='keyword'>struct</span></td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line">	<span class='keyword'>int</span> exp_tag;</td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line">	<span class='keyword'>int</span> exp_class;</td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line">	<span class='keyword'>int</span> exp_constructed;</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line">	<span class='keyword'>int</span> exp_pad;</td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line">	<span class='keyword'>long</span> exp_len;</td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line">	} tag_exp_type;</td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line"><span class='keyword'>typedef</span> <span class='keyword'>struct</span></td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line">	<span class='keyword'>int</span> imp_tag;</td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line">	<span class='keyword'>int</span> imp_class;</td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">	<span class='keyword'>int</span> utype;</td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line">	<span class='keyword'>int</span> format;</td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line">	<span class='keyword'>const</span> <span class='keyword'>char</span> *str;</td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line">	tag_exp_type exp_list[<span class='macro'>ASN1_FLAG_EXP_MAX<span class='expansion'>20</span></span>];</td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line">	<span class='keyword'>int</span> exp_count;</td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">	} tag_exp_arg;</td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> bitstr_cb(<span class='keyword'>const</span> <span class='keyword'>char</span> *elem, <span class='keyword'>int</span> len, <span class='keyword'>void</span> *bitstr);</td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> asn1_cb(<span class='keyword'>const</span> <span class='keyword'>char</span> *elem, <span class='keyword'>int</span> len, <span class='keyword'>void</span> *bitstr);</td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> append_exp(tag_exp_arg *arg, <span class='keyword'>int</span> exp_tag, <span class='keyword'>int</span> exp_class, <span class='keyword'>int</span> exp_constructed, <span class='keyword'>int</span> exp_pad, <span class='keyword'>int</span> imp_ok);</td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> parse_tagging(<span class='keyword'>const</span> <span class='keyword'>char</span> *vstart, <span class='keyword'>int</span> vlen, <span class='keyword'>int</span> *ptag, <span class='keyword'>int</span> *pclass);</td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line"><span class='keyword'>static</span> ASN1_TYPE *asn1_multi(<span class='keyword'>int</span> utype, <span class='keyword'>const</span> <span class='keyword'>char</span> *section, X509V3_CTX *cnf);</td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line"><span class='keyword'>static</span> ASN1_TYPE *asn1_str2type(<span class='keyword'>const</span> <span class='keyword'>char</span> *str, <span class='keyword'>int</span> format, <span class='keyword'>int</span> utype);</td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> asn1_str2tag(<span class='keyword'>const</span> <span class='keyword'>char</span> *tagstr, <span class='keyword'>int</span> len);</td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line">ASN1_TYPE *ASN1_generate_nconf(<span class='keyword'>char</span> *str, CONF *nconf)</td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line">	X509V3_CTX cnf;</td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line">	<span class='keyword'>if</span> (!nconf)</td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line">		<span class='keyword'>return</span> ASN1_generate_v3(str, <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>);</td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line">	X509V3_set_nconf(&amp;cnf, nconf);</td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line">	<span class='keyword'>return</span> ASN1_generate_v3(str, &amp;cnf);</td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line">ASN1_TYPE *ASN1_generate_v3(<span class='keyword'>char</span> *str, X509V3_CTX *cnf)</td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line">	ASN1_TYPE *ret;</td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line">	tag_exp_arg asn1_tags;</td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line">	tag_exp_type *etmp;</td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line">	<span class='keyword'>int</span> i, len;</td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *orig_der = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, *new_der = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line">	<span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *cpy_start;</td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *p;</td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line">	<span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *cp;</td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line">	<span class='keyword'>int</span> cpy_len;</td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line">	<span class='keyword'>long</span> hdr_len;</td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line">	<span class='keyword'>int</span> hdr_constructed = 0, hdr_tag, hdr_class;</td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line">	<span class='keyword'>int</span> r;</td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line">	asn1_tags.imp_tag = -1;</td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line">	asn1_tags.imp_class = -1;</td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line">	asn1_tags.format = <span class='macro'>ASN1_GEN_FORMAT_ASCII<span class='expansion'>1</span></span>;</td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line">	asn1_tags.exp_count = 0;</td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line">	<span class='keyword'>if</span> (CONF_parse_list(str, ',', 1, asn1_cb, &amp;asn1_tags) != 0)</td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line">		<span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line">	<span class='keyword'>if</span> ((asn1_tags.utype == <span class='macro'>V_ASN1_SEQUENCE<span class='expansion'>16</span></span>) || (asn1_tags.utype == <span class='macro'>V_ASN1_SET<span class='expansion'>17</span></span>))</td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line">		<span class='keyword'>if</span> (!cnf)</td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_GENERATE_V3, ASN1_R_SEQUENCE_OR_SET_NEEDS_CONFIG)<span class='expansion'>ERR_put_error(13,(178),(192),"asn1_gen.c",163)</span></span>;</td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line">			<span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line">		ret = asn1_multi(asn1_tags.utype, asn1_tags.str, cnf);</td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line">		ret = asn1_str2type(asn1_tags.str, asn1_tags.format, asn1_tags.utype);</td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line">	<span class='keyword'>if</span> (!ret)</td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line">		<span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line">	<span class='comment'>/* If no tagging return base type */</span></td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line">	<span class='keyword'>if</span> ((asn1_tags.imp_tag == -1) &amp;&amp; (asn1_tags.exp_count == 0))</td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line">		<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line">	<span class='comment'>/* Generate the encoding */</span></td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line">	cpy_len = i2d_ASN1_TYPE(ret, &amp;orig_der);</td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line">	ASN1_TYPE_free(ret);</td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">	ret = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line">	<span class='comment'>/* Set point to start copying for modified encoding */</span></td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line">	cpy_start = orig_der;</td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line">	<span class='comment'>/* Do we need IMPLICIT tagging? */</span></td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line">	<span class='keyword'>if</span> (asn1_tags.imp_tag != -1)</td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line">		<span class='comment'>/* If IMPLICIT we will replace the underlying tag */</span></td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line">		<span class='comment'>/* Skip existing tag+len */</span></td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">		r = ASN1_get_object(&amp;cpy_start, &amp;hdr_len, &amp;hdr_tag, &amp;hdr_class, cpy_len);</td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line">		<span class='keyword'>if</span> (r &amp; 0x80)</td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line">			<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line">		<span class='comment'>/* Update copy length */</span></td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line">		cpy_len -= cpy_start - orig_der;</td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line">		<span class='comment'>/* For IMPLICIT tagging the length should match the</span></td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line">		 <span class='comment'>* original length and constructed flag should be</span></td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line">		 <span class='comment'>* consistent.</span></td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line">		 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line">		<span class='keyword'>if</span> (r &amp; 0x1)</td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line">			<span class='comment'>/* Indefinite length constructed */</span></td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line">			hdr_constructed = 2;</td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line">			hdr_len = 0;</td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line">			<span class='comment'>/* Just retain constructed flag */</span></td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line">			hdr_constructed = r &amp; <span class='macro'>V_ASN1_CONSTRUCTED<span class='expansion'>0x20</span></span>;</td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line">		<span class='comment'>/* Work out new length with IMPLICIT tag: ignore constructed</span></td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line">		 <span class='comment'>* because it will mess up if indefinite length</span></td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line">		 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line">		len = ASN1_object_size(0, hdr_len, asn1_tags.imp_tag);</td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line">		len = cpy_len;</td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line">	<span class='comment'>/* Work out length in any EXPLICIT, starting from end */</span></td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line">	<span class='keyword'>for</span>(i = 0, etmp = asn1_tags.exp_list + asn1_tags.exp_count - 1; i &lt; asn1_tags.exp_count; i++, etmp--)</td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line">		<span class='comment'>/* Content length: number of content octets + any padding */</span></td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line">		len += etmp-&gt;exp_pad;</td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line">		etmp-&gt;exp_len = len;</td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line">		<span class='comment'>/* Total object length: length including new header */</span></td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line">		len = ASN1_object_size(0, len, etmp-&gt;exp_tag);</td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line">	<span class='comment'>/* Allocate buffer for new encoding */</span></td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN229">229</td><td class="line">	new_der = <span class='macro'>OPENSSL_malloc(len)<span class='expansion'>CRYPTO_malloc((int)len,"asn1_gen.c",229)</span></span>;</td></tr>
+<tr><td class="num" id="LN230">230</td><td class="line">	<span class='keyword'>if</span> (!new_der)</td></tr>
+<tr><td class="num" id="LN231">231</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN232">232</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN233">233</td><td class="line">	<span class='comment'>/* Generate tagged encoding */</span></td></tr>
+<tr><td class="num" id="LN234">234</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN235">235</td><td class="line">	p = new_der;</td></tr>
+<tr><td class="num" id="LN236">236</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN237">237</td><td class="line">	<span class='comment'>/* Output explicit tags first */</span></td></tr>
+<tr><td class="num" id="LN238">238</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN239">239</td><td class="line">	<span class='keyword'>for</span> (i = 0, etmp = asn1_tags.exp_list; i &lt; asn1_tags.exp_count; i++, etmp++)</td></tr>
+<tr><td class="num" id="LN240">240</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN241">241</td><td class="line">		ASN1_put_object(&amp;p, etmp-&gt;exp_constructed, etmp-&gt;exp_len,</td></tr>
+<tr><td class="num" id="LN242">242</td><td class="line">					etmp-&gt;exp_tag, etmp-&gt;exp_class);</td></tr>
+<tr><td class="num" id="LN243">243</td><td class="line">		<span class='keyword'>if</span> (etmp-&gt;exp_pad)</td></tr>
+<tr><td class="num" id="LN244">244</td><td class="line">			*p++ = 0;</td></tr>
+<tr><td class="num" id="LN245">245</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN246">246</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN247">247</td><td class="line">	<span class='comment'>/* If IMPLICIT, output tag */</span></td></tr>
+<tr><td class="num" id="LN248">248</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN249">249</td><td class="line">	<span class='keyword'>if</span> (asn1_tags.imp_tag != -1)</td></tr>
+<tr><td class="num" id="LN250">250</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN251">251</td><td class="line">		<span class='keyword'>if</span> (asn1_tags.imp_class == <span class='macro'>V_ASN1_UNIVERSAL<span class='expansion'>0x00</span></span> </td></tr>
+<tr><td class="num" id="LN252">252</td><td class="line">		    &amp;&amp; (asn1_tags.imp_tag == <span class='macro'>V_ASN1_SEQUENCE<span class='expansion'>16</span></span></td></tr>
+<tr><td class="num" id="LN253">253</td><td class="line">		     || asn1_tags.imp_tag == <span class='macro'>V_ASN1_SET<span class='expansion'>17</span></span>) )</td></tr>
+<tr><td class="num" id="LN254">254</td><td class="line">			hdr_constructed = <span class='macro'>V_ASN1_CONSTRUCTED<span class='expansion'>0x20</span></span>;</td></tr>
+<tr><td class="num" id="LN255">255</td><td class="line">		ASN1_put_object(&amp;p, hdr_constructed, hdr_len,</td></tr>
+<tr><td class="num" id="LN256">256</td><td class="line">					asn1_tags.imp_tag, asn1_tags.imp_class);</td></tr>
+<tr><td class="num" id="LN257">257</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN258">258</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN259">259</td><td class="line">	<span class='comment'>/* Copy across original encoding */</span></td></tr>
+<tr><td class="num" id="LN260">260</td><td class="line">	<span class='macro'>memcpy(p, cpy_start, cpy_len)<span class='expansion'>__builtin___memcpy_chk (p, cpy_start, cpy_len, __builtin_object_size<br> (p, 0))</span></span>;</td></tr>
+<tr><td class="num" id="LN261">261</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN262">262</td><td class="line">	cp = new_der;</td></tr>
+<tr><td class="num" id="LN263">263</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN264">264</td><td class="line">	<span class='comment'>/* Obtain new ASN1_TYPE structure */</span></td></tr>
+<tr><td class="num" id="LN265">265</td><td class="line">	ret = d2i_ASN1_TYPE(<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, &amp;cp, len);</td></tr>
+<tr><td class="num" id="LN266">266</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN267">267</td><td class="line">	err:</td></tr>
+<tr><td class="num" id="LN268">268</td><td class="line">	<span class='keyword'>if</span> (orig_der)</td></tr>
+<tr><td class="num" id="LN269">269</td><td class="line">		<span class='macro'>OPENSSL_free(orig_der)<span class='expansion'>CRYPTO_free(orig_der)</span></span>;</td></tr>
+<tr><td class="num" id="LN270">270</td><td class="line">	<span class='keyword'>if</span> (new_der)</td></tr>
+<tr><td class="num" id="LN271">271</td><td class="line">		<span class='macro'>OPENSSL_free(new_der)<span class='expansion'>CRYPTO_free(new_der)</span></span>;</td></tr>
+<tr><td class="num" id="LN272">272</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN273">273</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN274">274</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN275">275</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN276">276</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN277">277</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> asn1_cb(<span class='keyword'>const</span> <span class='keyword'>char</span> *elem, <span class='keyword'>int</span> len, <span class='keyword'>void</span> *bitstr)</td></tr>
+<tr><td class="num" id="LN278">278</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN279">279</td><td class="line">	tag_exp_arg *arg = bitstr;</td></tr>
+<tr><td class="num" id="LN280">280</td><td class="line">	<span class='keyword'>int</span> i;</td></tr>
+<tr><td class="num" id="LN281">281</td><td class="line">	<span class='keyword'>int</span> utype;</td></tr>
+<tr><td class="num" id="LN282">282</td><td class="line">	<span class='keyword'>int</span> vlen = 0;</td></tr>
+<tr><td class="num" id="LN283">283</td><td class="line">	<span class='keyword'>const</span> <span class='keyword'>char</span> *p, *<span class="mrange">vstart</span> = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path1" class="msg msgEvent" style="margin-left:25ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">1</div></td><td>'vstart' initialized to a null pointer value</td><td><div class="PathNav"><a href="#Path2" title="Next event (2)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN284">284</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN285">285</td><td class="line">	<span class='keyword'>int</span> tmp_tag, tmp_class;</td></tr>
+<tr><td class="num" id="LN286">286</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN287">287</td><td class="line">	<span class='keyword'>for</span>(i = 0, p = elem; <span class="mrange">i &lt; len</span>; p++, i++)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path2" class="msg msgEvent" style="margin-left:30ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">2</div></td><td><div class="PathNav"><a href="#Path1" title="Previous event (1)">&#x2190;</a></div></td></td><td>Assuming 'i' is &gt;= 'len'</td><td><div class="PathNav"><a href="#Path3" title="Next event (3)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path3" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">3</div></td><td><div class="PathNav"><a href="#Path2" title="Previous event (2)">&#x2190;</a></div></td></td><td>Loop condition is false. Execution continues on line 299</td><td><div class="PathNav"><a href="#Path4" title="Next event (4)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN288">288</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN289">289</td><td class="line">		<span class='comment'>/* Look for the ':' in name value pairs */</span></td></tr>
+<tr><td class="num" id="LN290">290</td><td class="line">		<span class='keyword'>if</span> (*p == ':')</td></tr>
+<tr><td class="num" id="LN291">291</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN292">292</td><td class="line">			vstart = p + 1;</td></tr>
+<tr><td class="num" id="LN293">293</td><td class="line">			vlen = len - (vstart - elem);</td></tr>
+<tr><td class="num" id="LN294">294</td><td class="line">			len = p - elem;</td></tr>
+<tr><td class="num" id="LN295">295</td><td class="line">			<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN296">296</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN297">297</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN298">298</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN299">299</td><td class="line">	utype = asn1_str2tag(elem, len);</td></tr>
+<tr><td class="num" id="LN300">300</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN301">301</td><td class="line">	<span class='keyword'>if</span> (utype == -1)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path4" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">4</div></td><td><div class="PathNav"><a href="#Path3" title="Previous event (3)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path5" title="Next event (5)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN302">302</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN303">303</td><td class="line">		<span class='macro'>ASN1err(ASN1_F_ASN1_CB, ASN1_R_UNKNOWN_TAG)<span class='expansion'>ERR_put_error(13,(177),(194),"asn1_gen.c",303)</span></span>;</td></tr>
+<tr><td class="num" id="LN304">304</td><td class="line">		ERR_add_error_data(2, <span class='string_literal'>"tag="</span>, elem);</td></tr>
+<tr><td class="num" id="LN305">305</td><td class="line">		<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN306">306</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN307">307</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN308">308</td><td class="line">	<span class='comment'>/* If this is not a modifier mark end of string and exit */</span></td></tr>
+<tr><td class="num" id="LN309">309</td><td class="line">	<span class='keyword'>if</span> (!(utype &amp; <span class='macro'>ASN1_GEN_FLAG<span class='expansion'>0x10000</span></span>))</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path5" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">5</div></td><td><div class="PathNav"><a href="#Path4" title="Previous event (4)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path6" title="Next event (6)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN310">310</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN311">311</td><td class="line">		arg-&gt;utype = utype;</td></tr>
+<tr><td class="num" id="LN312">312</td><td class="line">		arg-&gt;str = vstart;</td></tr>
+<tr><td class="num" id="LN313">313</td><td class="line">		<span class='comment'>/* If no value and not end of string, error */</span></td></tr>
+<tr><td class="num" id="LN314">314</td><td class="line">		<span class='keyword'>if</span> (!vstart &amp;&amp; elem[len])</td></tr>
+<tr><td class="num" id="LN315">315</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN316">316</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_CB, ASN1_R_MISSING_VALUE)<span class='expansion'>ERR_put_error(13,(177),(189),"asn1_gen.c",316)</span></span>;</td></tr>
+<tr><td class="num" id="LN317">317</td><td class="line">			<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN318">318</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN319">319</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN320">320</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN321">321</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN322">322</td><td class="line">	<span class='keyword'>switch</span>(utype)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path6" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">6</div></td><td><div class="PathNav"><a href="#Path5" title="Previous event (5)">&#x2190;</a></div></td></td><td>Control jumps to 'case 65544:'  at line 364</td><td><div class="PathNav"><a href="#EndPath" title="Next event (7)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN323">323</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN324">324</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN325">325</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>ASN1_GEN_FLAG_IMP<span class='expansion'>(0x10000|1)</span></span>:</td></tr>
+<tr><td class="num" id="LN326">326</td><td class="line">		<span class='comment'>/* Check for illegal multiple IMPLICIT tagging */</span></td></tr>
+<tr><td class="num" id="LN327">327</td><td class="line">		<span class='keyword'>if</span> (arg-&gt;imp_tag != -1)</td></tr>
+<tr><td class="num" id="LN328">328</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN329">329</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_CB, ASN1_R_ILLEGAL_NESTED_TAGGING)<span class='expansion'>ERR_put_error(13,(177),(181),"asn1_gen.c",329)</span></span>;</td></tr>
+<tr><td class="num" id="LN330">330</td><td class="line">			<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN331">331</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN332">332</td><td class="line">		<span class='keyword'>if</span> (!parse_tagging(vstart, vlen, &amp;arg-&gt;imp_tag, &amp;arg-&gt;imp_class))</td></tr>
+<tr><td class="num" id="LN333">333</td><td class="line">			<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN334">334</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN335">335</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN336">336</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>ASN1_GEN_FLAG_EXP<span class='expansion'>(0x10000|2)</span></span>:</td></tr>
+<tr><td class="num" id="LN337">337</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN338">338</td><td class="line">		<span class='keyword'>if</span> (!parse_tagging(vstart, vlen, &amp;tmp_tag, &amp;tmp_class))</td></tr>
+<tr><td class="num" id="LN339">339</td><td class="line">			<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN340">340</td><td class="line">		<span class='keyword'>if</span> (!append_exp(arg, tmp_tag, tmp_class, 1, 0, 0))</td></tr>
+<tr><td class="num" id="LN341">341</td><td class="line">			<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN342">342</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN343">343</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN344">344</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>ASN1_GEN_FLAG_SEQWRAP<span class='expansion'>(0x10000|6)</span></span>:</td></tr>
+<tr><td class="num" id="LN345">345</td><td class="line">		<span class='keyword'>if</span> (!append_exp(arg, <span class='macro'>V_ASN1_SEQUENCE<span class='expansion'>16</span></span>, <span class='macro'>V_ASN1_UNIVERSAL<span class='expansion'>0x00</span></span>, 1, 0, 1))</td></tr>
+<tr><td class="num" id="LN346">346</td><td class="line">			<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN347">347</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN348">348</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN349">349</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>ASN1_GEN_FLAG_SETWRAP<span class='expansion'>(0x10000|7)</span></span>:</td></tr>
+<tr><td class="num" id="LN350">350</td><td class="line">		<span class='keyword'>if</span> (!append_exp(arg, <span class='macro'>V_ASN1_SET<span class='expansion'>17</span></span>, <span class='macro'>V_ASN1_UNIVERSAL<span class='expansion'>0x00</span></span>, 1, 0, 1))</td></tr>
+<tr><td class="num" id="LN351">351</td><td class="line">			<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN352">352</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN353">353</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN354">354</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>ASN1_GEN_FLAG_BITWRAP<span class='expansion'>(0x10000|4)</span></span>:</td></tr>
+<tr><td class="num" id="LN355">355</td><td class="line">		<span class='keyword'>if</span> (!append_exp(arg, <span class='macro'>V_ASN1_BIT_STRING<span class='expansion'>3</span></span>, <span class='macro'>V_ASN1_UNIVERSAL<span class='expansion'>0x00</span></span>, 0, 1, 1))</td></tr>
+<tr><td class="num" id="LN356">356</td><td class="line">			<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN357">357</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN358">358</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN359">359</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>ASN1_GEN_FLAG_OCTWRAP<span class='expansion'>(0x10000|5)</span></span>:</td></tr>
+<tr><td class="num" id="LN360">360</td><td class="line">		<span class='keyword'>if</span> (!append_exp(arg, <span class='macro'>V_ASN1_OCTET_STRING<span class='expansion'>4</span></span>, <span class='macro'>V_ASN1_UNIVERSAL<span class='expansion'>0x00</span></span>, 0, 0, 1))</td></tr>
+<tr><td class="num" id="LN361">361</td><td class="line">			<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN362">362</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN363">363</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN364">364</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>ASN1_GEN_FLAG_FORMAT<span class='expansion'>(0x10000|8)</span></span>:</td></tr>
+<tr><td class="num" id="LN365">365</td><td class="line">		<span class='keyword'>if</span> (!strncmp(<span class="mrange">vstart</span>, <span class='string_literal'>"ASCII"</span>, 5))</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgEvent" style="margin-left:22ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">7</div></td><td><div class="PathNav"><a href="#Path6" title="Previous event (6)">&#x2190;</a></div></td></td><td>Null pointer argument in call to string comparison function</td></tr></table></div></td></tr>
+<tr><td class="num" id="LN366">366</td><td class="line">			arg-&gt;format = <span class='macro'>ASN1_GEN_FORMAT_ASCII<span class='expansion'>1</span></span>;</td></tr>
+<tr><td class="num" id="LN367">367</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> (!strncmp(vstart, <span class='string_literal'>"UTF8"</span>, 4))</td></tr>
+<tr><td class="num" id="LN368">368</td><td class="line">			arg-&gt;format = <span class='macro'>ASN1_GEN_FORMAT_UTF8<span class='expansion'>2</span></span>;</td></tr>
+<tr><td class="num" id="LN369">369</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> (!strncmp(vstart, <span class='string_literal'>"HEX"</span>, 3))</td></tr>
+<tr><td class="num" id="LN370">370</td><td class="line">			arg-&gt;format = <span class='macro'>ASN1_GEN_FORMAT_HEX<span class='expansion'>3</span></span>;</td></tr>
+<tr><td class="num" id="LN371">371</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> (!strncmp(vstart, <span class='string_literal'>"BITLIST"</span>, 3))</td></tr>
+<tr><td class="num" id="LN372">372</td><td class="line">			arg-&gt;format = <span class='macro'>ASN1_GEN_FORMAT_BITLIST<span class='expansion'>4</span></span>;</td></tr>
+<tr><td class="num" id="LN373">373</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN374">374</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN375">375</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_CB, ASN1_R_UNKOWN_FORMAT)<span class='expansion'>ERR_put_error(13,(177),(195),"asn1_gen.c",375)</span></span>;</td></tr>
+<tr><td class="num" id="LN376">376</td><td class="line">			<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN377">377</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN378">378</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN379">379</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN380">380</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN381">381</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN382">382</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN383">383</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN384">384</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN385">385</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN386">386</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> parse_tagging(<span class='keyword'>const</span> <span class='keyword'>char</span> *vstart, <span class='keyword'>int</span> vlen, <span class='keyword'>int</span> *ptag, <span class='keyword'>int</span> *pclass)</td></tr>
+<tr><td class="num" id="LN387">387</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN388">388</td><td class="line">	<span class='keyword'>char</span> erch[2];</td></tr>
+<tr><td class="num" id="LN389">389</td><td class="line">	<span class='keyword'>long</span> tag_num;</td></tr>
+<tr><td class="num" id="LN390">390</td><td class="line">	<span class='keyword'>char</span> *eptr;</td></tr>
+<tr><td class="num" id="LN391">391</td><td class="line">	<span class='keyword'>if</span> (!vstart)</td></tr>
+<tr><td class="num" id="LN392">392</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN393">393</td><td class="line">	tag_num = strtoul(vstart, &amp;eptr, 10);</td></tr>
+<tr><td class="num" id="LN394">394</td><td class="line">	<span class='comment'>/* Check we haven't gone past max length: should be impossible */</span></td></tr>
+<tr><td class="num" id="LN395">395</td><td class="line">	<span class='keyword'>if</span> (eptr &amp;&amp; *eptr &amp;&amp; (eptr &gt; vstart + vlen))</td></tr>
+<tr><td class="num" id="LN396">396</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN397">397</td><td class="line">	<span class='keyword'>if</span> (tag_num &lt; 0)</td></tr>
+<tr><td class="num" id="LN398">398</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN399">399</td><td class="line">		<span class='macro'>ASN1err(ASN1_F_PARSE_TAGGING, ASN1_R_INVALID_NUMBER)<span class='expansion'>ERR_put_error(13,(182),(187),"asn1_gen.c",399)</span></span>;</td></tr>
+<tr><td class="num" id="LN400">400</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN401">401</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN402">402</td><td class="line">	*ptag = tag_num;</td></tr>
+<tr><td class="num" id="LN403">403</td><td class="line">	<span class='comment'>/* If we have non numeric characters, parse them */</span></td></tr>
+<tr><td class="num" id="LN404">404</td><td class="line">	<span class='keyword'>if</span> (eptr)</td></tr>
+<tr><td class="num" id="LN405">405</td><td class="line">		vlen -= eptr - vstart;</td></tr>
+<tr><td class="num" id="LN406">406</td><td class="line">	<span class='keyword'>else</span> </td></tr>
+<tr><td class="num" id="LN407">407</td><td class="line">		vlen = 0;</td></tr>
+<tr><td class="num" id="LN408">408</td><td class="line">	<span class='keyword'>if</span> (vlen)</td></tr>
+<tr><td class="num" id="LN409">409</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN410">410</td><td class="line">		<span class='keyword'>switch</span> (*eptr)</td></tr>
+<tr><td class="num" id="LN411">411</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN412">412</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN413">413</td><td class="line">			<span class='keyword'>case</span> 'U':</td></tr>
+<tr><td class="num" id="LN414">414</td><td class="line">			*pclass = <span class='macro'>V_ASN1_UNIVERSAL<span class='expansion'>0x00</span></span>;</td></tr>
+<tr><td class="num" id="LN415">415</td><td class="line">			<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN416">416</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN417">417</td><td class="line">			<span class='keyword'>case</span> 'A':</td></tr>
+<tr><td class="num" id="LN418">418</td><td class="line">			*pclass = <span class='macro'>V_ASN1_APPLICATION<span class='expansion'>0x40</span></span>;</td></tr>
+<tr><td class="num" id="LN419">419</td><td class="line">			<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN420">420</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN421">421</td><td class="line">			<span class='keyword'>case</span> 'P':</td></tr>
+<tr><td class="num" id="LN422">422</td><td class="line">			*pclass = <span class='macro'>V_ASN1_PRIVATE<span class='expansion'>0xc0</span></span>;</td></tr>
+<tr><td class="num" id="LN423">423</td><td class="line">			<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN424">424</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN425">425</td><td class="line">			<span class='keyword'>case</span> 'C':</td></tr>
+<tr><td class="num" id="LN426">426</td><td class="line">			*pclass = <span class='macro'>V_ASN1_CONTEXT_SPECIFIC<span class='expansion'>0x80</span></span>;</td></tr>
+<tr><td class="num" id="LN427">427</td><td class="line">			<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN428">428</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN429">429</td><td class="line">			<span class='keyword'>default</span>:</td></tr>
+<tr><td class="num" id="LN430">430</td><td class="line">			erch[0] = *eptr;</td></tr>
+<tr><td class="num" id="LN431">431</td><td class="line">			erch[1] = 0;</td></tr>
+<tr><td class="num" id="LN432">432</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_PARSE_TAGGING, ASN1_R_INVALID_MODIFIER)<span class='expansion'>ERR_put_error(13,(182),(186),"asn1_gen.c",432)</span></span>;</td></tr>
+<tr><td class="num" id="LN433">433</td><td class="line">			ERR_add_error_data(2, <span class='string_literal'>"Char="</span>, erch);</td></tr>
+<tr><td class="num" id="LN434">434</td><td class="line">			<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN435">435</td><td class="line">			<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN436">436</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN437">437</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN438">438</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN439">439</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN440">440</td><td class="line">		*pclass = <span class='macro'>V_ASN1_CONTEXT_SPECIFIC<span class='expansion'>0x80</span></span>;</td></tr>
+<tr><td class="num" id="LN441">441</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN442">442</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN443">443</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN444">444</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN445">445</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN446">446</td><td class="line"><span class='comment'>/* Handle multiple types: SET and SEQUENCE */</span></td></tr>
+<tr><td class="num" id="LN447">447</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN448">448</td><td class="line"><span class='keyword'>static</span> ASN1_TYPE *asn1_multi(<span class='keyword'>int</span> utype, <span class='keyword'>const</span> <span class='keyword'>char</span> *section, X509V3_CTX *cnf)</td></tr>
+<tr><td class="num" id="LN449">449</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN450">450</td><td class="line">	ASN1_TYPE *ret = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN451">451</td><td class="line">	<span class='macro'>STACK_OF(ASN1_TYPE)<span class='expansion'>struct stack_st_ASN1_TYPE</span></span> *sk = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN452">452</td><td class="line">	<span class='macro'>STACK_OF(CONF_VALUE)<span class='expansion'>struct stack_st_CONF_VALUE</span></span> *sect = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN453">453</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *der = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN454">454</td><td class="line">	<span class='keyword'>int</span> derlen;</td></tr>
+<tr><td class="num" id="LN455">455</td><td class="line">	<span class='keyword'>int</span> i;</td></tr>
+<tr><td class="num" id="LN456">456</td><td class="line">	sk = <span class='macro'>sk_ASN1_TYPE_new_null()<span class='expansion'>((struct stack_st_ASN1_TYPE *)sk_new_null())</span></span>;</td></tr>
+<tr><td class="num" id="LN457">457</td><td class="line">	<span class='keyword'>if</span> (!sk)</td></tr>
+<tr><td class="num" id="LN458">458</td><td class="line">		<span class='keyword'>goto</span> bad;</td></tr>
+<tr><td class="num" id="LN459">459</td><td class="line">	<span class='keyword'>if</span> (section)</td></tr>
+<tr><td class="num" id="LN460">460</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN461">461</td><td class="line">		<span class='keyword'>if</span> (!cnf)</td></tr>
+<tr><td class="num" id="LN462">462</td><td class="line">			<span class='keyword'>goto</span> bad;</td></tr>
+<tr><td class="num" id="LN463">463</td><td class="line">		sect = X509V3_get_section(cnf, (<span class='keyword'>char</span> *)section);</td></tr>
+<tr><td class="num" id="LN464">464</td><td class="line">		<span class='keyword'>if</span> (!sect)</td></tr>
+<tr><td class="num" id="LN465">465</td><td class="line">			<span class='keyword'>goto</span> bad;</td></tr>
+<tr><td class="num" id="LN466">466</td><td class="line">		<span class='keyword'>for</span> (i = 0; i &lt; <span class='macro'>sk_CONF_VALUE_num(sect)<span class='expansion'>sk_num(((_STACK*) (1 ? (sect) : (struct stack_st_CONF_VALUE*)<br>0)))</span></span>; i++)</td></tr>
+<tr><td class="num" id="LN467">467</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN468">468</td><td class="line">			ASN1_TYPE *typ = ASN1_generate_v3(<span class='macro'>sk_CONF_VALUE_value(sect, i)<span class='expansion'>((CONF_VALUE *)sk_value(((_STACK*) (1 ? (sect) : (struct stack_st_CONF_VALUE<br>*)0)), (i)))</span></span>-&gt;value, cnf);</td></tr>
+<tr><td class="num" id="LN469">469</td><td class="line">			<span class='keyword'>if</span> (!typ)</td></tr>
+<tr><td class="num" id="LN470">470</td><td class="line">				<span class='keyword'>goto</span> bad;</td></tr>
+<tr><td class="num" id="LN471">471</td><td class="line">			<span class='keyword'>if</span> (!<span class='macro'>sk_ASN1_TYPE_push(sk, typ)<span class='expansion'>sk_push(((_STACK*) (1 ? (sk) : (struct stack_st_ASN1_TYPE*)0)<br>), ((void*) (1 ? (typ) : (ASN1_TYPE*)0)))</span></span>)</td></tr>
+<tr><td class="num" id="LN472">472</td><td class="line">				<span class='keyword'>goto</span> bad;</td></tr>
+<tr><td class="num" id="LN473">473</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN474">474</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN475">475</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN476">476</td><td class="line">	<span class='comment'>/* Now we has a STACK of the components, convert to the correct form */</span></td></tr>
+<tr><td class="num" id="LN477">477</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN478">478</td><td class="line">	<span class='keyword'>if</span> (utype == <span class='macro'>V_ASN1_SET<span class='expansion'>17</span></span>)</td></tr>
+<tr><td class="num" id="LN479">479</td><td class="line">		derlen = i2d_ASN1_SET_ANY(sk, &amp;der);</td></tr>
+<tr><td class="num" id="LN480">480</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN481">481</td><td class="line">		derlen = i2d_ASN1_SEQUENCE_ANY(sk, &amp;der);</td></tr>
+<tr><td class="num" id="LN482">482</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN483">483</td><td class="line">	<span class='keyword'>if</span> (derlen &lt; 0)</td></tr>
+<tr><td class="num" id="LN484">484</td><td class="line">		<span class='keyword'>goto</span> bad;</td></tr>
+<tr><td class="num" id="LN485">485</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN486">486</td><td class="line">	<span class='keyword'>if</span> (!(ret = ASN1_TYPE_new()))</td></tr>
+<tr><td class="num" id="LN487">487</td><td class="line">		<span class='keyword'>goto</span> bad;</td></tr>
+<tr><td class="num" id="LN488">488</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN489">489</td><td class="line">	<span class='keyword'>if</span> (!(ret-&gt;value.asn1_string = ASN1_STRING_type_new(utype)))</td></tr>
+<tr><td class="num" id="LN490">490</td><td class="line">		<span class='keyword'>goto</span> bad;</td></tr>
+<tr><td class="num" id="LN491">491</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN492">492</td><td class="line">	ret-&gt;type = utype;</td></tr>
+<tr><td class="num" id="LN493">493</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN494">494</td><td class="line">	ret-&gt;value.asn1_string-&gt;data = der;</td></tr>
+<tr><td class="num" id="LN495">495</td><td class="line">	ret-&gt;value.asn1_string-&gt;length = derlen;</td></tr>
+<tr><td class="num" id="LN496">496</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN497">497</td><td class="line">	der = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN498">498</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN499">499</td><td class="line">	bad:</td></tr>
+<tr><td class="num" id="LN500">500</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN501">501</td><td class="line">	<span class='keyword'>if</span> (der)</td></tr>
+<tr><td class="num" id="LN502">502</td><td class="line">		<span class='macro'>OPENSSL_free(der)<span class='expansion'>CRYPTO_free(der)</span></span>;</td></tr>
+<tr><td class="num" id="LN503">503</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN504">504</td><td class="line">	<span class='keyword'>if</span> (sk)</td></tr>
+<tr><td class="num" id="LN505">505</td><td class="line">		<span class='macro'>sk_ASN1_TYPE_pop_free(sk, ASN1_TYPE_free)<span class='expansion'>sk_pop_free(((_STACK*) (1 ? (sk) : (struct stack_st_ASN1_TYPE<br>*)0)), ((void (*)(void *)) ((1 ? (ASN1_TYPE_free) : (void (*)<br>(ASN1_TYPE *))0))))</span></span>;</td></tr>
+<tr><td class="num" id="LN506">506</td><td class="line">	<span class='keyword'>if</span> (sect)</td></tr>
+<tr><td class="num" id="LN507">507</td><td class="line">		X509V3_section_free(cnf, sect);</td></tr>
+<tr><td class="num" id="LN508">508</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN509">509</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN510">510</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN511">511</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN512">512</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> append_exp(tag_exp_arg *arg, <span class='keyword'>int</span> exp_tag, <span class='keyword'>int</span> exp_class, <span class='keyword'>int</span> exp_constructed, <span class='keyword'>int</span> exp_pad, <span class='keyword'>int</span> imp_ok)</td></tr>
+<tr><td class="num" id="LN513">513</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN514">514</td><td class="line">	tag_exp_type *exp_tmp;</td></tr>
+<tr><td class="num" id="LN515">515</td><td class="line">	<span class='comment'>/* Can only have IMPLICIT if permitted */</span></td></tr>
+<tr><td class="num" id="LN516">516</td><td class="line">	<span class='keyword'>if</span> ((arg-&gt;imp_tag != -1) &amp;&amp; !imp_ok)</td></tr>
+<tr><td class="num" id="LN517">517</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN518">518</td><td class="line">		<span class='macro'>ASN1err(ASN1_F_APPEND_EXP, ASN1_R_ILLEGAL_IMPLICIT_TAG)<span class='expansion'>ERR_put_error(13,(176),(179),"asn1_gen.c",518)</span></span>;</td></tr>
+<tr><td class="num" id="LN519">519</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN520">520</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN521">521</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN522">522</td><td class="line">	<span class='keyword'>if</span> (arg-&gt;exp_count == <span class='macro'>ASN1_FLAG_EXP_MAX<span class='expansion'>20</span></span>)</td></tr>
+<tr><td class="num" id="LN523">523</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN524">524</td><td class="line">		<span class='macro'>ASN1err(ASN1_F_APPEND_EXP, ASN1_R_DEPTH_EXCEEDED)<span class='expansion'>ERR_put_error(13,(176),(174),"asn1_gen.c",524)</span></span>;</td></tr>
+<tr><td class="num" id="LN525">525</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN526">526</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN527">527</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN528">528</td><td class="line">	exp_tmp = &amp;arg-&gt;exp_list[arg-&gt;exp_count++];</td></tr>
+<tr><td class="num" id="LN529">529</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN530">530</td><td class="line">	<span class='comment'>/* If IMPLICIT set tag to implicit value then</span></td></tr>
+<tr><td class="num" id="LN531">531</td><td class="line">	 <span class='comment'>* reset implicit tag since it has been used.</span></td></tr>
+<tr><td class="num" id="LN532">532</td><td class="line">	 <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN533">533</td><td class="line">	<span class='keyword'>if</span> (arg-&gt;imp_tag != -1)</td></tr>
+<tr><td class="num" id="LN534">534</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN535">535</td><td class="line">		exp_tmp-&gt;exp_tag = arg-&gt;imp_tag;</td></tr>
+<tr><td class="num" id="LN536">536</td><td class="line">		exp_tmp-&gt;exp_class = arg-&gt;imp_class;</td></tr>
+<tr><td class="num" id="LN537">537</td><td class="line">		arg-&gt;imp_tag = -1;</td></tr>
+<tr><td class="num" id="LN538">538</td><td class="line">		arg-&gt;imp_class = -1;</td></tr>
+<tr><td class="num" id="LN539">539</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN540">540</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN541">541</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN542">542</td><td class="line">		exp_tmp-&gt;exp_tag = exp_tag;</td></tr>
+<tr><td class="num" id="LN543">543</td><td class="line">		exp_tmp-&gt;exp_class = exp_class;</td></tr>
+<tr><td class="num" id="LN544">544</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN545">545</td><td class="line">	exp_tmp-&gt;exp_constructed = exp_constructed;</td></tr>
+<tr><td class="num" id="LN546">546</td><td class="line">	exp_tmp-&gt;exp_pad = exp_pad;</td></tr>
+<tr><td class="num" id="LN547">547</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN548">548</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN549">549</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN550">550</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN551">551</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN552">552</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> asn1_str2tag(<span class='keyword'>const</span> <span class='keyword'>char</span> *tagstr, <span class='keyword'>int</span> len)</td></tr>
+<tr><td class="num" id="LN553">553</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN554">554</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>int</span> i;</td></tr>
+<tr><td class="num" id="LN555">555</td><td class="line">	<span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>struct</span> tag_name_st *tntmp, tnst [] = {</td></tr>
+<tr><td class="num" id="LN556">556</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"BOOL"</span>, V_ASN1_BOOLEAN)<span class='expansion'>{"BOOL", sizeof("BOOL") - 1, 1}</span></span>,</td></tr>
+<tr><td class="num" id="LN557">557</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"BOOLEAN"</span>, V_ASN1_BOOLEAN)<span class='expansion'>{"BOOLEAN", sizeof("BOOLEAN") - 1, 1}</span></span>,</td></tr>
+<tr><td class="num" id="LN558">558</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"NULL"</span>, V_ASN1_NULL)<span class='expansion'>{"NULL", sizeof("NULL") - 1, 5}</span></span>,</td></tr>
+<tr><td class="num" id="LN559">559</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"INT"</span>, V_ASN1_INTEGER)<span class='expansion'>{"INT", sizeof("INT") - 1, 2}</span></span>,</td></tr>
+<tr><td class="num" id="LN560">560</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"INTEGER"</span>, V_ASN1_INTEGER)<span class='expansion'>{"INTEGER", sizeof("INTEGER") - 1, 2}</span></span>,</td></tr>
+<tr><td class="num" id="LN561">561</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"ENUM"</span>, V_ASN1_ENUMERATED)<span class='expansion'>{"ENUM", sizeof("ENUM") - 1, 10}</span></span>,</td></tr>
+<tr><td class="num" id="LN562">562</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"ENUMERATED"</span>, V_ASN1_ENUMERATED)<span class='expansion'>{"ENUMERATED", sizeof("ENUMERATED") - 1, 10}</span></span>,</td></tr>
+<tr><td class="num" id="LN563">563</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"OID"</span>, V_ASN1_OBJECT)<span class='expansion'>{"OID", sizeof("OID") - 1, 6}</span></span>,</td></tr>
+<tr><td class="num" id="LN564">564</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"OBJECT"</span>, V_ASN1_OBJECT)<span class='expansion'>{"OBJECT", sizeof("OBJECT") - 1, 6}</span></span>,</td></tr>
+<tr><td class="num" id="LN565">565</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"UTCTIME"</span>, V_ASN1_UTCTIME)<span class='expansion'>{"UTCTIME", sizeof("UTCTIME") - 1, 23}</span></span>,</td></tr>
+<tr><td class="num" id="LN566">566</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"UTC"</span>, V_ASN1_UTCTIME)<span class='expansion'>{"UTC", sizeof("UTC") - 1, 23}</span></span>,</td></tr>
+<tr><td class="num" id="LN567">567</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"GENERALIZEDTIME"</span>, V_ASN1_GENERALIZEDTIME)<span class='expansion'>{"GENERALIZEDTIME", sizeof("GENERALIZEDTIME") - 1, 24}</span></span>,</td></tr>
+<tr><td class="num" id="LN568">568</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"GENTIME"</span>, V_ASN1_GENERALIZEDTIME)<span class='expansion'>{"GENTIME", sizeof("GENTIME") - 1, 24}</span></span>,</td></tr>
+<tr><td class="num" id="LN569">569</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"OCT"</span>, V_ASN1_OCTET_STRING)<span class='expansion'>{"OCT", sizeof("OCT") - 1, 4}</span></span>,</td></tr>
+<tr><td class="num" id="LN570">570</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"OCTETSTRING"</span>, V_ASN1_OCTET_STRING)<span class='expansion'>{"OCTETSTRING", sizeof("OCTETSTRING") - 1, 4}</span></span>,</td></tr>
+<tr><td class="num" id="LN571">571</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"BITSTR"</span>, V_ASN1_BIT_STRING)<span class='expansion'>{"BITSTR", sizeof("BITSTR") - 1, 3}</span></span>,</td></tr>
+<tr><td class="num" id="LN572">572</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"BITSTRING"</span>, V_ASN1_BIT_STRING)<span class='expansion'>{"BITSTRING", sizeof("BITSTRING") - 1, 3}</span></span>,</td></tr>
+<tr><td class="num" id="LN573">573</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"UNIVERSALSTRING"</span>, V_ASN1_UNIVERSALSTRING)<span class='expansion'>{"UNIVERSALSTRING", sizeof("UNIVERSALSTRING") - 1, 28}</span></span>,</td></tr>
+<tr><td class="num" id="LN574">574</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"UNIV"</span>, V_ASN1_UNIVERSALSTRING)<span class='expansion'>{"UNIV", sizeof("UNIV") - 1, 28}</span></span>,</td></tr>
+<tr><td class="num" id="LN575">575</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"IA5"</span>, V_ASN1_IA5STRING)<span class='expansion'>{"IA5", sizeof("IA5") - 1, 22}</span></span>,</td></tr>
+<tr><td class="num" id="LN576">576</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"IA5STRING"</span>, V_ASN1_IA5STRING)<span class='expansion'>{"IA5STRING", sizeof("IA5STRING") - 1, 22}</span></span>,</td></tr>
+<tr><td class="num" id="LN577">577</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"UTF8"</span>, V_ASN1_UTF8STRING)<span class='expansion'>{"UTF8", sizeof("UTF8") - 1, 12}</span></span>,</td></tr>
+<tr><td class="num" id="LN578">578</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"UTF8String"</span>, V_ASN1_UTF8STRING)<span class='expansion'>{"UTF8String", sizeof("UTF8String") - 1, 12}</span></span>,</td></tr>
+<tr><td class="num" id="LN579">579</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"BMP"</span>, V_ASN1_BMPSTRING)<span class='expansion'>{"BMP", sizeof("BMP") - 1, 30}</span></span>,</td></tr>
+<tr><td class="num" id="LN580">580</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"BMPSTRING"</span>, V_ASN1_BMPSTRING)<span class='expansion'>{"BMPSTRING", sizeof("BMPSTRING") - 1, 30}</span></span>,</td></tr>
+<tr><td class="num" id="LN581">581</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"VISIBLESTRING"</span>, V_ASN1_VISIBLESTRING)<span class='expansion'>{"VISIBLESTRING", sizeof("VISIBLESTRING") - 1, 26}</span></span>,</td></tr>
+<tr><td class="num" id="LN582">582</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"VISIBLE"</span>, V_ASN1_VISIBLESTRING)<span class='expansion'>{"VISIBLE", sizeof("VISIBLE") - 1, 26}</span></span>,</td></tr>
+<tr><td class="num" id="LN583">583</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"PRINTABLESTRING"</span>, V_ASN1_PRINTABLESTRING)<span class='expansion'>{"PRINTABLESTRING", sizeof("PRINTABLESTRING") - 1, 19}</span></span>,</td></tr>
+<tr><td class="num" id="LN584">584</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"PRINTABLE"</span>, V_ASN1_PRINTABLESTRING)<span class='expansion'>{"PRINTABLE", sizeof("PRINTABLE") - 1, 19}</span></span>,</td></tr>
+<tr><td class="num" id="LN585">585</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"T61"</span>, V_ASN1_T61STRING)<span class='expansion'>{"T61", sizeof("T61") - 1, 20}</span></span>,</td></tr>
+<tr><td class="num" id="LN586">586</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"T61STRING"</span>, V_ASN1_T61STRING)<span class='expansion'>{"T61STRING", sizeof("T61STRING") - 1, 20}</span></span>,</td></tr>
+<tr><td class="num" id="LN587">587</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"TELETEXSTRING"</span>, V_ASN1_T61STRING)<span class='expansion'>{"TELETEXSTRING", sizeof("TELETEXSTRING") - 1, 20}</span></span>,</td></tr>
+<tr><td class="num" id="LN588">588</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"GeneralString"</span>, V_ASN1_GENERALSTRING)<span class='expansion'>{"GeneralString", sizeof("GeneralString") - 1, 27}</span></span>,</td></tr>
+<tr><td class="num" id="LN589">589</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"GENSTR"</span>, V_ASN1_GENERALSTRING)<span class='expansion'>{"GENSTR", sizeof("GENSTR") - 1, 27}</span></span>,</td></tr>
+<tr><td class="num" id="LN590">590</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"NUMERIC"</span>, V_ASN1_NUMERICSTRING)<span class='expansion'>{"NUMERIC", sizeof("NUMERIC") - 1, 18}</span></span>,</td></tr>
+<tr><td class="num" id="LN591">591</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"NUMERICSTRING"</span>, V_ASN1_NUMERICSTRING)<span class='expansion'>{"NUMERICSTRING", sizeof("NUMERICSTRING") - 1, 18}</span></span>,</td></tr>
+<tr><td class="num" id="LN592">592</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN593">593</td><td class="line">		<span class='comment'>/* Special cases */</span></td></tr>
+<tr><td class="num" id="LN594">594</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"SEQUENCE"</span>, V_ASN1_SEQUENCE)<span class='expansion'>{"SEQUENCE", sizeof("SEQUENCE") - 1, 16}</span></span>,</td></tr>
+<tr><td class="num" id="LN595">595</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"SEQ"</span>, V_ASN1_SEQUENCE)<span class='expansion'>{"SEQ", sizeof("SEQ") - 1, 16}</span></span>,</td></tr>
+<tr><td class="num" id="LN596">596</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"SET"</span>, V_ASN1_SET)<span class='expansion'>{"SET", sizeof("SET") - 1, 17}</span></span>,</td></tr>
+<tr><td class="num" id="LN597">597</td><td class="line">		<span class='comment'>/* type modifiers */</span></td></tr>
+<tr><td class="num" id="LN598">598</td><td class="line">		<span class='comment'>/* Explicit tag */</span></td></tr>
+<tr><td class="num" id="LN599">599</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"EXP"</span>, ASN1_GEN_FLAG_EXP)<span class='expansion'>{"EXP", sizeof("EXP") - 1, (0x10000|2)}</span></span>,</td></tr>
+<tr><td class="num" id="LN600">600</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"EXPLICIT"</span>, ASN1_GEN_FLAG_EXP)<span class='expansion'>{"EXPLICIT", sizeof("EXPLICIT") - 1, (0x10000|2)}</span></span>,</td></tr>
+<tr><td class="num" id="LN601">601</td><td class="line">		<span class='comment'>/* Implicit tag */</span></td></tr>
+<tr><td class="num" id="LN602">602</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"IMP"</span>, ASN1_GEN_FLAG_IMP)<span class='expansion'>{"IMP", sizeof("IMP") - 1, (0x10000|1)}</span></span>,</td></tr>
+<tr><td class="num" id="LN603">603</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"IMPLICIT"</span>, ASN1_GEN_FLAG_IMP)<span class='expansion'>{"IMPLICIT", sizeof("IMPLICIT") - 1, (0x10000|1)}</span></span>,</td></tr>
+<tr><td class="num" id="LN604">604</td><td class="line">		<span class='comment'>/* OCTET STRING wrapper */</span></td></tr>
+<tr><td class="num" id="LN605">605</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"OCTWRAP"</span>, ASN1_GEN_FLAG_OCTWRAP)<span class='expansion'>{"OCTWRAP", sizeof("OCTWRAP") - 1, (0x10000|5)}</span></span>,</td></tr>
+<tr><td class="num" id="LN606">606</td><td class="line">		<span class='comment'>/* SEQUENCE wrapper */</span></td></tr>
+<tr><td class="num" id="LN607">607</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"SEQWRAP"</span>, ASN1_GEN_FLAG_SEQWRAP)<span class='expansion'>{"SEQWRAP", sizeof("SEQWRAP") - 1, (0x10000|6)}</span></span>,</td></tr>
+<tr><td class="num" id="LN608">608</td><td class="line">		<span class='comment'>/* SET wrapper */</span></td></tr>
+<tr><td class="num" id="LN609">609</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"SETWRAP"</span>, ASN1_GEN_FLAG_SETWRAP)<span class='expansion'>{"SETWRAP", sizeof("SETWRAP") - 1, (0x10000|7)}</span></span>,</td></tr>
+<tr><td class="num" id="LN610">610</td><td class="line">		<span class='comment'>/* BIT STRING wrapper */</span></td></tr>
+<tr><td class="num" id="LN611">611</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"BITWRAP"</span>, ASN1_GEN_FLAG_BITWRAP)<span class='expansion'>{"BITWRAP", sizeof("BITWRAP") - 1, (0x10000|4)}</span></span>,</td></tr>
+<tr><td class="num" id="LN612">612</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"FORM"</span>, ASN1_GEN_FLAG_FORMAT)<span class='expansion'>{"FORM", sizeof("FORM") - 1, (0x10000|8)}</span></span>,</td></tr>
+<tr><td class="num" id="LN613">613</td><td class="line">		<span class='macro'>ASN1_GEN_STR(<span class='string_literal'>"FORMAT"</span>, ASN1_GEN_FLAG_FORMAT)<span class='expansion'>{"FORMAT", sizeof("FORMAT") - 1, (0x10000|8)}</span></span>,</td></tr>
+<tr><td class="num" id="LN614">614</td><td class="line">	};</td></tr>
+<tr><td class="num" id="LN615">615</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN616">616</td><td class="line">	<span class='keyword'>if</span> (len == -1)</td></tr>
+<tr><td class="num" id="LN617">617</td><td class="line">		len = strlen(tagstr);</td></tr>
+<tr><td class="num" id="LN618">618</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN619">619</td><td class="line">	tntmp = tnst;	</td></tr>
+<tr><td class="num" id="LN620">620</td><td class="line">	<span class='keyword'>for</span> (i = 0; i &lt; <span class='keyword'>sizeof</span>(tnst) / <span class='keyword'>sizeof</span>(<span class='keyword'>struct</span> tag_name_st); i++, tntmp++)</td></tr>
+<tr><td class="num" id="LN621">621</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN622">622</td><td class="line">		<span class='keyword'>if</span> ((len == tntmp-&gt;len) &amp;&amp; !strncmp(tntmp-&gt;strnam, tagstr, len))</td></tr>
+<tr><td class="num" id="LN623">623</td><td class="line">			<span class='keyword'>return</span> tntmp-&gt;tag;</td></tr>
+<tr><td class="num" id="LN624">624</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN625">625</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN626">626</td><td class="line">	<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN627">627</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN628">628</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN629">629</td><td class="line"><span class='keyword'>static</span> ASN1_TYPE *asn1_str2type(<span class='keyword'>const</span> <span class='keyword'>char</span> *str, <span class='keyword'>int</span> format, <span class='keyword'>int</span> utype)</td></tr>
+<tr><td class="num" id="LN630">630</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN631">631</td><td class="line">	ASN1_TYPE *atmp = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN632">632</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN633">633</td><td class="line">	CONF_VALUE vtmp;</td></tr>
+<tr><td class="num" id="LN634">634</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN635">635</td><td class="line">	<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *rdata;</td></tr>
+<tr><td class="num" id="LN636">636</td><td class="line">	<span class='keyword'>long</span> rdlen;</td></tr>
+<tr><td class="num" id="LN637">637</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN638">638</td><td class="line">	<span class='keyword'>int</span> no_unused = 1;</td></tr>
+<tr><td class="num" id="LN639">639</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN640">640</td><td class="line">	<span class='keyword'>if</span> (!(atmp = ASN1_TYPE_new()))</td></tr>
+<tr><td class="num" id="LN641">641</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN642">642</td><td class="line">		<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_put_error(13,(179),((1|64)),"asn1_gen.c",642)</span></span>;</td></tr>
+<tr><td class="num" id="LN643">643</td><td class="line">		<span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN644">644</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN645">645</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN646">646</td><td class="line">	<span class='keyword'>if</span> (!str)</td></tr>
+<tr><td class="num" id="LN647">647</td><td class="line">		str = <span class='string_literal'>""</span>;</td></tr>
+<tr><td class="num" id="LN648">648</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN649">649</td><td class="line">	<span class='keyword'>switch</span>(utype)</td></tr>
+<tr><td class="num" id="LN650">650</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN651">651</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN652">652</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_NULL<span class='expansion'>5</span></span>:</td></tr>
+<tr><td class="num" id="LN653">653</td><td class="line">		<span class='keyword'>if</span> (str &amp;&amp; *str)</td></tr>
+<tr><td class="num" id="LN654">654</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN655">655</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ASN1_R_ILLEGAL_NULL_VALUE)<span class='expansion'>ERR_put_error(13,(179),(182),"asn1_gen.c",655)</span></span>;</td></tr>
+<tr><td class="num" id="LN656">656</td><td class="line">			<span class='keyword'>goto</span> bad_form;</td></tr>
+<tr><td class="num" id="LN657">657</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN658">658</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN659">659</td><td class="line">		</td></tr>
+<tr><td class="num" id="LN660">660</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_BOOLEAN<span class='expansion'>1</span></span>:</td></tr>
+<tr><td class="num" id="LN661">661</td><td class="line">		<span class='keyword'>if</span> (format != <span class='macro'>ASN1_GEN_FORMAT_ASCII<span class='expansion'>1</span></span>)</td></tr>
+<tr><td class="num" id="LN662">662</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN663">663</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ASN1_R_NOT_ASCII_FORMAT)<span class='expansion'>ERR_put_error(13,(179),(190),"asn1_gen.c",663)</span></span>;</td></tr>
+<tr><td class="num" id="LN664">664</td><td class="line">			<span class='keyword'>goto</span> bad_form;</td></tr>
+<tr><td class="num" id="LN665">665</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN666">666</td><td class="line">		vtmp.name = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN667">667</td><td class="line">		vtmp.section = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN668">668</td><td class="line">		vtmp.value = (<span class='keyword'>char</span> *)str;</td></tr>
+<tr><td class="num" id="LN669">669</td><td class="line">		<span class='keyword'>if</span> (!X509V3_get_value_bool(&amp;vtmp, &amp;atmp-&gt;value.boolean))</td></tr>
+<tr><td class="num" id="LN670">670</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN671">671</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ASN1_R_ILLEGAL_BOOLEAN)<span class='expansion'>ERR_put_error(13,(179),(176),"asn1_gen.c",671)</span></span>;</td></tr>
+<tr><td class="num" id="LN672">672</td><td class="line">			<span class='keyword'>goto</span> bad_str;</td></tr>
+<tr><td class="num" id="LN673">673</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN674">674</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN675">675</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN676">676</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_INTEGER<span class='expansion'>2</span></span>:</td></tr>
+<tr><td class="num" id="LN677">677</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_ENUMERATED<span class='expansion'>10</span></span>:</td></tr>
+<tr><td class="num" id="LN678">678</td><td class="line">		<span class='keyword'>if</span> (format != <span class='macro'>ASN1_GEN_FORMAT_ASCII<span class='expansion'>1</span></span>)</td></tr>
+<tr><td class="num" id="LN679">679</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN680">680</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ASN1_R_INTEGER_NOT_ASCII_FORMAT)<span class='expansion'>ERR_put_error(13,(179),(185),"asn1_gen.c",680)</span></span>;</td></tr>
+<tr><td class="num" id="LN681">681</td><td class="line">			<span class='keyword'>goto</span> bad_form;</td></tr>
+<tr><td class="num" id="LN682">682</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN683">683</td><td class="line">		<span class='keyword'>if</span> (!(atmp-&gt;value.integer = s2i_ASN1_INTEGER(<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, (<span class='keyword'>char</span> *)str)))</td></tr>
+<tr><td class="num" id="LN684">684</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN685">685</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ASN1_R_ILLEGAL_INTEGER)<span class='expansion'>ERR_put_error(13,(179),(180),"asn1_gen.c",685)</span></span>;</td></tr>
+<tr><td class="num" id="LN686">686</td><td class="line">			<span class='keyword'>goto</span> bad_str;</td></tr>
+<tr><td class="num" id="LN687">687</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN688">688</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN689">689</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN690">690</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_OBJECT<span class='expansion'>6</span></span>:</td></tr>
+<tr><td class="num" id="LN691">691</td><td class="line">		<span class='keyword'>if</span> (format != <span class='macro'>ASN1_GEN_FORMAT_ASCII<span class='expansion'>1</span></span>)</td></tr>
+<tr><td class="num" id="LN692">692</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN693">693</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ASN1_R_OBJECT_NOT_ASCII_FORMAT)<span class='expansion'>ERR_put_error(13,(179),(191),"asn1_gen.c",693)</span></span>;</td></tr>
+<tr><td class="num" id="LN694">694</td><td class="line">			<span class='keyword'>goto</span> bad_form;</td></tr>
+<tr><td class="num" id="LN695">695</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN696">696</td><td class="line">		<span class='keyword'>if</span> (!(atmp-&gt;value.object = OBJ_txt2obj(str, 0)))</td></tr>
+<tr><td class="num" id="LN697">697</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN698">698</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ASN1_R_ILLEGAL_OBJECT)<span class='expansion'>ERR_put_error(13,(179),(183),"asn1_gen.c",698)</span></span>;</td></tr>
+<tr><td class="num" id="LN699">699</td><td class="line">			<span class='keyword'>goto</span> bad_str;</td></tr>
+<tr><td class="num" id="LN700">700</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN701">701</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN702">702</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN703">703</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_UTCTIME<span class='expansion'>23</span></span>:</td></tr>
+<tr><td class="num" id="LN704">704</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_GENERALIZEDTIME<span class='expansion'>24</span></span>:</td></tr>
+<tr><td class="num" id="LN705">705</td><td class="line">		<span class='keyword'>if</span> (format != <span class='macro'>ASN1_GEN_FORMAT_ASCII<span class='expansion'>1</span></span>)</td></tr>
+<tr><td class="num" id="LN706">706</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN707">707</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ASN1_R_TIME_NOT_ASCII_FORMAT)<span class='expansion'>ERR_put_error(13,(179),(193),"asn1_gen.c",707)</span></span>;</td></tr>
+<tr><td class="num" id="LN708">708</td><td class="line">			<span class='keyword'>goto</span> bad_form;</td></tr>
+<tr><td class="num" id="LN709">709</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN710">710</td><td class="line">		<span class='keyword'>if</span> (!(atmp-&gt;value.asn1_string = ASN1_STRING_new()))</td></tr>
+<tr><td class="num" id="LN711">711</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN712">712</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_put_error(13,(179),((1|64)),"asn1_gen.c",712)</span></span>;</td></tr>
+<tr><td class="num" id="LN713">713</td><td class="line">			<span class='keyword'>goto</span> bad_str;</td></tr>
+<tr><td class="num" id="LN714">714</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN715">715</td><td class="line">		<span class='keyword'>if</span> (!ASN1_STRING_set(atmp-&gt;value.asn1_string, str, -1))</td></tr>
+<tr><td class="num" id="LN716">716</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN717">717</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_put_error(13,(179),((1|64)),"asn1_gen.c",717)</span></span>;</td></tr>
+<tr><td class="num" id="LN718">718</td><td class="line">			<span class='keyword'>goto</span> bad_str;</td></tr>
+<tr><td class="num" id="LN719">719</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN720">720</td><td class="line">		atmp-&gt;value.asn1_string-&gt;type = utype;</td></tr>
+<tr><td class="num" id="LN721">721</td><td class="line">		<span class='keyword'>if</span> (!ASN1_TIME_check(atmp-&gt;value.asn1_string))</td></tr>
+<tr><td class="num" id="LN722">722</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN723">723</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ASN1_R_ILLEGAL_TIME_VALUE)<span class='expansion'>ERR_put_error(13,(179),(184),"asn1_gen.c",723)</span></span>;</td></tr>
+<tr><td class="num" id="LN724">724</td><td class="line">			<span class='keyword'>goto</span> bad_str;</td></tr>
+<tr><td class="num" id="LN725">725</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN726">726</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN727">727</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN728">728</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN729">729</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_BMPSTRING<span class='expansion'>30</span></span>:</td></tr>
+<tr><td class="num" id="LN730">730</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_PRINTABLESTRING<span class='expansion'>19</span></span>:</td></tr>
+<tr><td class="num" id="LN731">731</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_IA5STRING<span class='expansion'>22</span></span>:</td></tr>
+<tr><td class="num" id="LN732">732</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_T61STRING<span class='expansion'>20</span></span>:</td></tr>
+<tr><td class="num" id="LN733">733</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_UTF8STRING<span class='expansion'>12</span></span>:</td></tr>
+<tr><td class="num" id="LN734">734</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_VISIBLESTRING<span class='expansion'>26</span></span>:</td></tr>
+<tr><td class="num" id="LN735">735</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_UNIVERSALSTRING<span class='expansion'>28</span></span>:</td></tr>
+<tr><td class="num" id="LN736">736</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_GENERALSTRING<span class='expansion'>27</span></span>:</td></tr>
+<tr><td class="num" id="LN737">737</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_NUMERICSTRING<span class='expansion'>18</span></span>:</td></tr>
+<tr><td class="num" id="LN738">738</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN739">739</td><td class="line">		<span class='keyword'>if</span> (format == <span class='macro'>ASN1_GEN_FORMAT_ASCII<span class='expansion'>1</span></span>)</td></tr>
+<tr><td class="num" id="LN740">740</td><td class="line">			format = <span class='macro'>MBSTRING_ASC<span class='expansion'>(0x1000|1)</span></span>;</td></tr>
+<tr><td class="num" id="LN741">741</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> (format == <span class='macro'>ASN1_GEN_FORMAT_UTF8<span class='expansion'>2</span></span>)</td></tr>
+<tr><td class="num" id="LN742">742</td><td class="line">			format = <span class='macro'>MBSTRING_UTF8<span class='expansion'>(0x1000)</span></span>;</td></tr>
+<tr><td class="num" id="LN743">743</td><td class="line">		<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN744">744</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN745">745</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ASN1_R_ILLEGAL_FORMAT)<span class='expansion'>ERR_put_error(13,(179),(177),"asn1_gen.c",745)</span></span>;</td></tr>
+<tr><td class="num" id="LN746">746</td><td class="line">			<span class='keyword'>goto</span> bad_form;</td></tr>
+<tr><td class="num" id="LN747">747</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN748">748</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN749">749</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN750">750</td><td class="line">		<span class='keyword'>if</span> (ASN1_mbstring_copy(&amp;atmp-&gt;value.asn1_string, (<span class='keyword'>unsigned</span> <span class='keyword'>char</span> *)str,</td></tr>
+<tr><td class="num" id="LN751">751</td><td class="line">						-1, format, ASN1_tag2bit(utype)) &lt;= 0)</td></tr>
+<tr><td class="num" id="LN752">752</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN753">753</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_put_error(13,(179),((1|64)),"asn1_gen.c",753)</span></span>;</td></tr>
+<tr><td class="num" id="LN754">754</td><td class="line">			<span class='keyword'>goto</span> bad_str;</td></tr>
+<tr><td class="num" id="LN755">755</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN756">756</td><td class="line">		</td></tr>
+<tr><td class="num" id="LN757">757</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN758">758</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN759">759</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN760">760</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_BIT_STRING<span class='expansion'>3</span></span>:</td></tr>
+<tr><td class="num" id="LN761">761</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN762">762</td><td class="line">		<span class='keyword'>case</span> <span class='macro'>V_ASN1_OCTET_STRING<span class='expansion'>4</span></span>:</td></tr>
+<tr><td class="num" id="LN763">763</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN764">764</td><td class="line">		<span class='keyword'>if</span> (!(atmp-&gt;value.asn1_string = ASN1_STRING_new()))</td></tr>
+<tr><td class="num" id="LN765">765</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN766">766</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_put_error(13,(179),((1|64)),"asn1_gen.c",766)</span></span>;</td></tr>
+<tr><td class="num" id="LN767">767</td><td class="line">			<span class='keyword'>goto</span> bad_form;</td></tr>
+<tr><td class="num" id="LN768">768</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN769">769</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN770">770</td><td class="line">		<span class='keyword'>if</span> (format == <span class='macro'>ASN1_GEN_FORMAT_HEX<span class='expansion'>3</span></span>)</td></tr>
+<tr><td class="num" id="LN771">771</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN772">772</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN773">773</td><td class="line">			<span class='keyword'>if</span> (!(rdata = string_to_hex((<span class='keyword'>char</span> *)str, &amp;rdlen)))</td></tr>
+<tr><td class="num" id="LN774">774</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN775">775</td><td class="line">				<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ASN1_R_ILLEGAL_HEX)<span class='expansion'>ERR_put_error(13,(179),(178),"asn1_gen.c",775)</span></span>;</td></tr>
+<tr><td class="num" id="LN776">776</td><td class="line">				<span class='keyword'>goto</span> bad_str;</td></tr>
+<tr><td class="num" id="LN777">777</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN778">778</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN779">779</td><td class="line">			atmp-&gt;value.asn1_string-&gt;data = rdata;</td></tr>
+<tr><td class="num" id="LN780">780</td><td class="line">			atmp-&gt;value.asn1_string-&gt;length = rdlen;</td></tr>
+<tr><td class="num" id="LN781">781</td><td class="line">			atmp-&gt;value.asn1_string-&gt;type = utype;</td></tr>
+<tr><td class="num" id="LN782">782</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN783">783</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN784">784</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> (format == <span class='macro'>ASN1_GEN_FORMAT_ASCII<span class='expansion'>1</span></span>)</td></tr>
+<tr><td class="num" id="LN785">785</td><td class="line">			ASN1_STRING_set(atmp-&gt;value.asn1_string, str, -1);</td></tr>
+<tr><td class="num" id="LN786">786</td><td class="line">		<span class='keyword'>else</span> <span class='keyword'>if</span> ((format == <span class='macro'>ASN1_GEN_FORMAT_BITLIST<span class='expansion'>4</span></span>) &amp;&amp; (utype == <span class='macro'>V_ASN1_BIT_STRING<span class='expansion'>3</span></span>))</td></tr>
+<tr><td class="num" id="LN787">787</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN788">788</td><td class="line">			<span class='keyword'>if</span> (!CONF_parse_list(str, ',', 1, bitstr_cb, atmp-&gt;value.bit_string))</td></tr>
+<tr><td class="num" id="LN789">789</td><td class="line">				{</td></tr>
+<tr><td class="num" id="LN790">790</td><td class="line">				<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ASN1_R_LIST_ERROR)<span class='expansion'>ERR_put_error(13,(179),(188),"asn1_gen.c",790)</span></span>;</td></tr>
+<tr><td class="num" id="LN791">791</td><td class="line">				<span class='keyword'>goto</span> bad_str;</td></tr>
+<tr><td class="num" id="LN792">792</td><td class="line">				}</td></tr>
+<tr><td class="num" id="LN793">793</td><td class="line">			no_unused = 0;</td></tr>
+<tr><td class="num" id="LN794">794</td><td class="line">			</td></tr>
+<tr><td class="num" id="LN795">795</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN796">796</td><td class="line">		<span class='keyword'>else</span> </td></tr>
+<tr><td class="num" id="LN797">797</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN798">798</td><td class="line">			<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ASN1_R_ILLEGAL_BITSTRING_FORMAT)<span class='expansion'>ERR_put_error(13,(179),(175),"asn1_gen.c",798)</span></span>;</td></tr>
+<tr><td class="num" id="LN799">799</td><td class="line">			<span class='keyword'>goto</span> bad_form;</td></tr>
+<tr><td class="num" id="LN800">800</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN801">801</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN802">802</td><td class="line">		<span class='keyword'>if</span> ((utype == <span class='macro'>V_ASN1_BIT_STRING<span class='expansion'>3</span></span>) &amp;&amp; no_unused)</td></tr>
+<tr><td class="num" id="LN803">803</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN804">804</td><td class="line">			atmp-&gt;value.asn1_string-&gt;flags</td></tr>
+<tr><td class="num" id="LN805">805</td><td class="line">				&amp;= ~(<span class='macro'>ASN1_STRING_FLAG_BITS_LEFT<span class='expansion'>0x08</span></span>|0x07);</td></tr>
+<tr><td class="num" id="LN806">806</td><td class="line">        		atmp-&gt;value.asn1_string-&gt;flags</td></tr>
+<tr><td class="num" id="LN807">807</td><td class="line">				|= <span class='macro'>ASN1_STRING_FLAG_BITS_LEFT<span class='expansion'>0x08</span></span>;</td></tr>
+<tr><td class="num" id="LN808">808</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN809">809</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN810">810</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN811">811</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN812">812</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN813">813</td><td class="line">		<span class='keyword'>default</span>:</td></tr>
+<tr><td class="num" id="LN814">814</td><td class="line">		<span class='macro'>ASN1err(ASN1_F_ASN1_STR2TYPE, ASN1_R_UNSUPPORTED_TYPE)<span class='expansion'>ERR_put_error(13,(179),(196),"asn1_gen.c",814)</span></span>;</td></tr>
+<tr><td class="num" id="LN815">815</td><td class="line">		<span class='keyword'>goto</span> bad_str;</td></tr>
+<tr><td class="num" id="LN816">816</td><td class="line">		<span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN817">817</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN818">818</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN819">819</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN820">820</td><td class="line">	atmp-&gt;type = utype;</td></tr>
+<tr><td class="num" id="LN821">821</td><td class="line">	<span class='keyword'>return</span> atmp;</td></tr>
+<tr><td class="num" id="LN822">822</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN823">823</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN824">824</td><td class="line">	bad_str:</td></tr>
+<tr><td class="num" id="LN825">825</td><td class="line">	ERR_add_error_data(2, <span class='string_literal'>"string="</span>, str);</td></tr>
+<tr><td class="num" id="LN826">826</td><td class="line">	bad_form:</td></tr>
+<tr><td class="num" id="LN827">827</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN828">828</td><td class="line">	ASN1_TYPE_free(atmp);</td></tr>
+<tr><td class="num" id="LN829">829</td><td class="line">	<span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN830">830</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN831">831</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN832">832</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN833">833</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>int</span> bitstr_cb(<span class='keyword'>const</span> <span class='keyword'>char</span> *elem, <span class='keyword'>int</span> len, <span class='keyword'>void</span> *bitstr)</td></tr>
+<tr><td class="num" id="LN834">834</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN835">835</td><td class="line">	<span class='keyword'>long</span> bitnum;</td></tr>
+<tr><td class="num" id="LN836">836</td><td class="line">	<span class='keyword'>char</span> *eptr;</td></tr>
+<tr><td class="num" id="LN837">837</td><td class="line">	<span class='keyword'>if</span> (!elem)</td></tr>
+<tr><td class="num" id="LN838">838</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN839">839</td><td class="line">	bitnum = strtoul(elem, &amp;eptr, 10);</td></tr>
+<tr><td class="num" id="LN840">840</td><td class="line">	<span class='keyword'>if</span> (eptr &amp;&amp; *eptr &amp;&amp; (eptr != elem + len))</td></tr>
+<tr><td class="num" id="LN841">841</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN842">842</td><td class="line">	<span class='keyword'>if</span> (bitnum &lt; 0)</td></tr>
+<tr><td class="num" id="LN843">843</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN844">844</td><td class="line">		<span class='macro'>ASN1err(ASN1_F_BITSTR_CB, ASN1_R_INVALID_NUMBER)<span class='expansion'>ERR_put_error(13,(180),(187),"asn1_gen.c",844)</span></span>;</td></tr>
+<tr><td class="num" id="LN845">845</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN846">846</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN847">847</td><td class="line">	<span class='keyword'>if</span> (!ASN1_BIT_STRING_set_bit(bitstr, bitnum, 1))</td></tr>
+<tr><td class="num" id="LN848">848</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN849">849</td><td class="line">		<span class='macro'>ASN1err(ASN1_F_BITSTR_CB, ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_put_error(13,(180),((1|64)),"asn1_gen.c",849)</span></span>;</td></tr>
+<tr><td class="num" id="LN850">850</td><td class="line">		<span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN851">851</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN852">852</td><td class="line">	<span class='keyword'>return</span> 1;</td></tr>
+<tr><td class="num" id="LN853">853</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN854">854</td><td class="line"> </td></tr>
+</table></body></html>

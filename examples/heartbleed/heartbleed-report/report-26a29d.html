@@ -1,0 +1,352 @@
+<!doctype html>
+<html>
+<head>
+<title>rsa_crpt.c</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC The left operand of '&' is a garbage value -->
+
+<!-- BUGTYPE Result of operation is garbage or undefined -->
+
+<!-- BUGCATEGORY Logic error -->
+
+<!-- BUGFILE /Users/fran/Desktop/openssl-1.0.1f/crypto/rsa/rsa_crpt.c -->
+
+<!-- FILENAME rsa_crpt.c -->
+
+<!-- FUNCTIONNAME RSA_setup_blinding -->
+
+<!-- BUGLINE 236 -->
+
+<!-- BUGCOLUMN 3 -->
+
+<!-- BUGPATHLENGTH 7 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>crypto/rsa/rsa_crpt.c</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 236, column 3</a></td></tr>
+<tr><td class="rowname">Description:</td><td>The left operand of '&' is a garbage value</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/* crypto/rsa/rsa_lib.c */</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>/* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"> <span class='comment'>* All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"> <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"> <span class='comment'>* This package is an SSL implementation written</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"> <span class='comment'>* by Eric Young (eay@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"> <span class='comment'>* The implementation was written so as to conform with Netscapes SSL.</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"> <span class='comment'>* This library is free for commercial and non-commercial use as long as</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"> <span class='comment'>* the following conditions are aheared to.  The following conditions</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"> <span class='comment'>* apply to all code found in this distribution, be it the RC4, RSA,</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"> <span class='comment'>* lhash, DES, etc., code; not just the SSL code.  The SSL documentation</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"> <span class='comment'>* included with this distribution is covered by the same copyright terms</span></td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"> <span class='comment'>* except that the holder is Tim Hudson (tjh@cryptsoft.com).</span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"> <span class='comment'>* Copyright remains Eric Young's, and as such any Copyright notices in</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"> <span class='comment'>* the code are not to be removed.</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"> <span class='comment'>* If this package is used in a product, Eric Young should be given attribution</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"> <span class='comment'>* as the author of the parts of the library used.</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"> <span class='comment'>* This can be in the form of a textual message at program startup or</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"> <span class='comment'>* in documentation (online or textual) provided with the package.</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"> <span class='comment'>* Redistribution and use in source and binary forms, with or without</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"> <span class='comment'>* modification, are permitted provided that the following conditions</span></td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"> <span class='comment'>* are met:</span></td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"> <span class='comment'>* 1. Redistributions of source code must retain the copyright</span></td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer.</span></td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"> <span class='comment'>* 2. Redistributions in binary form must reproduce the above copyright</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"> <span class='comment'>*    notice, this list of conditions and the following disclaimer in the</span></td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"> <span class='comment'>*    documentation and/or other materials provided with the distribution.</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"> <span class='comment'>* 3. All advertising materials mentioning features or use of this software</span></td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> <span class='comment'>*    must display the following acknowledgement:</span></td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"> <span class='comment'>*    "This product includes cryptographic software written by</span></td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"> <span class='comment'>*     Eric Young (eay@cryptsoft.com)"</span></td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"> <span class='comment'>*    The word 'cryptographic' can be left out if the rouines from the library</span></td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line"> <span class='comment'>*    being used are not cryptographic related :-).</span></td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line"> <span class='comment'>* 4. If you include any Windows specific code (or a derivative thereof) from</span> </td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line"> <span class='comment'>*    the apps directory (application code) you must include an acknowledgement:</span></td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line"> <span class='comment'>*    "This product includes software written by Tim Hudson (tjh@cryptsoft.com)"</span></td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line"> <span class='comment'>* THIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND</span></td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line"> <span class='comment'>* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span></td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line"> <span class='comment'>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span></td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line"> <span class='comment'>* ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE</span></td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line"> <span class='comment'>* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span></td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line"> <span class='comment'>* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</span></td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line"> <span class='comment'>* OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</span></td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line"> <span class='comment'>* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span></td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line"> <span class='comment'>* LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY</span></td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line"> <span class='comment'>* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF</span></td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line"> <span class='comment'>* SUCH DAMAGE.</span></td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line"> <span class='comment'>*</span> </td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line"> <span class='comment'>* The licence and distribution terms for any publically available version or</span></td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line"> <span class='comment'>* derivative of this code cannot be changed.  i.e. this code cannot simply be</span></td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line"> <span class='comment'>* copied and put under another distribution licence</span></td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line"> <span class='comment'>* [including the GNU Public Licence.]</span></td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line"><span class='directive'>#include &lt;stdio.h&gt;</span></td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line"><span class='directive'>#include &lt;openssl/crypto.h&gt;</span></td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line"><span class='directive'>#include "cryptlib.h"</span></td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line"><span class='directive'>#include &lt;openssl/lhash.h&gt;</span></td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line"><span class='directive'>#include &lt;openssl/bn.h&gt;</span></td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line"><span class='directive'>#include &lt;openssl/rsa.h&gt;</span></td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line"><span class='directive'>#include &lt;openssl/rand.h&gt;</span></td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line"><span class='directive'>#ifndef OPENSSL_NO_ENGINE</span></td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line"><span class='directive'>#include &lt;openssl/engine.h&gt;</span></td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line"><span class='keyword'>int</span> RSA_size(<span class='keyword'>const</span> RSA *r)</td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line">	<span class='keyword'>return</span>(<span class='macro'>BN_num_bytes(r-&gt;n)<span class='expansion'>((BN_num_bits(r-&gt;n)+7)/8)</span></span>);</td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line"><span class='keyword'>int</span> RSA_public_encrypt(<span class='keyword'>int</span> flen, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *from, <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *to,</td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line">	     RSA *rsa, <span class='keyword'>int</span> padding)</td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line"><span class='directive'>#ifdef OPENSSL_FIPS</span></td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line">	<span class='keyword'>if</span> (FIPS_mode() &amp;&amp; !(rsa-&gt;meth-&gt;flags &amp; <span class='macro'>RSA_FLAG_FIPS_METHOD<span class='expansion'>0x0400</span></span>)</td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line">			&amp;&amp; !(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NON_FIPS_ALLOW<span class='expansion'>0x0400</span></span>))</td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line">		<span class='macro'>RSAerr(RSA_F_RSA_PUBLIC_ENCRYPT, RSA_R_NON_FIPS_RSA_METHOD)<span class='expansion'>ERR_put_error(4,(153),(157),"rsa_crpt.c",82)</span></span>;</td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line">		<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line">	<span class='keyword'>return</span>(rsa-&gt;meth-&gt;rsa_pub_enc(flen, from, to, rsa, padding));</td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line"><span class='keyword'>int</span> RSA_private_encrypt(<span class='keyword'>int</span> flen, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *from, <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *to,</td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line">	     RSA *rsa, <span class='keyword'>int</span> padding)</td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line"><span class='directive'>#ifdef OPENSSL_FIPS</span></td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">	<span class='keyword'>if</span> (FIPS_mode() &amp;&amp; !(rsa-&gt;meth-&gt;flags &amp; <span class='macro'>RSA_FLAG_FIPS_METHOD<span class='expansion'>0x0400</span></span>)</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line">			&amp;&amp; !(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NON_FIPS_ALLOW<span class='expansion'>0x0400</span></span>))</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line">		<span class='macro'>RSAerr(RSA_F_RSA_PRIVATE_ENCRYPT, RSA_R_NON_FIPS_RSA_METHOD)<span class='expansion'>ERR_put_error(4,(151),(157),"rsa_crpt.c",96)</span></span>;</td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">		<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line">	<span class='keyword'>return</span>(rsa-&gt;meth-&gt;rsa_priv_enc(flen, from, to, rsa, padding));</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line"><span class='keyword'>int</span> RSA_private_decrypt(<span class='keyword'>int</span> flen, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *from, <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *to,</td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line">	     RSA *rsa, <span class='keyword'>int</span> padding)</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line"><span class='directive'>#ifdef OPENSSL_FIPS</span></td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line">	<span class='keyword'>if</span> (FIPS_mode() &amp;&amp; !(rsa-&gt;meth-&gt;flags &amp; <span class='macro'>RSA_FLAG_FIPS_METHOD<span class='expansion'>0x0400</span></span>)</td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line">			&amp;&amp; !(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NON_FIPS_ALLOW<span class='expansion'>0x0400</span></span>))</td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line">		<span class='macro'>RSAerr(RSA_F_RSA_PRIVATE_DECRYPT, RSA_R_NON_FIPS_RSA_METHOD)<span class='expansion'>ERR_put_error(4,(150),(157),"rsa_crpt.c",110)</span></span>;</td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line">		<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">	<span class='keyword'>return</span>(rsa-&gt;meth-&gt;rsa_priv_dec(flen, from, to, rsa, padding));</td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line"><span class='keyword'>int</span> RSA_public_decrypt(<span class='keyword'>int</span> flen, <span class='keyword'>const</span> <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *from, <span class='keyword'>unsigned</span> <span class='keyword'>char</span> *to,</td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line">	     RSA *rsa, <span class='keyword'>int</span> padding)</td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line"><span class='directive'>#ifdef OPENSSL_FIPS</span></td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line">	<span class='keyword'>if</span> (FIPS_mode() &amp;&amp; !(rsa-&gt;meth-&gt;flags &amp; <span class='macro'>RSA_FLAG_FIPS_METHOD<span class='expansion'>0x0400</span></span>)</td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line">			&amp;&amp; !(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NON_FIPS_ALLOW<span class='expansion'>0x0400</span></span>))</td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line">		<span class='macro'>RSAerr(RSA_F_RSA_PUBLIC_DECRYPT, RSA_R_NON_FIPS_RSA_METHOD)<span class='expansion'>ERR_put_error(4,(152),(157),"rsa_crpt.c",124)</span></span>;</td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line">		<span class='keyword'>return</span> -1;</td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line">	<span class='keyword'>return</span>(rsa-&gt;meth-&gt;rsa_pub_dec(flen, from, to, rsa, padding));</td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line"><span class='keyword'>int</span> RSA_flags(<span class='keyword'>const</span> RSA *r)</td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line">	<span class='keyword'>return</span>((r == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)?0:r-&gt;meth-&gt;flags);</td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line"><span class='keyword'>void</span> RSA_blinding_off(RSA *rsa)</td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line">	<span class='keyword'>if</span> (rsa-&gt;blinding != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line">		BN_BLINDING_free(rsa-&gt;blinding);</td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line">		rsa-&gt;blinding=<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">	rsa-&gt;flags &amp;= ~<span class='macro'>RSA_FLAG_BLINDING<span class='expansion'>0x0008</span></span>;</td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line">	rsa-&gt;flags |= <span class='macro'>RSA_FLAG_NO_BLINDING<span class='expansion'>0x0080</span></span>;</td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line"><span class='keyword'>int</span> RSA_blinding_on(RSA *rsa, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line">	{</td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line">	<span class='keyword'>int</span> ret=0;</td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line">	<span class='keyword'>if</span> (rsa-&gt;blinding != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line">		RSA_blinding_off(rsa);</td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line">	rsa-&gt;blinding = RSA_setup_blinding(rsa, ctx);</td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line">	<span class='keyword'>if</span> (rsa-&gt;blinding == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line">	rsa-&gt;flags |= <span class='macro'>RSA_FLAG_BLINDING<span class='expansion'>0x0008</span></span>;</td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line">	rsa-&gt;flags &amp;= ~<span class='macro'>RSA_FLAG_NO_BLINDING<span class='expansion'>0x0080</span></span>;</td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line">	ret=1;</td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line">	<span class='keyword'>return</span>(ret);</td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line">	}</td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line"><span class='keyword'>static</span> BIGNUM *rsa_get_public_exp(<span class='keyword'>const</span> BIGNUM *d, <span class='keyword'>const</span> BIGNUM *p,</td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line">	<span class='keyword'>const</span> BIGNUM *q, BN_CTX *ctx)</td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line">	BIGNUM *ret = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, *r0, *r1, *r2;</td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line">	<span class='keyword'>if</span> (d == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span> || p == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span> || q == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line">		<span class='keyword'>return</span> <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line">	BN_CTX_start(ctx);</td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line">	r0 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line">	r1 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line">	r2 = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line">	<span class='keyword'>if</span> (r2 == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line">	<span class='keyword'>if</span> (!BN_sub(r1, p, BN_value_one())) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">	<span class='keyword'>if</span> (!BN_sub(r2, q, BN_value_one())) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line">	<span class='keyword'>if</span> (!BN_mul(r0, r1, r2, ctx)) <span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line">	ret = BN_mod_inverse(<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, d, r0, ctx);</td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line">	BN_CTX_end(ctx);</td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">BN_BLINDING *RSA_setup_blinding(RSA *rsa, BN_CTX *in_ctx)</td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line">	BIGNUM local_n;</td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line">	BIGNUM *e,*n;</td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line">	BN_CTX *ctx;</td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line">	BN_BLINDING *ret = <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>;</td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line">	<span class='keyword'>if</span> (<span class="mrange">in_ctx == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span></span>)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path1" class="msg msgEvent" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">1</div></td><td>Assuming 'in_ctx' is not equal to null</td><td><div class="PathNav"><a href="#Path2" title="Next event (2)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path2" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">2</div></td><td><div class="PathNav"><a href="#Path1" title="Previous event (1)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path3" title="Next event (3)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line">		<span class='keyword'>if</span> ((ctx = BN_CTX_new()) == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>) <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line">		ctx = in_ctx;</td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line">	BN_CTX_start(ctx);</td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line">	e  = BN_CTX_get(ctx);</td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line">	<span class='keyword'>if</span> (<span class="mrange">e == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span></span>)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path3" class="msg msgEvent" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">3</div></td><td><div class="PathNav"><a href="#Path2" title="Previous event (2)">&#x2190;</a></div></td></td><td>Assuming 'e' is not equal to null</td><td><div class="PathNav"><a href="#Path4" title="Next event (4)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path4" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">4</div></td><td><div class="PathNav"><a href="#Path3" title="Previous event (3)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path5" title="Next event (5)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line">		<span class='macro'>RSAerr(RSA_F_RSA_SETUP_BLINDING, ERR_R_MALLOC_FAILURE)<span class='expansion'>ERR_put_error(4,(136),((1|64)),"rsa_crpt.c",208)</span></span>;</td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line">	<span class='keyword'>if</span> (rsa-&gt;e == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path5" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">5</div></td><td><div class="PathNav"><a href="#Path4" title="Previous event (4)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path6" title="Next event (6)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line">		e = rsa_get_public_exp(rsa-&gt;d, rsa-&gt;p, rsa-&gt;q, ctx);</td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line">		<span class='keyword'>if</span> (e == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line">			{</td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line">			<span class='macro'>RSAerr(RSA_F_RSA_SETUP_BLINDING, RSA_R_NO_PUBLIC_EXPONENT)<span class='expansion'>ERR_put_error(4,(136),(140),"rsa_crpt.c",217)</span></span>;</td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line">			<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line">			}</td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line">		e = rsa-&gt;e;</td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line">	</td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line">	<span class='keyword'>if</span> ((RAND_status() == 0) &amp;&amp; rsa-&gt;d != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span> &amp;&amp; rsa-&gt;d-&gt;d != <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line">		<span class='comment'>/* if PRNG is not properly seeded, resort to secret</span></td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line">		 <span class='comment'>* exponent as unpredictable seed */</span></td></tr>
+<tr><td class="num" id="LN229">229</td><td class="line">		RAND_add(rsa-&gt;d-&gt;d, rsa-&gt;d-&gt;dmax * <span class='keyword'>sizeof</span> rsa-&gt;d-&gt;d[0], 0.0);</td></tr>
+<tr><td class="num" id="LN230">230</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN231">231</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN232">232</td><td class="line">	<span class='keyword'>if</span> (!(rsa-&gt;flags &amp; <span class='macro'>RSA_FLAG_NO_CONSTTIME<span class='expansion'>0x0100</span></span>))</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path6" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">6</div></td><td><div class="PathNav"><a href="#Path5" title="Previous event (5)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#EndPath" title="Next event (7)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN233">233</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN234">234</td><td class="line">		<span class='comment'>/* Set BN_FLG_CONSTTIME flag */</span></td></tr>
+<tr><td class="num" id="LN235">235</td><td class="line">		n = &amp;local_n;</td></tr>
+<tr><td class="num" id="LN236">236</td><td class="line">		<span class='macro'>BN_with_flags(n, rsa-&gt;n, BN_FLG_CONSTTIME)<span class='expansion'>((n)-&gt;d=(rsa-&gt;n)-&gt;d, (n)-&gt;top=(rsa-&gt;n)-&gt;top<br>, (n)-&gt;dmax=(rsa-&gt;n)-&gt;dmax, (n)-&gt;neg=(rsa-&gt;n)-&gt;<br>neg, (n)-&gt;flags=(((n)-&gt;flags &amp; 0x01) | ((rsa-&gt;n)<br>-&gt;flags &amp; ~0x01) | 0x02 | (0x04)))</span></span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgControl" style="margin-left:17ex; max-width:100em"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">7</div></td><td><div class="PathNav"><a href="#Path6" title="Previous event (6)">&#x2190;</a></div></td></td><td>Within the expansion of the macro 'BN_with_flags':
+</td></tr></table><div class="msg msgEvent" style="width:94%; margin-left:5px"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">a</div></td><td valign="top">The left operand of '&amp;' is a garbage value</td></tr></table></div>
+</div></td></tr>
+<tr><td class="num" id="LN237">237</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN238">238</td><td class="line">	<span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN239">239</td><td class="line">		n = rsa-&gt;n;</td></tr>
+<tr><td class="num" id="LN240">240</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN241">241</td><td class="line">	ret = BN_BLINDING_create_param(<span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>, e, n, ctx,</td></tr>
+<tr><td class="num" id="LN242">242</td><td class="line">			rsa-&gt;meth-&gt;bn_mod_exp, rsa-&gt;_method_mod_n);</td></tr>
+<tr><td class="num" id="LN243">243</td><td class="line">	<span class='keyword'>if</span> (ret == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN244">244</td><td class="line">		{</td></tr>
+<tr><td class="num" id="LN245">245</td><td class="line">		<span class='macro'>RSAerr(RSA_F_RSA_SETUP_BLINDING, ERR_R_BN_LIB)<span class='expansion'>ERR_put_error(4,(136),(3),"rsa_crpt.c",245)</span></span>;</td></tr>
+<tr><td class="num" id="LN246">246</td><td class="line">		<span class='keyword'>goto</span> err;</td></tr>
+<tr><td class="num" id="LN247">247</td><td class="line">		}</td></tr>
+<tr><td class="num" id="LN248">248</td><td class="line">	CRYPTO_THREADID_current(BN_BLINDING_thread_id(ret));</td></tr>
+<tr><td class="num" id="LN249">249</td><td class="line">err:</td></tr>
+<tr><td class="num" id="LN250">250</td><td class="line">	BN_CTX_end(ctx);</td></tr>
+<tr><td class="num" id="LN251">251</td><td class="line">	<span class='keyword'>if</span> (in_ctx == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN252">252</td><td class="line">		BN_CTX_free(ctx);</td></tr>
+<tr><td class="num" id="LN253">253</td><td class="line">	<span class='keyword'>if</span>(rsa-&gt;e == <span class='macro'>NULL<span class='expansion'>((void*)0)</span></span>)</td></tr>
+<tr><td class="num" id="LN254">254</td><td class="line">		BN_free(e);</td></tr>
+<tr><td class="num" id="LN255">255</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN256">256</td><td class="line">	<span class='keyword'>return</span> ret;</td></tr>
+<tr><td class="num" id="LN257">257</td><td class="line">}</td></tr>
+</table></body></html>

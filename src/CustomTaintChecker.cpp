@@ -25,7 +25,6 @@
 #include "TaintConfig.h"
 
 #include "clang/AST/Attr.h"
-#include "ClangSACheckers.h"
 #include "clang/Config/config.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/AST/StmtVisitor.h"

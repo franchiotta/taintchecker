@@ -76,7 +76,7 @@ public:
     ID.AddPointer(Symbol);
   }
   
-  PathDiagnosticPiece *VisitNode(const ExplodedNode *N,
+  std::shared_ptr<PathDiagnosticPiece> VisitNode(const ExplodedNode *N,
                                  const ExplodedNode *PrevN,
                                  BugReporterContext &BRC,
                                  BugReport &BR) override;

@@ -135,7 +135,7 @@ ProgramStateRef removeTaint(ProgramStateRef &PS, const MemRegion *R,
   return PS;
 }
 
-PathDiagnosticPiece *TaintBugVisitor::VisitNode(const ExplodedNode *N,
+std::shared_ptr<PathDiagnosticPiece> TaintBugVisitor::VisitNode(const ExplodedNode *N,
                                                 const ExplodedNode *PrevN,
                                                 BugReporterContext &BRC,
                                                 BugReport &BR) {
@@ -162,7 +162,7 @@ PathDiagnosticPiece *TaintBugVisitor::VisitNode(const ExplodedNode *N,
     char Message[70];
     sprintf(Message, "Expression '%s' gets tainted here",
             exprToString(Expression).data());
-    return new PathDiagnosticEventPiece(L, Message);
+    return std::make_shared<PathDiagnosticEventPiece>(L, Message);
   }
   return nullptr;
 }

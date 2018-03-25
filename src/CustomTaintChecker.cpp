@@ -25,7 +25,6 @@
 #include "TaintConfig.h"
 
 #include "clang/AST/Attr.h"
-#include "ClangSACheckers.h"
 #include "clang/Config/config.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/AST/StmtVisitor.h"
@@ -345,9 +344,6 @@ CustomTaintChecker::getTaintPropagationRule(const FunctionDecl *FDecl,
     case Builtin::BIstrncpy:
     case Builtin::BIstrncat:
       return TaintPropagationRule(1, 2, 0, true);
-    case Builtin::BIstrlcpy:
-    case Builtin::BIstrlcat:
-      return TaintPropagationRule(1, 2, 0, false);
     case Builtin::BIstrndup:
       return TaintPropagationRule(0, 1, ReturnValueIndex);
 
